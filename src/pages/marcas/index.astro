@@ -1,0 +1,33 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getMarcas } from "../../lib/content";
+import Container from "../../components/Container.astro";
+
+const marcas = await getMarcas();
+---
+
+<Layout title="Marcas | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="text-4xl font-bold mb-8">Marcas</h1>
+
+            <div class="grid gap-4">
+                {
+                    marcas.map((marca: any) => (
+                        <article class="border rounded p-4">
+                            <h2 class="text-2xl font-bold">
+                                <a href={`/marcas/${marca.slug}`}>
+                                    {marca.nombre}
+                                </a>
+                            </h2>
+
+                            <p class="mt-2 text-gray-700">
+                                {marca.descripcion_corta}
+                            </p>
+                        </article>
+                    ))
+                }
+            </div>
+        </Container>
+    </main>
+</Layout>

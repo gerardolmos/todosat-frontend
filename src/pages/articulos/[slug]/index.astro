@@ -1,0 +1,72 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getArticulos } from "../../../lib/content";
+import { renderBlocks } from "../../../lib/renderBlocks";
+import { getMediaUrl } from "../../../lib/media";
+import Container from "../../../components/Container.astro";
+
+export async function getStaticPaths() {
+    const articulos = await getArticulos();
+
+    return articulos.map((articulo: any) => ({
+        params: {
+            slug: articulo.slug,
+        },
+        props: {
+            articulo: articulo,
+        },
+    }));
+}
+
+const { articulo } = Astro.props as any;
+const contenidoHTML = renderBlocks(articulo.contenido);
+const imagenUrl = getMediaUrl(articulo.imagen_principal);
+---
+
+<Layout title={`${articulo.titulo} | TODOSat`}>
+    <main class="min-h-screen py-10">
+        <Container>
+            <a href="/articulos" class="text-blue-600 underline">
+                ← Volver a artículos
+            </a>
+
+            <h1 class="text-5xl font-bold mt-6">
+                {articulo.titulo}
+            </h1>
+
+            <p class="mt-4 text-2xl text-gray-700">
+                {articulo.subtitulo}
+            </p>
+
+            {
+                imagenUrl && (
+                    <img
+                        src={imagenUrl}
+                        alt={articulo.titulo}
+                        class="mt-8 w-full max-w-4xl rounded"
+                    />
+                )
+            }
+
+            <div class="mt-10">
+                <p>
+                    Tipo:
+                    <strong>
+                        {articulo.tipo_articulo}
+                    </strong>
+                </p>
+
+                <p class="mt-2">
+                    Fecha:
+                    <strong>
+                        {articulo.fecha_publicacion}
+                    </strong>
+                </p>
+            </div>
+            <section
+                class="mt-10 prose prose-lg max-w-none"
+                set:html={contenidoHTML}
+            />
+        </Container>
+    </main>
+</Layout>

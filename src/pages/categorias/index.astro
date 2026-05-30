@@ -1,0 +1,34 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import { getCategorias } from "../../lib/content";
+
+const categorias = await getCategorias();
+---
+
+<Layout title="Categorías | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="mb-8 text-4xl font-bold">Categorías</h1>
+
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {
+                    categorias.map((categoria: any) => (
+                        <a
+                            href={`/categorias/${categoria.slug}`}
+                            class="block rounded border p-6 hover:bg-gray-50 transition"
+                        >
+                            <h2 class="text-2xl font-bold">
+                                {categoria.nombre}
+                            </h2>
+
+                            <p class="mt-2 text-gray-600">
+                                {categoria.descripcion}
+                            </p>
+                        </a>
+                    ))
+                }
+            </div>
+        </Container>
+    </main>
+</Layout>

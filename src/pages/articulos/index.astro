@@ -1,0 +1,39 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import { getArticulos } from "../../lib/content";
+
+const articulos = await getArticulos();
+---
+
+<Layout title="Artículos | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="text-4xl font-bold mb-8">Artículos</h1>
+
+            <div class="grid gap-6">
+                {
+                    articulos.map((articulo: any) => (
+                        <a
+                            href={`/articulos/${articulo.slug}`}
+                            class="block border rounded p-6 hover:bg-gray-50 transition"
+                        >
+                            <h2 class="text-2xl font-bold">
+                                {articulo.titulo}
+                            </h2>
+
+                            <p class="mt-2 text-gray-600">
+                                {articulo.subtitulo}
+                            </p>
+
+                            <p class="mt-4 text-sm">
+                                Tipo:
+                                {articulo.tipo_articulo}
+                            </p>
+                        </a>
+                    ))
+                }
+            </div>
+        </Container>
+    </main>
+</Layout>

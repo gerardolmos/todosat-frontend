@@ -1,0 +1,104 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Container from "../../../components/Container.astro";
+import { getModelos } from "../../../lib/content";
+import { renderBlocks } from "../../../lib/renderBlocks";
+import { getMediaUrl } from "../../../lib/media";
+
+export async function getStaticPaths() {
+    const modelos = await getModelos();
+
+    return modelos.map((modelo: any) => ({
+        params: {
+            slug: modelo.slug,
+        },
+        props: {
+            modelo,
+        },
+    }));
+}
+
+const { modelo } = Astro.props as any;
+
+const contenidoHTML = renderBlocks(modelo.descripcion_completa);
+
+const imagenUrl = getMediaUrl(modelo.imagen_principal);
+---
+
+<Layout title={`${modelo.nombre} | TODOSat`}>
+    <main class="min-h-screen py-10">
+        <Container>
+            <a href="/modelos" class="text-blue-600 underline">
+                ← Volver a modelos
+            </a>
+
+            <h1 class="mt-6 text-5xl font-bold">
+                {modelo.nombre}
+            </h1>
+
+            <p class="mt-4 text-xl text-gray-600">
+                {modelo.descripcion_corta}
+            </p>
+
+            {
+                imagenUrl && (
+                    <img
+                        src={imagenUrl}
+                        alt={modelo.nombre}
+                        class="mt-8 w-full max-w-4xl rounded"
+                    />
+                )
+            }
+
+            <div class="mt-10 grid gap-4">
+                {
+                    modelo.marca && (
+                        <p>
+                            <strong>Marca:</strong> {modelo.marca.nombre}
+                        </p>
+                    )
+                }
+
+                <p>
+                    <strong>Año:</strong>
+                    {modelo.ano_lanzamiento}
+                </p>
+
+                <p>
+                    <strong>Velocidad descarga:</strong>
+                    {modelo.velocidad_descarga} Mbps
+                </p>
+
+                <p>
+                    <strong>Velocidad subida:</strong>
+                    {modelo.velocidad_subida} Mbps
+                </p>
+
+                <p>
+                    <strong>Latencia:</strong>
+                    {modelo.latencia} ms
+                </p>
+
+                <p>
+                    <strong>Consumo:</strong>
+                    {modelo.consumo}
+                </p>
+
+                <p>
+                    <strong>Uso recomendado:</strong>
+                    {modelo.uso_recomendado}
+                </p>
+
+                <p>
+                    <strong>Precio orientativo:</strong>
+                    {modelo.precio_orientativo} €
+                </p>
+            </div>
+
+            <section
+                class="mt-10 prose prose-lg max-w-none"
+                set:html={contenidoHTML}
+            />
+        </Container>
+    </main>
+</Layout>

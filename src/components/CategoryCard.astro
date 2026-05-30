@@ -1,0 +1,20 @@
+---
+interface Props {
+    categoria: any;
+}
+
+const { categoria } = Astro.props;
+---
+
+<a
+    href={`/categorias/${categoria.slug}`}
+    class="block rounded border p-6 hover:bg-gray-50 transition"
+>
+    <h3 class="text-2xl font-bold">
+        {categoria.nombre}
+    </h3>
+
+    <p class="mt-2 text-gray-600">
+        {categoria.descripcion}
+    </p>
+</a>

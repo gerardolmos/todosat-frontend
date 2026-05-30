@@ -1,0 +1,38 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Container from "../../../components/Container.astro";
+import { getMarcas } from "../../../lib/content";
+
+export async function getStaticPaths() {
+    const marcas = await getMarcas();
+
+    return marcas.map((marca: any) => ({
+        params: {
+            slug: marca.slug,
+        },
+        props: {
+            marca: marca,
+        },
+    }));
+}
+
+const { marca } = Astro.props as any;
+---
+
+<Layout title={`${marca.nombre} | TODOSat`}>
+    <main class="min-h-screen py-10">
+        <Container>
+            <a href="/marcas" class="text-blue-600 underline">
+                ← Volver a marcas
+            </a>
+
+            <h1 class="text-5xl font-bold mt-6">
+                {marca.nombre}
+            </h1>
+
+            <p class="mt-6 text-xl">
+                {marca.descripcion_corta}
+            </p>
+        </Container>
+    </main>
+</Layout>

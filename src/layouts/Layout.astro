@@ -1,0 +1,50 @@
+---
+import "../styles/global.css";
+
+interface Props {
+    title?: string;
+    description?: string;
+}
+
+const {
+    title = "TODOSat",
+    description = "Portal especializado en internet satelital.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>{title}</title>
+        <meta name="description" content={description} />
+    </head>
+
+    <body class="min-h-screen bg-white text-black">
+        <header class="border-b">
+            <div
+                class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4"
+            >
+                <a href="/" class="text-2xl font-bold"> TODOSat </a>
+
+                <nav class="flex gap-6 text-sm font-medium">
+                    <a href="/marcas">Marcas</a>
+                    <a href="/articulos">Artículos</a>
+                    <a href="/categorias">Categorías</a>
+                    <a href="/modelos">Modelos</a>
+                </nav>
+            </div>
+        </header>
+
+        <slot />
+
+        <footer class="mt-20 border-t">
+            <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-gray-600">
+                © {new Date().getFullYear()} TODOSat. Portal especializado en internet
+                satelital.
+            </div>
+        </footer>
+    </body>
+</html>
