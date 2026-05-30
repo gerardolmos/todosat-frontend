@@ -1,20 +1,49 @@
 ---
+import { getMediaUrl } from "../lib/media";
+
 interface Props {
     marca: any;
 }
 
 const { marca } = Astro.props;
+
+const logoUrl = getMediaUrl(marca.logo);
+const portadaUrl = getMediaUrl(marca.imagen_portada);
 ---
 
 <a
     href={`/marcas/${marca.slug}`}
-    class="block rounded border p-6 hover:bg-gray-50 transition"
+    class="block overflow-hidden rounded border hover:bg-gray-50 transition"
 >
-    <h3 class="text-2xl font-bold">
-        {marca.nombre}
-    </h3>
+    {
+        portadaUrl && (
+            <img
+                src={portadaUrl}
+                alt={marca.nombre}
+                class="h-56 w-full object-cover"
+            />
+        )
+    }
 
-    <p class="mt-2 text-gray-600">
-        {marca.descripcion_corta}
-    </p>
+    <div class="p-6">
+        {
+            logoUrl && (
+                <img
+                    src={logoUrl}
+                    alt={`Logo de ${marca.nombre}`}
+                    class="mb-4 max-h-12 w-auto"
+                />
+            )
+        }
+
+        <h3 class="text-2xl font-bold">
+            {marca.nombre}
+        </h3>
+
+        {
+            marca.descripcion_corta && (
+                <p class="mt-2 text-gray-600">{marca.descripcion_corta}</p>
+            )
+        }
+    </div>
 </a>

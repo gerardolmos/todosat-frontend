@@ -1,48 +1,46 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import { getArticulos } from "../../../lib/content";
-import { renderBlocks } from "../../../lib/renderBlocks";
-import { getMediaUrl } from "../../../lib/media";
 import Container from "../../../components/Container.astro";
+import { getManuales } from "../../../lib/content";
+import { getMediaUrl } from "../../../lib/media";
 
 export async function getStaticPaths() {
-    const articulos = await getArticulos();
+    const manuales = await getManuales();
 
-    return articulos.map((articulo: any) => ({
+    return manuales.map((manual: any) => ({
         params: {
-            slug: articulo.slug,
+            slug: manual.slug,
         },
         props: {
-            articulo: articulo,
+            manual,
         },
     }));
 }
 
-const { articulo } = Astro.props as any;
-const contenidoHTML = renderBlocks(articulo.contenido);
-const imagenUrl = getMediaUrl(articulo.imagen_principal);
+const { manual } = Astro.props as any;
 
-const categoria = articulo.categoria_tematica;
-const marcas = articulo.marcas || [];
-const modelos = articulo.modelos || [];
-const manuales = articulo.manuals || [];
+const archivoPdfUrl = getMediaUrl(manual.archivo_pdf);
+const imagenUrl = getMediaUrl(manual.imagen_portada);
+const marcas = manual.marcas || [];
+const modelos = manual.modelos || [];
+const articulos = manual.articulos || [];
 ---
 
-<Layout title={`${articulo.titulo} | TODOSat`}>
+<Layout title={`${manual.titulo} | TODOSat`}>
     <main class="min-h-screen py-10">
         <Container>
-            <a href="/articulos" class="text-blue-600 underline">
-                ← Volver a artículos
+            <a href="/manuales" class="text-blue-600 underline">
+                ← Volver a manuales
             </a>
 
-            <h1 class="text-5xl font-bold mt-6">
-                {articulo.titulo}
+            <h1 class="mt-6 text-5xl font-bold">
+                {manual.titulo}
             </h1>
 
             {
-                articulo.subtitulo && (
-                    <p class="mt-4 text-2xl text-gray-700">
-                        {articulo.subtitulo}
+                manual.descripcion && (
+                    <p class="mt-4 text-xl text-gray-700">
+                        {manual.descripcion}
                     </p>
                 )
             }
@@ -51,7 +49,7 @@ const manuales = articulo.manuals || [];
                 imagenUrl && (
                     <img
                         src={imagenUrl}
-                        alt={articulo.titulo}
+                        alt={manual.titulo}
                         class="mt-8 w-full max-w-4xl rounded"
                     />
                 )
@@ -59,40 +57,57 @@ const manuales = articulo.manuals || [];
 
             <div class="mt-10 space-y-2">
                 {
-                    articulo.tipo_articulo && (
+                    manual.version && (
                         <p>
-                            Tipo: <strong>{articulo.tipo_articulo}</strong>
+                            Versión: <strong>{manual.version}</strong>
                         </p>
                     )
                 }
 
                 {
-                    articulo.fecha_publicacion && (
+                    manual.idioma && (
                         <p>
-                            Fecha: <strong>{articulo.fecha_publicacion}</strong>
+                            Idioma: <strong>{manual.idioma}</strong>
                         </p>
                     )
                 }
 
                 {
-                    categoria && (
+                    manual.ano_publicacion && (
                         <p>
-                            Categoría:{" "}
-                            <a
-                                href={`/categorias/${categoria.slug}`}
-                                class="text-blue-600 underline"
-                            >
-                                {categoria.nombre}
-                            </a>
+                            Año: <strong>{manual.ano_publicacion}</strong>
+                        </p>
+                    )
+                }
+
+                {
+                    manual.oficial !== null && manual.oficial !== undefined && (
+                        <p>
+                            Tipo:{" "}
+                            <strong>
+                                {manual.oficial
+                                    ? "Manual oficial"
+                                    : "Manual no oficial"}
+                            </strong>
                         </p>
                     )
                 }
             </div>
 
-            <section
-                class="mt-10 prose prose-lg max-w-none"
-                set:html={contenidoHTML}
-            />
+            {
+                archivoPdfUrl && (
+                    <p class="mt-8">
+                        <a
+                            href={archivoPdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-block rounded bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+                        >
+                            Abrir PDF
+                        </a>
+                    </p>
+                )
+            }
 
             {
                 marcas.length > 0 && (
@@ -137,25 +152,21 @@ const manuales = articulo.manuals || [];
             }
 
             {
-                manuales.length > 0 && (
+                articulos.length > 0 && (
                     <section class="mt-12">
                         <h2 class="text-3xl font-bold">
-                            Manuales relacionados
+                            Artículos relacionados
                         </h2>
 
                         <ul class="mt-4 space-y-2">
-                            {manuales.map((manual: any) => (
+                            {articulos.map((articulo: any) => (
                                 <li>
-                                    <span class="font-medium">
-                                        {manual.titulo}
-                                    </span>
-
-                                    {manual.ano_publicacion && (
-                                        <span class="text-gray-600">
-                                            {" "}
-                                            ({manual.ano_publicacion})
-                                        </span>
-                                    )}
+                                    <a
+                                        href={`/articulos/${articulo.slug}`}
+                                        class="text-blue-600 underline"
+                                    >
+                                        {articulo.titulo}
+                                    </a>
                                 </li>
                             ))}
                         </ul>

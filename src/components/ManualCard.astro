@@ -1,0 +1,55 @@
+---
+import { getMediaUrl } from "../lib/media";
+
+interface Props {
+    manual: any;
+}
+
+const { manual } = Astro.props;
+const imagenUrl = getMediaUrl(manual.imagen_portada);
+---
+
+<a
+    href={`/manuales/${manual.slug}`}
+    class="block overflow-hidden rounded border hover:bg-gray-50 transition"
+>
+    {
+        imagenUrl && (
+            <img
+                src={imagenUrl}
+                alt={manual.titulo}
+                class="h-56 w-full object-cover"
+            />
+        )
+    }
+
+    <div class="p-6">
+        <h3 class="text-2xl font-bold">
+            {manual.titulo}
+        </h3>
+
+        {
+            manual.descripcion && (
+                <p class="mt-2 text-gray-600">{manual.descripcion}</p>
+            )
+        }
+
+        <div class="mt-4 space-y-1 text-sm text-gray-500">
+            {manual.version && <p>Versión: {manual.version}</p>}
+
+            {manual.idioma && <p>Idioma: {manual.idioma}</p>}
+
+            {manual.ano_publicacion && <p>Año: {manual.ano_publicacion}</p>}
+
+            {
+                manual.oficial !== null && manual.oficial !== undefined && (
+                    <p>
+                        {manual.oficial
+                            ? "Manual oficial"
+                            : "Manual no oficial"}
+                    </p>
+                )
+            }
+        </div>
+    </div>
+</a>

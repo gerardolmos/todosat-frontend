@@ -1,0 +1,20 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import ManualCard from "../../components/ManualCard.astro";
+import { getManuales } from "../../lib/content";
+
+const manuales = await getManuales();
+---
+
+<Layout title="Manuales | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="mb-8 text-4xl font-bold">Manuales</h1>
+
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {manuales.map((manual: any) => <ManualCard manual={manual} />)}
+            </div>
+        </Container>
+    </main>
+</Layout>

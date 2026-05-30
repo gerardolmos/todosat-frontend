@@ -1,9 +1,10 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
-import { getModelos } from "../../../lib/content";
+import { getModelos, getArticulos, getManuales } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
+import ArticleCard from "../../../components/ArticleCard.astro";
 
 export async function getStaticPaths() {
     const modelos = await getModelos();
@@ -23,6 +24,20 @@ const { modelo } = Astro.props as any;
 const contenidoHTML = renderBlocks(modelo.descripcion_completa);
 
 const imagenUrl = getMediaUrl(modelo.imagen_principal);
+
+const galeria = modelo.galeria || [];
+
+const articulos = (await getArticulos()).filter((articulo: any) =>
+    articulo.modelos?.some(
+        (modeloRelacionado: any) => modeloRelacionado.slug === modelo.slug,
+    ),
+);
+
+const manuales = (await getManuales()).filter((manual: any) =>
+    manual.modelos?.some(
+        (modeloRelacionado: any) => modeloRelacionado.slug === modelo.slug,
+    ),
+);
 ---
 
 <Layout title={`${modelo.nombre} | TODOSat`}>
@@ -54,7 +69,13 @@ const imagenUrl = getMediaUrl(modelo.imagen_principal);
                 {
                     modelo.marca && (
                         <p>
-                            <strong>Marca:</strong> {modelo.marca.nombre}
+                            <strong>Marca:</strong>{" "}
+                            <a
+                                href={`/marcas/${modelo.marca.slug}`}
+                                class="text-blue-600 underline"
+                            >
+                                {modelo.marca.nombre}
+                            </a>
                         </p>
                     )
                 }
@@ -93,12 +114,90 @@ const imagenUrl = getMediaUrl(modelo.imagen_principal);
                     <strong>Precio orientativo:</strong>
                     {modelo.precio_orientativo} €
                 </p>
+
+                <p>
+                    <strong>Portátil:</strong>
+                    {modelo.portatil ? "Sí" : "No"}
+                </p>
             </div>
 
             <section
                 class="mt-10 prose prose-lg max-w-none"
                 set:html={contenidoHTML}
             />
+            {
+                galeria.length > 0 && (
+                    <section class="mt-12">
+                        <h2 class="mb-6 text-3xl font-bold">Galería</h2>
+
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {galeria.map((imagen: any) => {
+                                const url = getMediaUrl(imagen);
+
+                                return url ? (
+                                    <img
+                                        src={url}
+                                        alt={modelo.nombre}
+                                        class="w-full rounded"
+                                    />
+                                ) : null;
+                            })}
+                        </div>
+                    </section>
+                )
+            }
+
+            <section class="mt-12">
+                <h2 class="mb-6 text-3xl font-bold">Artículos relacionados</h2>
+
+                {
+                    articulos.length > 0 ? (
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {articulos.map((articulo: any) => (
+                                <ArticleCard articulo={articulo} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-gray-600">
+                            Todavía no hay artículos relacionados con este
+                            modelo.
+                        </p>
+                    )
+                }
+            </section>
+
+            <section class="mt-12">
+                <h2 class="mb-6 text-3xl font-bold">Manuales relacionados</h2>
+
+                {
+                    manuales.length > 0 ? (
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {manuales.map((manual: any) => (
+                                <article class="rounded border p-6">
+                                    <h3 class="text-2xl font-bold">
+                                        {manual.titulo}
+                                    </h3>
+
+                                    <p class="mt-2 text-gray-600">
+                                        {manual.descripcion}
+                                    </p>
+
+                                    {manual.ano_publicacion && (
+                                        <p class="mt-4 text-sm text-gray-500">
+                                            Año: {manual.ano_publicacion}
+                                        </p>
+                                    )}
+                                </article>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-gray-600">
+                            Todavía no hay manuales relacionados con este
+                            modelo.
+                        </p>
+                    )
+                }
+            </section>
         </Container>
     </main>
 </Layout>

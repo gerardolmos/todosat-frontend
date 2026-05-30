@@ -1,20 +1,43 @@
 ---
+import { getMediaUrl } from "../lib/media";
+
 interface Props {
     modelo: any;
 }
 
 const { modelo } = Astro.props;
+const imagenUrl = getMediaUrl(modelo.imagen_principal);
 ---
 
 <a
     href={`/modelos/${modelo.slug}`}
-    class="block rounded border p-6 hover:bg-gray-50 transition"
+    class="block overflow-hidden rounded border hover:bg-gray-50 transition"
 >
-    <h3 class="text-2xl font-bold">
-        {modelo.nombre}
-    </h3>
+    {
+        imagenUrl && (
+            <img
+                src={imagenUrl}
+                alt={modelo.nombre}
+                class="h-56 w-full object-cover"
+            />
+        )
+    }
 
-    <p class="mt-2 text-gray-600">
-        {modelo.descripcion_corta}
-    </p>
+    <div class="p-6">
+        <h3 class="text-2xl font-bold">
+            {modelo.nombre}
+        </h3>
+
+        {
+            modelo.descripcion_corta && (
+                <p class="mt-2 text-gray-600">{modelo.descripcion_corta}</p>
+            )
+        }
+
+        {
+            modelo.marca && (
+                <p class="mt-4 text-sm text-gray-500">{modelo.marca.nombre}</p>
+            )
+        }
+    </div>
 </a>

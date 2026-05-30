@@ -1,0 +1,64 @@
+---
+import { getMediaUrl } from "../lib/media";
+
+interface Props {
+    destacado: any;
+}
+
+const { destacado } = Astro.props;
+
+const imagenUrl = getMediaUrl(destacado.imagen);
+
+const relaciones = [
+    destacado.marca && {
+        tipo: "marca",
+        href: `/marcas/${destacado.marca.slug}`,
+    },
+    destacado.modelo && {
+        tipo: "modelo",
+        href: `/modelos/${destacado.modelo.slug}`,
+    },
+    destacado.articulo && {
+        tipo: "articulo",
+        href: `/articulos/${destacado.articulo.slug}`,
+    },
+    destacado.manual && {
+        tipo: "manual",
+        href: `/manuales/${destacado.manual.slug}`,
+    },
+].filter(Boolean);
+
+const href = relaciones.length === 1 ? relaciones[0].href : "#";
+const tieneRelacionValida = relaciones.length === 1;
+---
+
+<a
+    href={href}
+    class={`block overflow-hidden rounded border transition ${
+        tieneRelacionValida
+            ? "hover:bg-gray-50"
+            : "pointer-events-none opacity-60"
+    }`}
+>
+    {
+        imagenUrl && (
+            <img
+                src={imagenUrl}
+                alt={destacado.titulo}
+                class="h-64 w-full object-cover"
+            />
+        )
+    }
+
+    <div class="p-6">
+        <h3 class="text-2xl font-bold">
+            {destacado.titulo}
+        </h3>
+
+        {
+            destacado.descripcion && (
+                <p class="mt-2 text-gray-600">{destacado.descripcion}</p>
+            )
+        }
+    </div>
+</a>

@@ -1,7 +1,16 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
-import { getMarcas } from "../../../lib/content";
+import {
+    getMarcas,
+    getModelos,
+    getArticulos,
+    getManuales,
+} from "../../../lib/content";
+import ModelCard from "../../../components/ModelCard.astro";
+import { renderBlocks } from "../../../lib/renderBlocks";
+import { getMediaUrl } from "../../../lib/media";
+import ArticleCard from "../../../components/ArticleCard.astro";
 
 export async function getStaticPaths() {
     const marcas = await getMarcas();
@@ -17,6 +26,25 @@ export async function getStaticPaths() {
 }
 
 const { marca } = Astro.props as any;
+const descripcionHTML = renderBlocks(marca.descripcion_completa);
+const logoUrl = getMediaUrl(marca.logo);
+const imagenPortadaUrl = getMediaUrl(marca.imagen_portada);
+
+const modelos = (await getModelos()).filter(
+    (modelo: any) => modelo.marca?.slug === marca.slug,
+);
+
+const articulos = (await getArticulos()).filter((articulo: any) =>
+    articulo.marcas?.some(
+        (marcaRelacionada: any) => marcaRelacionada.slug === marca.slug,
+    ),
+);
+
+const manuales = (await getManuales()).filter((manual: any) =>
+    manual.marcas?.some(
+        (marcaRelacionada: any) => marcaRelacionada.slug === marca.slug,
+    ),
+);
 ---
 
 <Layout title={`${marca.nombre} | TODOSat`}>
@@ -30,9 +58,142 @@ const { marca } = Astro.props as any;
                 {marca.nombre}
             </h1>
 
+            {
+                logoUrl && (
+                    <img
+                        src={logoUrl}
+                        alt={`Logo de ${marca.nombre}`}
+                        class="mt-6 max-h-24 w-auto"
+                    />
+                )
+            }
+
             <p class="mt-6 text-xl">
                 {marca.descripcion_corta}
             </p>
+
+            {
+                imagenPortadaUrl && (
+                    <img
+                        src={imagenPortadaUrl}
+                        alt={marca.nombre}
+                        class="mt-8 w-full max-w-4xl rounded"
+                    />
+                )
+            }
+
+            <div class="mt-10 grid gap-3 rounded border p-6">
+                {
+                    marca.tipo_orbita && (
+                        <p>
+                            <strong>Tipo de órbita:</strong> {marca.tipo_orbita}
+                        </p>
+                    )
+                }
+
+                {
+                    marca.pais_origen && (
+                        <p>
+                            <strong>País de origen:</strong> {marca.pais_origen}
+                        </p>
+                    )
+                }
+
+                {
+                    marca.web_oficial && (
+                        <p>
+                            <strong>Web oficial:</strong>{" "}
+                            <a
+                                href={marca.web_oficial}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-blue-600 underline"
+                            >
+                                {marca.web_oficial}
+                            </a>
+                        </p>
+                    )
+                }
+            </div>
+
+            {
+                descripcionHTML && (
+                    <section
+                        class="mt-10 prose prose-lg max-w-none"
+                        set:html={descripcionHTML}
+                    />
+                )
+            }
+
+            <section class="mt-12">
+                <h2 class="mb-6 text-3xl font-bold">
+                    Modelos de {marca.nombre}
+                </h2>
+
+                {
+                    modelos.length > 0 ? (
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {modelos.map((modelo: any) => (
+                                <ModelCard modelo={modelo} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-gray-600">
+                            Todavía no hay modelos publicados para esta marca.
+                        </p>
+                    )
+                }
+            </section>
+            <section class="mt-12">
+                <h2 class="mb-6 text-3xl font-bold">Artículos relacionados</h2>
+
+                {
+                    articulos.length > 0 ? (
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {articulos.map((articulo: any) => (
+                                <ArticleCard articulo={articulo} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-gray-600">
+                            Todavía no hay artículos relacionados con esta
+                            marca.
+                        </p>
+                    )
+                }
+            </section>
+
+            <section class="mt-12">
+                <h2 class="mb-6 text-3xl font-bold">Manuales relacionados</h2>
+
+                {
+                    manuales.length > 0 ? (
+                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {manuales.map((manual: any) => (
+                                <article class="rounded border p-6">
+                                    <h3 class="text-2xl font-bold">
+                                        {manual.titulo}
+                                    </h3>
+
+                                    <p class="mt-2 text-gray-600">
+                                        {manual.descripcion}
+                                    </p>
+
+                                    {manual.ano_publicacion && (
+                                        <p class="mt-4 text-sm text-gray-500">
+                                            Año: {manual.ano_publicacion}
+                                        </p>
+                                    )}
+                                </article>
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-gray-600">
+                            Todavía no hay manuales relacionados con esta marca.
+                        </p>
+                    )
+                }
+            </section>
         </Container>
     </main>
 </Layout>

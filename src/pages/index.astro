@@ -1,10 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
-import { getMarcas, getArticulos } from "../lib/content";
+import { getMarcas, getArticulos, getDestacados } from "../lib/content";
 import ArticleCard from "../components/ArticleCard.astro";
 import BrandCard from "../components/BrandCard.astro";
+import FeaturedCard from "../components/FeaturedCard.astro";
 
+const destacados = await getDestacados();
 const marcas = await getMarcas();
 
 const articulos = (await getArticulos())
@@ -28,10 +30,24 @@ const articulos = (await getArticulos())
 				</p>
 			</section>
 
-			<section class="mt-12">
+			{
+				destacados.length > 0 && (
+					<section class="mt-12">
+						<h2 class="mb-6 text-3xl font-bold">Destacados</h2>
+
+						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+							{destacados.map((destacado: any) => (
+								<FeaturedCard destacado={destacado} />
+							))}
+						</div>
+					</section>
+				)
+			}
+
+			<section class="mt-16">
 				<h2 class="mb-6 text-3xl font-bold">Últimos artículos</h2>
 
-				<div class="grid gap-6">
+				<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 					{
 						articulos.map((articulo: any) => (
 							<ArticleCard articulo={articulo} />
@@ -43,7 +59,7 @@ const articulos = (await getArticulos())
 			<section class="mt-16">
 				<h2 class="mb-6 text-3xl font-bold">Marcas</h2>
 
-				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+				<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 					{marcas.map((marca: any) => <BrandCard marca={marca} />)}
 				</div>
 			</section>
