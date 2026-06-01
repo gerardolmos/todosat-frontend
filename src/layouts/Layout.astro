@@ -32,8 +32,8 @@ const {
                 <nav class="flex gap-6 text-sm font-medium">
                     <a href="/marcas">Marcas</a>
                     <a href="/modelos">Modelos</a>
-                    <a href="/manuales">Manuales</a>
                     <a href="/articulos">Artículos</a>
+                    <a href="/manuales">Manuales</a>
                     <a href="/categorias">Categorías</a>
                 </nav>
             </div>
@@ -41,10 +41,55 @@ const {
 
         <slot />
 
-        <footer class="mt-20 border-t">
-            <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-gray-600">
-                © {new Date().getFullYear()} TODOSat. Portal especializado en internet
-                satelital.
+        <footer class="mt-20 border-t bg-gray-50">
+            <div class="mx-auto max-w-6xl px-6 py-10">
+                <div class="grid gap-8 md:grid-cols-2">
+                    <div>
+                        <p class="text-xl font-bold text-black">TODOSat</p>
+
+                        <p
+                            class="mt-3 max-w-md text-sm leading-6 text-gray-600"
+                        >
+                            Portal especializado en internet satelital,
+                            hardware, cobertura, instalación y actualidad del
+                            sector.
+                        </p>
+                    </div>
+
+                    <div class="md:text-right">
+                        <p class="text-sm font-semibold text-black">
+                            Información legal
+                        </p>
+
+                        <div
+                            class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600 md:justify-end"
+                        >
+                            <a href="/aviso-legal" class="hover:text-black">
+                                Aviso legal
+                            </a>
+
+                            <a href="/privacidad" class="hover:text-black">
+                                Privacidad
+                            </a>
+
+                            <a href="/cookies" class="hover:text-black">
+                                Cookies
+                            </a>
+
+                            <a href="/contacto" class="hover:text-black">
+                                Contacto
+                            </a>
+
+                            <a href="/rss.xml" class="hover:text-black">
+                                RSS
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 border-t pt-6 text-sm text-gray-500">
+                    © {new Date().getFullYear()} TODOSat.
+                </div>
             </div>
         </footer>
     </body>

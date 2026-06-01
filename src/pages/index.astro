@@ -1,13 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
-import { getMarcas, getArticulos, getDestacados } from "../lib/content";
+import {
+	getMarcasDestacadas,
+	getArticulos,
+	getDestacados,
+} from "../lib/content";
 import ArticleCard from "../components/ArticleCard.astro";
 import BrandCard from "../components/BrandCard.astro";
 import FeaturedCard from "../components/FeaturedCard.astro";
 
 const destacados = await getDestacados();
-const marcas = await getMarcas();
+const marcasDestacadas = await getMarcasDestacadas();
 
 const articulos = (await getArticulos())
 	.sort(
@@ -28,12 +32,62 @@ const articulos = (await getArticulos())
 					Portal especializado en internet satelital, hardware,
 					cobertura, instalación y actualidad del sector.
 				</p>
+
+				<form
+					action="/buscar"
+					method="get"
+					class="mt-8 flex max-w-2xl gap-3"
+				>
+					<input
+						type="search"
+						name="q"
+						placeholder="Buscar marcas, modelos, artículos o manuales..."
+						class="w-full rounded border px-4 py-3"
+					/>
+
+					<button
+						type="submit"
+						class="rounded bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+					>
+						Buscar
+					</button>
+				</form>
 			</section>
+
+			{
+				marcasDestacadas.length > 0 && (
+					<section class="mt-12">
+						<div class="mb-6 flex items-end justify-between gap-4">
+							<div>
+								<h2 class="text-3xl font-bold">
+									Marcas destacadas
+								</h2>
+								<p class="mt-2 text-gray-600">
+									Una selección de operadores y compañías
+									relevantes del sector.
+								</p>
+							</div>
+
+							<a href="/marcas" class="text-blue-600 underline">
+								Ver todas las marcas →
+							</a>
+						</div>
+
+						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+							{marcasDestacadas.map((marca: any) => (
+								<BrandCard marca={marca} />
+							))}
+						</div>
+					</section>
+				)
+			}
 
 			{
 				destacados.length > 0 && (
 					<section class="mt-12">
-						<h2 class="mb-6 text-3xl font-bold">Destacados</h2>
+						<h2 class="mb-6 text-3xl font-bold">
+							Contenido destacado
+						</h2>
 
 						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 							{destacados.map((destacado: any) => (
@@ -53,14 +107,6 @@ const articulos = (await getArticulos())
 							<ArticleCard articulo={articulo} />
 						))
 					}
-				</div>
-			</section>
-
-			<section class="mt-16">
-				<h2 class="mb-6 text-3xl font-bold">Marcas</h2>
-
-				<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-					{marcas.map((marca: any) => <BrandCard marca={marca} />)}
 				</div>
 			</section>
 		</Container>

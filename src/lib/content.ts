@@ -25,7 +25,9 @@ export async function getModelos() {
 }
 
 export async function getManuales() {
-    const data = await fetchAPI('/api/manuals?populate=*');
+    const data = await fetchAPI(
+        "/api/manuals?populate[imagen_portada]=true&populate[archivo_pdf]=true&populate[marcas][populate][imagen_portada]=true&populate[marcas][populate][logo]=true&populate[modelos][populate][imagen_principal]=true&populate[articulos][populate][imagen_principal]=true"
+    );
 
     return data.data.filter((manual: any) => manual.activo);
 }
@@ -36,4 +38,10 @@ export async function getDestacados() {
     return data.data
         .filter((destacado: any) => destacado.activa)
         .sort((a: any, b: any) => a.orden - b.orden);
+}
+
+export async function getMarcasDestacadas() {
+    const marcas = await getMarcas();
+
+    return marcas.filter((marca: any) => marca.destacada);
 }

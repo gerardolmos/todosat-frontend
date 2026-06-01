@@ -1,0 +1,290 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Container from "../components/Container.astro";
+import {
+    getMarcas,
+    getModelos,
+    getArticulos,
+    getManuales,
+} from "../lib/content";
+
+const marcas = await getMarcas();
+const modelos = await getModelos();
+const articulos = await getArticulos();
+const manuales = await getManuales();
+
+const datosBusqueda = [
+    ...marcas.map((item: any) => ({
+        tipo: "Marca",
+        titulo: item.nombre,
+        descripcion: item.descripcion_corta,
+        url: `/marcas/${item.slug}`,
+        texto: `${item.nombre} ${item.descripcion_corta} ${item.pais_origen} ${item.tipo_orbita}`,
+    })),
+    ...modelos.map((item: any) => ({
+        tipo: "Modelo",
+        titulo: item.nombre,
+        descripcion: item.descripcion_corta,
+        url: `/modelos/${item.slug}`,
+        texto: `${item.nombre} ${item.descripcion_corta} ${item.uso_recomendado} ${item.marca?.nombre}`,
+    })),
+    ...articulos.map((item: any) => ({
+        tipo: "Artículo",
+        titulo: item.titulo,
+        descripcion: item.subtitulo,
+        url: `/articulos/${item.slug}`,
+        texto: `${item.titulo} ${item.subtitulo} ${item.tipo_articulo}`,
+    })),
+    ...manuales.map((item: any) => ({
+        tipo: "Manual",
+        titulo: item.titulo,
+        descripcion: item.descripcion,
+        url: `/manuales/${item.slug}`,
+        texto: `${item.titulo} ${item.descripcion} ${item.idioma} ${item.ano_publicacion}`,
+    })),
+];
+---
+
+<Layout title="Buscar | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="text-4xl font-bold">Buscar en TODOSat</h1>
+
+            <form
+                action="/buscar"
+                method="get"
+                class="mt-8 flex max-w-2xl gap-3"
+            >
+                <input
+                    id="search-input"
+                    type="search"
+                    name="q"
+                    placeholder="Buscar marcas, modelos, artículos o manuales..."
+                    class="w-full rounded border px-4 py-3"
+                />
+
+                <button
+                    type="submit"
+                    class="rounded bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+                >
+                    Buscar
+                </button>
+            </form>
+
+            <div id="search-results" class="mt-10"></div>
+
+            <script
+                type="application/json"
+                id="search-data"
+                set:html={JSON.stringify(datosBusqueda)}
+            />
+        </Container>
+    </main>
+
+    <script>
+        type SearchItem = {
+            tipo: string;
+            titulo: string;
+            descripcion?: string;
+            url: string;
+            texto: string;
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const query = params.get("q")?.toLowerCase().trim() || "";
+
+        const input = document.getElementById("search-input");
+        const resultsContainer = document.getElementById("search-results");
+        const dataElement = document.getElementById("search-data");
+
+        if (
+            input instanceof HTMLInputElement &&
+            resultsContainer instanceof HTMLElement &&
+            dataElement instanceof HTMLScriptElement
+        ) {
+            input.value = query;
+
+            const data = JSON.parse(
+                dataElement.textContent || "[]",
+            ) as SearchItem[];
+
+            if (!query) {
+                resultsContainer.innerHTML = `
+                <p class="text-gray-600">
+                    Escribe una búsqueda para encontrar contenido en TODOSat.
+                </p>
+            `;
+            } else {
+                const resultados = data.filter((item: SearchItem) =>
+                    item.texto.toLowerCase().includes(query),
+                );
+
+                const marcas = resultados.filter(
+                    (item: SearchItem) => item.tipo === "Marca",
+                );
+
+                const modelos = resultados.filter(
+                    (item: SearchItem) => item.tipo === "Modelo",
+                );
+
+                const articulos = resultados.filter(
+                    (item: SearchItem) => item.tipo === "Artículo",
+                );
+
+                const manuales = resultados.filter(
+                    (item: SearchItem) => item.tipo === "Manual",
+                );
+
+                if (resultados.length === 0) {
+                    resultsContainer.innerHTML = `
+                    <p class="text-gray-600">
+                        No se han encontrado resultados para <strong>${query}</strong>.
+                    </p>
+                `;
+                } else {
+                    resultsContainer.innerHTML = `
+                    <p class="mb-8 text-gray-700">
+                        ${resultados.length} resultado${resultados.length === 1 ? "" : "s"} para <strong>${query}</strong>
+                    </p>
+
+                   ${
+                       marcas.length > 0
+                           ? `
+<section class="mt-8">
+    <h2 class="mb-4 text-2xl font-bold">Marcas</h2>
+
+    <ul class="space-y-4">
+        ${marcas
+            .map(
+                (item: SearchItem) => `
+            <li class="rounded border p-5">
+                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
+                    ${item.titulo}
+                </a>
+
+                ${
+                    item.descripcion
+                        ? `
+                    <p class="mt-2 text-gray-600">
+                        ${item.descripcion}
+                    </p>
+                `
+                        : ""
+                }
+            </li>
+        `,
+            )
+            .join("")}
+    </ul>
+</section>
+`
+                           : ""
+                   }
+
+${
+    modelos.length > 0
+        ? `
+<section class="mt-8">
+    <h2 class="mb-4 text-2xl font-bold">Modelos</h2>
+
+    <ul class="space-y-4">
+        ${modelos
+            .map(
+                (item: SearchItem) => `
+            <li class="rounded border p-5">
+                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
+                    ${item.titulo}
+                </a>
+
+                ${
+                    item.descripcion
+                        ? `
+                    <p class="mt-2 text-gray-600">
+                        ${item.descripcion}
+                    </p>
+                `
+                        : ""
+                }
+            </li>
+        `,
+            )
+            .join("")}
+    </ul>
+</section>
+`
+        : ""
+}
+
+${
+    articulos.length > 0
+        ? `
+<section class="mt-8">
+    <h2 class="mb-4 text-2xl font-bold">Artículos</h2>
+
+    <ul class="space-y-4">
+        ${articulos
+            .map(
+                (item: SearchItem) => `
+            <li class="rounded border p-5">
+                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
+                    ${item.titulo}
+                </a>
+
+                ${
+                    item.descripcion
+                        ? `
+                    <p class="mt-2 text-gray-600">
+                        ${item.descripcion}
+                    </p>
+                `
+                        : ""
+                }
+            </li>
+        `,
+            )
+            .join("")}
+    </ul>
+</section>
+`
+        : ""
+}
+
+${
+    manuales.length > 0
+        ? `
+<section class="mt-8">
+    <h2 class="mb-4 text-2xl font-bold">Manuales</h2>
+
+    <ul class="space-y-4">
+        ${manuales
+            .map(
+                (item: SearchItem) => `
+            <li class="rounded border p-5">
+                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
+                    ${item.titulo}
+                </a>
+
+                ${
+                    item.descripcion
+                        ? `
+                    <p class="mt-2 text-gray-600">
+                        ${item.descripcion}
+                    </p>
+                `
+                        : ""
+                }
+            </li>
+        `,
+            )
+            .join("")}
+    </ul>
+</section>
+`
+        : ""
+}
+                `;
+                }
+            }
+        }
+    </script>
+</Layout>

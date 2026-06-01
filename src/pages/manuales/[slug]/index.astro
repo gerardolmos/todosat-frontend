@@ -3,6 +3,7 @@ import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import { getManuales } from "../../../lib/content";
 import { getMediaUrl } from "../../../lib/media";
+import RelatedCard from "../../../components/RelatedCard.astro";
 
 export async function getStaticPaths() {
     const manuales = await getManuales();
@@ -112,20 +113,21 @@ const articulos = manual.articulos || [];
             {
                 marcas.length > 0 && (
                     <section class="mt-12">
-                        <h2 class="text-3xl font-bold">Marcas relacionadas</h2>
+                        <h2 class="mb-6 text-3xl font-bold">
+                            Marcas relacionadas
+                        </h2>
 
-                        <ul class="mt-4 space-y-2">
+                        <div class="grid gap-4 md:grid-cols-2">
                             {marcas.map((marca: any) => (
-                                <li>
-                                    <a
-                                        href={`/marcas/${marca.slug}`}
-                                        class="text-blue-600 underline"
-                                    >
-                                        {marca.nombre}
-                                    </a>
-                                </li>
+                                <RelatedCard
+                                    type="Marca"
+                                    title={marca.nombre}
+                                    description={marca.descripcion_corta}
+                                    url={`/marcas/${marca.slug}`}
+                                    image={marca.imagen_portada}
+                                />
                             ))}
-                        </ul>
+                        </div>
                     </section>
                 )
             }
@@ -133,20 +135,21 @@ const articulos = manual.articulos || [];
             {
                 modelos.length > 0 && (
                     <section class="mt-12">
-                        <h2 class="text-3xl font-bold">Modelos relacionados</h2>
+                        <h2 class="mb-6 text-3xl font-bold">
+                            Modelos relacionados
+                        </h2>
 
-                        <ul class="mt-4 space-y-2">
+                        <div class="grid gap-4 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
-                                <li>
-                                    <a
-                                        href={`/modelos/${modelo.slug}`}
-                                        class="text-blue-600 underline"
-                                    >
-                                        {modelo.nombre}
-                                    </a>
-                                </li>
+                                <RelatedCard
+                                    type="Modelo"
+                                    title={modelo.nombre}
+                                    description={modelo.descripcion_corta}
+                                    url={`/modelos/${modelo.slug}`}
+                                    image={modelo.imagen_principal}
+                                />
                             ))}
-                        </ul>
+                        </div>
                     </section>
                 )
             }
@@ -154,22 +157,21 @@ const articulos = manual.articulos || [];
             {
                 articulos.length > 0 && (
                     <section class="mt-12">
-                        <h2 class="text-3xl font-bold">
+                        <h2 class="mb-6 text-3xl font-bold">
                             Artículos relacionados
                         </h2>
 
-                        <ul class="mt-4 space-y-2">
+                        <div class="grid gap-4 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
-                                <li>
-                                    <a
-                                        href={`/articulos/${articulo.slug}`}
-                                        class="text-blue-600 underline"
-                                    >
-                                        {articulo.titulo}
-                                    </a>
-                                </li>
+                                <RelatedCard
+                                    type="Artículo"
+                                    title={articulo.titulo}
+                                    description={articulo.subtitulo}
+                                    url={`/articulos/${articulo.slug}`}
+                                    image={articulo.imagen_principal}
+                                />
                             ))}
-                        </ul>
+                        </div>
                     </section>
                 )
             }
