@@ -4,6 +4,7 @@ import { getArticulos } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import Container from "../../../components/Container.astro";
+import RelatedCard from "../../../components/RelatedCard.astro";
 
 export async function getStaticPaths() {
     const articulos = await getArticulos();
@@ -99,18 +100,17 @@ const manuales = articulo.manuals || [];
                     <section class="mt-12">
                         <h2 class="text-3xl font-bold">Marcas relacionadas</h2>
 
-                        <ul class="mt-4 space-y-2">
+                        <div class="mt-4 grid gap-4 md:grid-cols-2">
                             {marcas.map((marca: any) => (
-                                <li>
-                                    <a
-                                        href={`/marcas/${marca.slug}`}
-                                        class="text-blue-600 underline"
-                                    >
-                                        {marca.nombre}
-                                    </a>
-                                </li>
+                                <RelatedCard
+                                    type="Marca"
+                                    title={marca.nombre}
+                                    description={marca.descripcion_corta}
+                                    url={`/marcas/${marca.slug}`}
+                                    image={marca.imagen_portada}
+                                />
                             ))}
-                        </ul>
+                        </div>
                     </section>
                 )
             }
@@ -120,18 +120,17 @@ const manuales = articulo.manuals || [];
                     <section class="mt-12">
                         <h2 class="text-3xl font-bold">Modelos relacionados</h2>
 
-                        <ul class="mt-4 space-y-2">
+                        <div class="mt-4 grid gap-4 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
-                                <li>
-                                    <a
-                                        href={`/modelos/${modelo.slug}`}
-                                        class="text-blue-600 underline"
-                                    >
-                                        {modelo.nombre}
-                                    </a>
-                                </li>
+                                <RelatedCard
+                                    type="Modelo"
+                                    title={modelo.nombre}
+                                    description={modelo.descripcion_corta}
+                                    url={`/modelos/${modelo.slug}`}
+                                    image={modelo.imagen_principal}
+                                />
                             ))}
-                        </ul>
+                        </div>
                     </section>
                 )
             }
@@ -143,22 +142,17 @@ const manuales = articulo.manuals || [];
                             Manuales relacionados
                         </h2>
 
-                        <ul class="mt-4 space-y-2">
+                        <div class="mt-4 grid gap-4 md:grid-cols-2">
                             {manuales.map((manual: any) => (
-                                <li>
-                                    <span class="font-medium">
-                                        {manual.titulo}
-                                    </span>
-
-                                    {manual.ano_publicacion && (
-                                        <span class="text-gray-600">
-                                            {" "}
-                                            ({manual.ano_publicacion})
-                                        </span>
-                                    )}
-                                </li>
+                                <RelatedCard
+                                    type="Manual"
+                                    title={manual.titulo}
+                                    description={manual.descripcion}
+                                    url={`/manuales/${manual.slug}`}
+                                    image={manual.imagen_portada}
+                                />
                             ))}
-                        </ul>
+                        </div>
                     </section>
                 )
             }

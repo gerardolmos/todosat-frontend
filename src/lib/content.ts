@@ -7,7 +7,9 @@ export async function getMarcas() {
 }
 
 export async function getArticulos() {
-    const data = await fetchAPI('/api/articulos?populate=*');
+    const data = await fetchAPI(
+        "/api/articulos?populate[imagen_principal]=true&populate[categoria_tematica]=true&populate[marcas][populate][imagen_portada]=true&populate[marcas][populate][logo]=true&populate[modelos][populate][imagen_principal]=true&populate[manuals][populate][imagen_portada]=true"
+    );
 
     return data.data.filter((articulo: any) => articulo.activo);
 }

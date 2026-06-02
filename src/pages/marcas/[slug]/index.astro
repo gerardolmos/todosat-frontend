@@ -7,10 +7,9 @@ import {
     getArticulos,
     getManuales,
 } from "../../../lib/content";
-import ModelCard from "../../../components/ModelCard.astro";
 import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
-import ArticleCard from "../../../components/ArticleCard.astro";
+import RelatedCard from "../../../components/RelatedCard.astro";
 
 export async function getStaticPaths() {
     const marcas = await getMarcas();
@@ -132,9 +131,15 @@ const manuales = (await getManuales()).filter((manual: any) =>
 
                 {
                     modelos.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid gap-4 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
-                                <ModelCard modelo={modelo} />
+                                <RelatedCard
+                                    type="Modelo"
+                                    title={modelo.nombre}
+                                    description={modelo.descripcion_corta}
+                                    url={`/modelos/${modelo.slug}`}
+                                    image={modelo.imagen_principal}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -149,9 +154,15 @@ const manuales = (await getManuales()).filter((manual: any) =>
 
                 {
                     articulos.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid gap-4 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
-                                <ArticleCard articulo={articulo} />
+                                <RelatedCard
+                                    type="Artículo"
+                                    title={articulo.titulo}
+                                    description={articulo.subtitulo}
+                                    url={`/articulos/${articulo.slug}`}
+                                    image={articulo.imagen_principal}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -168,23 +179,15 @@ const manuales = (await getManuales()).filter((manual: any) =>
 
                 {
                     manuales.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid gap-4 md:grid-cols-2">
                             {manuales.map((manual: any) => (
-                                <article class="rounded border p-6">
-                                    <h3 class="text-2xl font-bold">
-                                        {manual.titulo}
-                                    </h3>
-
-                                    <p class="mt-2 text-gray-600">
-                                        {manual.descripcion}
-                                    </p>
-
-                                    {manual.ano_publicacion && (
-                                        <p class="mt-4 text-sm text-gray-500">
-                                            Año: {manual.ano_publicacion}
-                                        </p>
-                                    )}
-                                </article>
+                                <RelatedCard
+                                    type="Manual"
+                                    title={manual.titulo}
+                                    description={manual.descripcion}
+                                    url={`/manuales/${manual.slug}`}
+                                    image={manual.imagen_portada}
+                                />
                             ))}
                         </div>
                     ) : (
