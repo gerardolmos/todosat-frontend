@@ -2,6 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import { getCategorias, getArticulos } from "../../../lib/content";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
     const categorias = await getCategorias();
@@ -26,6 +27,17 @@ const articulos = (await getArticulos()).filter(
 <Layout title={`${categoria.nombre} | TODOSat`}>
     <main class="min-h-screen py-10">
         <Container>
+            <Breadcrumbs
+                items={[
+                    {
+                        label: "Categorías",
+                        href: "/categorias",
+                    },
+                    {
+                        label: categoria.nombre,
+                    },
+                ]}
+            />
             <a href="/categorias" class="text-blue-600 underline">
                 ← Volver a categorías
             </a>

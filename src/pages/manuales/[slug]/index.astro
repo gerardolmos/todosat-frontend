@@ -4,6 +4,7 @@ import Container from "../../../components/Container.astro";
 import { getManuales } from "../../../lib/content";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
     const manuales = await getManuales();
@@ -30,6 +31,17 @@ const articulos = manual.articulos || [];
 <Layout title={`${manual.titulo} | TODOSat`}>
     <main class="min-h-screen py-10">
         <Container>
+            <Breadcrumbs
+                items={[
+                    {
+                        label: "Manuales",
+                        href: "/manuales",
+                    },
+                    {
+                        label: manual.titulo,
+                    },
+                ]}
+            />
             <a href="/manuales" class="text-blue-600 underline">
                 ← Volver a manuales
             </a>

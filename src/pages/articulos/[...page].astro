@@ -3,22 +3,37 @@ import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
 import { getArticulos } from "../../lib/content";
 import ArticleCard from "../../components/ArticleCard.astro";
+import Pagination from "../../components/Pagination.astro";
 
-const articulos = await getArticulos();
+export async function getStaticPaths({ paginate }: any) {
+    const articulos = await getArticulos();
+
+    return paginate(articulos, {
+        pageSize: 9,
+    });
+}
+
+const { page } = Astro.props as any;
 ---
 
 <Layout title="Artículos | TODOSat">
     <main class="min-h-screen py-10">
         <Container>
-            <h1 class="text-4xl font-bold mb-8">Artículos</h1>
+            <h1 class="mb-8 text-4xl font-bold">Artículos</h1>
 
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {
-                    articulos.map((articulo: any) => (
+                    page.data.map((articulo: any) => (
                         <ArticleCard articulo={articulo} />
                     ))
                 }
             </div>
+
+            <Pagination
+                currentPage={page.currentPage}
+                totalPages={page.lastPage}
+                basePath="/articulos"
+            />
         </Container>
     </main>
 </Layout>

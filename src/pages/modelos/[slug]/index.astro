@@ -5,6 +5,7 @@ import { getModelos, getArticulos, getManuales } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
     const modelos = await getModelos();
@@ -43,6 +44,18 @@ const manuales = (await getManuales()).filter((manual: any) =>
 <Layout title={`${modelo.nombre} | TODOSat`}>
     <main class="min-h-screen py-10">
         <Container>
+            <Breadcrumbs
+                items={[
+                    {
+                        label: "Modelos",
+                        href: "/modelos",
+                    },
+                    {
+                        label: modelo.nombre,
+                    },
+                ]}
+            />
+
             <a href="/modelos" class="text-blue-600 underline">
                 ← Volver a modelos
             </a>

@@ -5,6 +5,7 @@ import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import Container from "../../../components/Container.astro";
 import RelatedCard from "../../../components/RelatedCard.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
     const articulos = await getArticulos();
@@ -32,6 +33,17 @@ const manuales = articulo.manuals || [];
 <Layout title={`${articulo.titulo} | TODOSat`}>
     <main class="min-h-screen py-10">
         <Container>
+            <Breadcrumbs
+                items={[
+                    {
+                        label: "Artículos",
+                        href: "/articulos",
+                    },
+                    {
+                        label: articulo.titulo,
+                    },
+                ]}
+            />
             <a href="/articulos" class="text-blue-600 underline">
                 ← Volver a artículos
             </a>

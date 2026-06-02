@@ -7,9 +7,10 @@ type Props = {
     url: string;
     image?: any;
     type?: string;
+    meta?: string;
 };
 
-const { title, description, url, image, type } = Astro.props;
+const { title, description, url, image, type, meta } = Astro.props;
 
 const imageUrl = getMediaUrl(image);
 ---
@@ -42,6 +43,8 @@ const imageUrl = getMediaUrl(image);
             <h3 class="font-semibold text-slate-900">
                 {title}
             </h3>
+
+            {meta && <p class="mt-1 text-xs text-slate-400">{meta}</p>}
 
             {
                 description && (

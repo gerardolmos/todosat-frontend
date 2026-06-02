@@ -1,0 +1,35 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import { getManuales } from "../../lib/content";
+import ManualCard from "../../components/ManualCard.astro";
+import Pagination from "../../components/Pagination.astro";
+
+export async function getStaticPaths({ paginate }: any) {
+    const manuales = await getManuales();
+
+    return paginate(manuales, {
+        pageSize: 9,
+    });
+}
+
+const { page } = Astro.props as any;
+---
+
+<Layout title="Manuales | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="mb-8 text-4xl font-bold">Manuales</h1>
+
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {page.data.map((manual: any) => <ManualCard manual={manual} />)}
+            </div>
+
+            <Pagination
+                currentPage={page.currentPage}
+                totalPages={page.lastPage}
+                basePath="/manuales"
+            />
+        </Container>
+    </main>
+</Layout>

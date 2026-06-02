@@ -10,6 +10,8 @@ import {
 import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
+import { formatLabel } from "../../../lib/format";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
     const marcas = await getMarcas();
@@ -49,6 +51,18 @@ const manuales = (await getManuales()).filter((manual: any) =>
 <Layout title={`${marca.nombre} | TODOSat`}>
     <main class="min-h-screen py-10">
         <Container>
+            <Breadcrumbs
+                items={[
+                    {
+                        label: "Marcas",
+                        href: "/marcas",
+                    },
+                    {
+                        label: marca.nombre,
+                    },
+                ]}
+            />
+
             <a href="/marcas" class="text-blue-600 underline">
                 ← Volver a marcas
             </a>
@@ -137,6 +151,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                                     type="Modelo"
                                     title={modelo.nombre}
                                     description={modelo.descripcion_corta}
+                                    meta={modelo.marca?.nombre}
                                     url={`/modelos/${modelo.slug}`}
                                     image={modelo.imagen_principal}
                                 />
@@ -160,6 +175,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                                     type="Artículo"
                                     title={articulo.titulo}
                                     description={articulo.subtitulo}
+                                    meta={formatLabel(articulo.tipo_articulo)}
                                     url={`/articulos/${articulo.slug}`}
                                     image={articulo.imagen_principal}
                                 />
@@ -185,6 +201,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                                     type="Manual"
                                     title={manual.titulo}
                                     description={manual.descripcion}
+                                    meta={`${manual.ano_publicacion ?? ""}${manual.idioma ? ` · ${formatLabel(manual.idioma)}` : ""}`}
                                     url={`/manuales/${manual.slug}`}
                                     image={manual.imagen_portada}
                                 />

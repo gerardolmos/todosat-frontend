@@ -1,0 +1,35 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import { getModelos } from "../../lib/content";
+import ModelCard from "../../components/ModelCard.astro";
+import Pagination from "../../components/Pagination.astro";
+
+export async function getStaticPaths({ paginate }: any) {
+    const modelos = await getModelos();
+
+    return paginate(modelos, {
+        pageSize: 9,
+    });
+}
+
+const { page } = Astro.props as any;
+---
+
+<Layout title="Modelos | TODOSat">
+    <main class="min-h-screen py-10">
+        <Container>
+            <h1 class="mb-8 text-4xl font-bold">Modelos</h1>
+
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {page.data.map((modelo: any) => <ModelCard modelo={modelo} />)}
+            </div>
+
+            <Pagination
+                currentPage={page.currentPage}
+                totalPages={page.lastPage}
+                basePath="/modelos"
+            />
+        </Container>
+    </main>
+</Layout>
