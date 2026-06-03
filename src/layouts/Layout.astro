@@ -7,7 +7,7 @@ interface Props {
 }
 
 const {
-    title = "TODOSat",
+    title = "Todo-Sat",
     description = "Portal especializado en internet satelital.",
 } = Astro.props;
 ---
@@ -22,33 +22,73 @@ const {
         <meta name="description" content={description} />
     </head>
 
-    <body class="min-h-screen bg-white text-black">
-        <header class="border-b">
+    <body>
+        <header
+            class="sticky top-0 z-50 border-b border-brand-border/80 bg-white/85 backdrop-blur"
+        >
             <div
-                class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4"
+                class="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8"
             >
-                <a href="/" class="text-2xl font-bold"> TODOSat </a>
+                <a
+                    href="/"
+                    class="font-heading text-3xl font-bold tracking-tight text-brand-base"
+                >
+                    Todo-Sat
+                </a>
 
-                <nav class="flex gap-6 text-sm font-medium">
-                    <a href="/marcas">Marcas</a>
-                    <a href="/modelos">Modelos</a>
-                    <a href="/articulos">Artículos</a>
-                    <a href="/manuales">Manuales</a>
-                    <a href="/categorias">Categorías</a>
+                <nav
+                    class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-brand-muted"
+                >
+                    <a
+                        href="/marcas"
+                        class="transition hover:text-info-primary"
+                    >
+                        Marcas
+                    </a>
+                    <a
+                        href="/modelos"
+                        class="transition hover:text-info-primary"
+                    >
+                        Modelos
+                    </a>
+                    <a
+                        href="/articulos"
+                        class="transition hover:text-info-primary"
+                    >
+                        Artículos
+                    </a>
+                    <a
+                        href="/manuales"
+                        class="transition hover:text-info-primary"
+                    >
+                        Manuales
+                    </a>
+                    <a
+                        href="/categorias"
+                        class="transition hover:text-info-primary"
+                    >
+                        Categorías
+                    </a>
                 </nav>
             </div>
         </header>
 
         <slot />
 
-        <footer class="mt-20 border-t bg-gray-50">
-            <div class="mx-auto max-w-6xl px-6 py-10">
-                <div class="grid gap-8 md:grid-cols-2">
+        <footer
+            class="mt-24 border-t border-brand-border bg-slate-950 text-white"
+        >
+            <div class="mx-auto max-w-7xl px-5 py-12 sm:px-6 lg:px-8">
+                <div class="grid gap-10 md:grid-cols-2">
                     <div>
-                        <p class="text-xl font-bold text-black">TODOSat</p>
+                        <p
+                            class="font-heading text-3xl font-bold tracking-tight"
+                        >
+                            Todo-Sat
+                        </p>
 
                         <p
-                            class="mt-3 max-w-md text-sm leading-6 text-gray-600"
+                            class="mt-4 max-w-md text-sm leading-6 text-slate-300"
                         >
                             Portal especializado en internet satelital,
                             hardware, cobertura, instalación y actualidad del
@@ -57,34 +97,36 @@ const {
                     </div>
 
                     <div class="md:text-right">
-                        <p class="text-sm font-semibold text-black">
+                        <p class="text-sm font-semibold text-white">
                             Información legal
                         </p>
 
                         <div
-                            class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600 md:justify-end"
+                            class="mt-4 flex flex-wrap gap-4 text-sm text-slate-300 md:justify-end"
                         >
-                            <a href="/aviso-legal" class="hover:text-black">
+                            <a href="/aviso-legal" class="hover:text-white">
                                 Aviso legal
                             </a>
 
-                            <a href="/privacidad" class="hover:text-black">
+                            <a href="/privacidad" class="hover:text-white">
                                 Privacidad
                             </a>
 
-                            <a href="/cookies" class="hover:text-black">
+                            <a href="/cookies" class="hover:text-white">
                                 Cookies
                             </a>
 
-                            <a href="/contacto" class="hover:text-black">
+                            <a href="/contacto" class="hover:text-white">
                                 Contacto
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-8 border-t pt-6 text-sm text-gray-500">
-                    © {new Date().getFullYear()} TODOSat.
+                <div
+                    class="mt-10 border-t border-white/10 pt-6 text-sm text-slate-400"
+                >
+                    © {new Date().getFullYear()} Todo-Sat.
                 </div>
             </div>
         </footer>

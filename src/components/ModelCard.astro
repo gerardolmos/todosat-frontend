@@ -11,33 +11,41 @@ const imagenUrl = getMediaUrl(modelo.imagen_principal);
 
 <a
     href={`/modelos/${modelo.slug}`}
-    class="block overflow-hidden rounded border hover:bg-gray-50 transition"
+    class="group block overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition hover:-translate-y-1 hover:border-info-primary/40 hover:shadow-lg"
 >
     {
         imagenUrl && (
-            <img
-                src={imagenUrl}
-                alt={modelo.nombre}
-                class="h-56 w-full object-cover"
-            />
+            <div class="overflow-hidden bg-brand-soft">
+                <img
+                    src={imagenUrl}
+                    alt={modelo.nombre}
+                    class="h-56 w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+            </div>
         )
     }
 
     <div class="p-6">
-        <h3 class="text-2xl font-bold">
+        {
+            modelo.marca && (
+                <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-info-primary">
+                    {modelo.marca.nombre}
+                </p>
+            )
+        }
+
+        <h3 class="text-2xl font-bold tracking-tight text-brand-base">
             {modelo.nombre}
         </h3>
 
         {
             modelo.descripcion_corta && (
-                <p class="mt-2 text-gray-600">{modelo.descripcion_corta}</p>
+                <p class="mt-3 text-sm leading-6 text-brand-muted">
+                    {modelo.descripcion_corta}
+                </p>
             )
         }
 
-        {
-            modelo.marca && (
-                <p class="mt-4 text-sm text-gray-500">{modelo.marca.nombre}</p>
-            )
-        }
+        <p class="mt-5 text-sm font-semibold text-info-primary">Ver modelo →</p>
     </div>
 </a>

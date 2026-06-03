@@ -3,6 +3,7 @@ import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import { getCategorias, getArticulos } from "../../../lib/content";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import RelatedCard from "../../../components/RelatedCard.astro";
 
 export async function getStaticPaths() {
     const categorias = await getCategorias();
@@ -53,24 +54,26 @@ const articulos = (await getArticulos()).filter(
             <section class="mt-12">
                 <h2 class="mb-6 text-3xl font-bold">Artículos</h2>
 
-                <div class="grid gap-6">
-                    {
-                        articulos.map((articulo: any) => (
-                            <a
-                                href={`/articulos/${articulo.slug}`}
-                                class="block rounded border p-6 hover:bg-gray-50"
-                            >
-                                <h3 class="text-2xl font-bold">
-                                    {articulo.titulo}
-                                </h3>
-
-                                <p class="mt-2 text-gray-600">
-                                    {articulo.subtitulo}
-                                </p>
-                            </a>
-                        ))
-                    }
-                </div>
+                {
+                    articulos.length > 0 ? (
+                        <div class="grid gap-4 md:grid-cols-2">
+                            {articulos.map((articulo: any) => (
+                                <RelatedCard
+                                    type="Artículo"
+                                    title={articulo.titulo}
+                                    description={articulo.subtitulo}
+                                    meta={articulo.tipo_articulo}
+                                    url={`/articulos/${articulo.slug}`}
+                                    image={articulo.imagen_principal}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <p class="text-gray-600">
+                            Todavía no hay artículos en esta categoría.
+                        </p>
+                    )
+                }
             </section>
         </Container>
     </main>

@@ -5,13 +5,19 @@ import {
 	getMarcasDestacadas,
 	getArticulos,
 	getDestacados,
+	getModelos,
+	getManuales,
 } from "../lib/content";
 import ArticleCard from "../components/ArticleCard.astro";
 import BrandCard from "../components/BrandCard.astro";
 import FeaturedCard from "../components/FeaturedCard.astro";
+import ModelCard from "../components/ModelCard.astro";
+import ManualCard from "../components/ManualCard.astro";
 
 const destacados = await getDestacados();
 const marcasDestacadas = await getMarcasDestacadas();
+const modelos = (await getModelos()).slice(0, 3);
+const manuales = (await getManuales()).slice(0, 3);
 
 const articulos = (await getArticulos())
 	.sort(
@@ -26,7 +32,7 @@ const articulos = (await getArticulos())
 	<main class="min-h-screen py-10">
 		<Container>
 			<section class="py-12">
-				<h1 class="text-5xl font-bold">TODOSat</h1>
+				<h1 class="font-heading text-5xl font-bold">Todo-Sat</h1>
 
 				<p class="mt-6 max-w-3xl text-xl text-gray-600">
 					Portal especializado en internet satelital, hardware,
@@ -109,6 +115,61 @@ const articulos = (await getArticulos())
 					}
 				</div>
 			</section>
+			{
+				modelos.length > 0 && (
+					<section class="mt-16">
+						<div class="mb-6 flex items-end justify-between gap-4">
+							<div>
+								<h2 class="text-3xl font-bold">
+									Modelos recientes
+								</h2>
+								<p class="mt-2 text-gray-600">
+									Equipos y terminales destacados del
+									ecosistema satelital.
+								</p>
+							</div>
+
+							<a href="/modelos" class="text-blue-600 underline">
+								Ver todos los modelos →
+							</a>
+						</div>
+
+						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+							{modelos.map((modelo: any) => (
+								<ModelCard modelo={modelo} />
+							))}
+						</div>
+					</section>
+				)
+			}
+
+			{
+				manuales.length > 0 && (
+					<section class="mt-16">
+						<div class="mb-6 flex items-end justify-between gap-4">
+							<div>
+								<h2 class="text-3xl font-bold">
+									Últimos manuales
+								</h2>
+								<p class="mt-2 text-gray-600">
+									Documentación técnica, guías y manuales
+									relacionados.
+								</p>
+							</div>
+
+							<a href="/manuales" class="text-blue-600 underline">
+								Ver todos los manuales →
+							</a>
+						</div>
+
+						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+							{manuales.map((manual: any) => (
+								<ManualCard manual={manual} />
+							))}
+						</div>
+					</section>
+				)
+			}
 		</Container>
 	</main>
 </Layout>
