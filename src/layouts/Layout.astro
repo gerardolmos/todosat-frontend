@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import logoTodoSatcom from "../assets/logoTodoSatcom.png";
 
 interface Props {
     title?: string;
@@ -24,55 +25,110 @@ const {
 
     <body>
         <header
-            class="sticky top-0 z-50 border-b border-brand-border/80 bg-white/85 backdrop-blur"
+            id="site-header"
+            class="sticky top-0 z-50 border-b border-brand-border/80 bg-white/90 backdrop-blur transition-transform duration-300"
         >
             <div
-                class="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8"
+                class="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-6 lg:px-8"
             >
-                <a
-                    href="/"
-                    class="font-heading text-3xl font-bold tracking-tight text-brand-base"
-                >
-                    Todo-Sat
+                <a href="/" class="block shrink-0">
+                    <img
+                        src={logoTodoSatcom.src}
+                        alt="TodoSatcom"
+                        class="w-[120px] md:w-[180px]"
+                    />
                 </a>
 
-                <nav
-                    class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-brand-muted"
+                <button
+                    id="menu-toggle"
+                    type="button"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-border text-brand-base md:hidden"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
                 >
-                    <a
-                        href="/marcas"
-                        class="transition hover:text-info-primary"
+                    <span class="text-2xl leading-none">☰</span>
+                </button>
+
+                <nav
+                    class="hidden items-center gap-7 text-sm font-semibold text-brand-muted md:flex"
+                >
+                    <a href="/marcas" class="hover:text-info-primary">Marcas</a>
+                    <a href="/modelos" class="hover:text-info-primary"
+                        >Modelos</a
                     >
-                        Marcas
-                    </a>
-                    <a
-                        href="/modelos"
-                        class="transition hover:text-info-primary"
+                    <a href="/articulos" class="hover:text-info-primary"
+                        >Artículos</a
                     >
-                        Modelos
-                    </a>
-                    <a
-                        href="/articulos"
-                        class="transition hover:text-info-primary"
+                    <a href="/manuales" class="hover:text-info-primary"
+                        >Manuales</a
                     >
-                        Artículos
-                    </a>
-                    <a
-                        href="/manuales"
-                        class="transition hover:text-info-primary"
+                    <a href="/categorias" class="hover:text-info-primary"
+                        >Categorías</a
                     >
-                        Manuales
-                    </a>
-                    <a
-                        href="/categorias"
-                        class="transition hover:text-info-primary"
-                    >
-                        Categorías
-                    </a>
                 </nav>
             </div>
+
+            <nav
+                id="mobile-menu"
+                class="hidden border-t border-brand-border bg-white px-5 py-4 md:hidden"
+            >
+                <div
+                    class="flex flex-col gap-3 text-sm font-semibold text-brand-muted"
+                >
+                    <a href="/marcas" class="py-2 hover:text-info-primary"
+                        >Marcas</a
+                    >
+                    <a href="/modelos" class="py-2 hover:text-info-primary"
+                        >Modelos</a
+                    >
+                    <a href="/articulos" class="py-2 hover:text-info-primary"
+                        >Artículos</a
+                    >
+                    <a href="/manuales" class="py-2 hover:text-info-primary"
+                        >Manuales</a
+                    >
+                    <a href="/categorias" class="py-2 hover:text-info-primary"
+                        >Categorías</a
+                    >
+                </div>
+            </nav>
         </header>
 
+        <script is:inline>
+            const button = document.getElementById("menu-toggle");
+            const menu = document.getElementById("mobile-menu");
+            const header = document.getElementById("site-header");
+
+            button?.addEventListener("click", () => {
+                const isOpen = !menu?.classList.contains("hidden");
+
+                menu?.classList.toggle("hidden");
+                button.setAttribute("aria-expanded", String(!isOpen));
+            });
+
+            let lastScrollY = window.scrollY;
+
+            window.addEventListener("scroll", () => {
+                const currentScrollY = window.scrollY;
+                const menuIsOpen = !menu?.classList.contains("hidden");
+
+                if (!header || menuIsOpen) return;
+
+                if (currentScrollY <= 20) {
+                    header.classList.remove("-translate-y-full");
+                    lastScrollY = currentScrollY;
+                    return;
+                }
+
+                if (currentScrollY > lastScrollY) {
+                    header.classList.add("-translate-y-full");
+                } else {
+                    header.classList.remove("-translate-y-full");
+                }
+
+                lastScrollY = currentScrollY;
+            });
+        </script>
         <slot />
 
         <footer

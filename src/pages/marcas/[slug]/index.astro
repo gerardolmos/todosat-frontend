@@ -21,12 +21,13 @@ export async function getStaticPaths() {
             slug: marca.slug,
         },
         props: {
-            marca: marca,
+            marca,
         },
     }));
 }
 
 const { marca } = Astro.props as any;
+
 const descripcionHTML = renderBlocks(marca.descripcion_completa);
 const logoUrl = getMediaUrl(marca.logo);
 const imagenPortadaUrl = getMediaUrl(marca.imagen_portada);
@@ -48,7 +49,10 @@ const manuales = (await getManuales()).filter((manual: any) =>
 );
 ---
 
-<Layout title={`${marca.nombre} | TODOSat`}>
+<Layout
+    title={`${marca.nombre} | Todo-Sat`}
+    description={marca.descripcion_corta}
+>
     <main class="min-h-screen py-10">
         <Container>
             <Breadcrumbs
@@ -63,89 +67,103 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 ]}
             />
 
-            <a href="/marcas" class="text-blue-600 underline">
-                ← Volver a marcas
-            </a>
+            <section
+                class="mt-8 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center"
+            >
+                <div>
+                    <a
+                        href="/marcas"
+                        class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                    >
+                        ← Volver a marcas
+                    </a>
 
-            <h1 class="text-5xl font-bold mt-6">
-                {marca.nombre}
-            </h1>
+                    {
+                        logoUrl && (
+                            <img
+                                src={logoUrl}
+                                alt={`Logo de ${marca.nombre}`}
+                                class="mt-8 max-h-20 w-auto"
+                            />
+                        )
+                    }
 
-            {
-                logoUrl && (
-                    <img
-                        src={logoUrl}
-                        alt={`Logo de ${marca.nombre}`}
-                        class="mt-6 max-h-24 w-auto"
-                    />
-                )
-            }
+                    <h1 class="mt-6 max-w-4xl">
+                        {marca.nombre}
+                    </h1>
 
-            <p class="mt-6 text-xl">
-                {marca.descripcion_corta}
-            </p>
+                    {
+                        marca.descripcion_corta && (
+                            <p class="mt-6 max-w-2xl text-xl leading-8 text-brand-muted">
+                                {marca.descripcion_corta}
+                            </p>
+                        )
+                    }
 
-            {
-                imagenPortadaUrl && (
-                    <img
-                        src={imagenPortadaUrl}
-                        alt={marca.nombre}
-                        class="mt-8 w-full max-w-4xl rounded"
-                    />
-                )
-            }
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        {
+                            marca.tipo_orbita && (
+                                <span class="rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark">
+                                    {marca.tipo_orbita}
+                                </span>
+                            )
+                        }
 
-            <div class="mt-10 grid gap-3 rounded border p-6">
-                {
-                    marca.tipo_orbita && (
-                        <p>
-                            <strong>Tipo de órbita:</strong> {marca.tipo_orbita}
-                        </p>
-                    )
-                }
+                        {
+                            marca.pais_origen && (
+                                <span class="rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-muted">
+                                    {marca.pais_origen}
+                                </span>
+                            )
+                        }
+                    </div>
 
-                {
-                    marca.pais_origen && (
-                        <p>
-                            <strong>País de origen:</strong> {marca.pais_origen}
-                        </p>
-                    )
-                }
-
-                {
-                    marca.web_oficial && (
-                        <p>
-                            <strong>Web oficial:</strong>{" "}
+                    {
+                        marca.web_oficial && (
                             <a
                                 href={marca.web_oficial}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="text-blue-600 underline"
+                                class="mt-8 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-info-primary-dark"
                             >
-                                {marca.web_oficial}
+                                Web oficial →
                             </a>
-                        </p>
+                        )
+                    }
+                </div>
+
+                {
+                    imagenPortadaUrl && (
+                        <div class="overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                            <img
+                                src={imagenPortadaUrl}
+                                alt={marca.nombre}
+                                class="h-full max-h-[460px] w-full object-cover"
+                            />
+                        </div>
                     )
                 }
-            </div>
+            </section>
 
             {
                 descripcionHTML && (
-                    <section
-                        class="mt-10 prose prose-lg max-w-none"
-                        set:html={descripcionHTML}
-                    />
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <div
+                            class="prose prose-lg max-w-none"
+                            set:html={descripcionHTML}
+                        />
+                    </section>
                 )
             }
 
-            <section class="mt-12">
-                <h2 class="mb-6 text-3xl font-bold">
+            <section class="mt-16 border-t border-brand-border pt-12">
+                <h2 class="mb-6">
                     Modelos de {marca.nombre}
                 </h2>
 
                 {
                     modelos.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
                                 <RelatedCard
                                     type="Modelo"
@@ -158,18 +176,19 @@ const manuales = (await getManuales()).filter((manual: any) =>
                             ))}
                         </div>
                     ) : (
-                        <p class="text-gray-600">
+                        <p class="text-brand-muted">
                             Todavía no hay modelos publicados para esta marca.
                         </p>
                     )
                 }
             </section>
-            <section class="mt-12">
-                <h2 class="mb-6 text-3xl font-bold">Artículos relacionados</h2>
+
+            <section class="mt-16 border-t border-brand-border pt-12">
+                <h2 class="mb-6">Artículos relacionados</h2>
 
                 {
                     articulos.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
                                 <RelatedCard
                                     type="Artículo"
@@ -182,7 +201,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                             ))}
                         </div>
                     ) : (
-                        <p class="text-gray-600">
+                        <p class="text-brand-muted">
                             Todavía no hay artículos relacionados con esta
                             marca.
                         </p>
@@ -190,12 +209,12 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 }
             </section>
 
-            <section class="mt-12">
-                <h2 class="mb-6 text-3xl font-bold">Manuales relacionados</h2>
+            <section class="mt-16 border-t border-brand-border pt-12">
+                <h2 class="mb-6">Manuales relacionados</h2>
 
                 {
                     manuales.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {manuales.map((manual: any) => (
                                 <RelatedCard
                                     type="Manual"
@@ -208,7 +227,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                             ))}
                         </div>
                     ) : (
-                        <p class="text-gray-600">
+                        <p class="text-brand-muted">
                             Todavía no hay manuales relacionados con esta marca.
                         </p>
                     )

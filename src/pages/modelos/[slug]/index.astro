@@ -6,6 +6,7 @@ import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import { formatLabel } from "../../../lib/format";
 
 export async function getStaticPaths() {
     const modelos = await getModelos();
@@ -23,9 +24,7 @@ export async function getStaticPaths() {
 const { modelo } = Astro.props as any;
 
 const contenidoHTML = renderBlocks(modelo.descripcion_completa);
-
 const imagenUrl = getMediaUrl(modelo.imagen_principal);
-
 const galeria = modelo.galeria || [];
 
 const articulos = (await getArticulos()).filter((articulo: any) =>
@@ -39,9 +38,48 @@ const manuales = (await getManuales()).filter((manual: any) =>
         (modeloRelacionado: any) => modeloRelacionado.slug === modelo.slug,
     ),
 );
+
+const specs = [
+    modelo.ano_lanzamiento && {
+        label: "Año",
+        value: modelo.ano_lanzamiento,
+    },
+    modelo.velocidad_descarga && {
+        label: "Descarga",
+        value: `${modelo.velocidad_descarga} Mbps`,
+    },
+    modelo.velocidad_subida && {
+        label: "Subida",
+        value: `${modelo.velocidad_subida} Mbps`,
+    },
+    modelo.latencia && {
+        label: "Latencia",
+        value: `${modelo.latencia} ms`,
+    },
+    modelo.consumo && {
+        label: "Consumo",
+        value: modelo.consumo,
+    },
+    modelo.uso_recomendado && {
+        label: "Uso recomendado",
+        value: modelo.uso_recomendado,
+    },
+    modelo.precio_orientativo && {
+        label: "Precio orientativo",
+        value: `${modelo.precio_orientativo} €`,
+    },
+    modelo.portatil !== null &&
+        modelo.portatil !== undefined && {
+            label: "Portátil",
+            value: modelo.portatil ? "Sí" : "No",
+        },
+].filter(Boolean);
 ---
 
-<Layout title={`${modelo.nombre} | TODOSat`}>
+<Layout
+    title={`${modelo.nombre} | Todo-Sat`}
+    description={modelo.descripcion_corta}
+>
     <main class="min-h-screen py-10">
         <Container>
             <Breadcrumbs
@@ -56,103 +94,103 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 ]}
             />
 
-            <a href="/modelos" class="text-blue-600 underline">
-                ← Volver a modelos
-            </a>
+            <section
+                class="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center"
+            >
+                <div>
+                    <a
+                        href="/modelos"
+                        class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                    >
+                        ← Volver a modelos
+                    </a>
 
-            <h1 class="mt-6 text-5xl font-bold">
-                {modelo.nombre}
-            </h1>
-
-            <p class="mt-4 text-xl text-gray-600">
-                {modelo.descripcion_corta}
-            </p>
-
-            {
-                imagenUrl && (
-                    <img
-                        src={imagenUrl}
-                        alt={modelo.nombre}
-                        class="mt-8 w-full max-w-4xl rounded"
-                    />
-                )
-            }
-
-            <div class="mt-10 grid gap-4">
-                {
-                    modelo.marca && (
-                        <p>
-                            <strong>Marca:</strong>{" "}
+                    {
+                        modelo.marca && (
                             <a
                                 href={`/marcas/${modelo.marca.slug}`}
-                                class="text-blue-600 underline"
+                                class="mt-8 inline-flex rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark hover:bg-sky-200"
                             >
                                 {modelo.marca.nombre}
                             </a>
-                        </p>
+                        )
+                    }
+
+                    <h1 class="mt-6 max-w-4xl">
+                        {modelo.nombre}
+                    </h1>
+
+                    {
+                        modelo.descripcion_corta && (
+                            <p class="mt-6 max-w-2xl text-xl leading-8 text-brand-muted">
+                                {modelo.descripcion_corta}
+                            </p>
+                        )
+                    }
+                </div>
+
+                {
+                    imagenUrl && (
+                        <div class="overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                            <img
+                                src={imagenUrl}
+                                alt={modelo.nombre}
+                                class="h-full max-h-[460px] w-full object-cover"
+                            />
+                        </div>
                     )
                 }
+            </section>
 
-                <p>
-                    <strong>Año:</strong>
-                    {modelo.ano_lanzamiento}
-                </p>
+            {
+                specs.length > 0 && (
+                    <section class="mt-16 rounded-3xl border border-brand-border bg-white p-6 shadow-sm md:p-8">
+                        <h2 class="mb-6 text-3xl">Ficha técnica</h2>
 
-                <p>
-                    <strong>Velocidad descarga:</strong>
-                    {modelo.velocidad_descarga} Mbps
-                </p>
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            {specs.map((spec: any) => (
+                                <div class="rounded-2xl bg-brand-soft p-4">
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-brand-muted">
+                                        {spec.label}
+                                    </p>
+                                    <p class="mt-2 text-lg font-semibold text-brand-base">
+                                        {spec.value}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )
+            }
 
-                <p>
-                    <strong>Velocidad subida:</strong>
-                    {modelo.velocidad_subida} Mbps
-                </p>
+            {
+                contenidoHTML && (
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <div
+                            class="prose prose-lg max-w-none"
+                            set:html={contenidoHTML}
+                        />
+                    </section>
+                )
+            }
 
-                <p>
-                    <strong>Latencia:</strong>
-                    {modelo.latencia} ms
-                </p>
-
-                <p>
-                    <strong>Consumo:</strong>
-                    {modelo.consumo}
-                </p>
-
-                <p>
-                    <strong>Uso recomendado:</strong>
-                    {modelo.uso_recomendado}
-                </p>
-
-                <p>
-                    <strong>Precio orientativo:</strong>
-                    {modelo.precio_orientativo} €
-                </p>
-
-                <p>
-                    <strong>Portátil:</strong>
-                    {modelo.portatil ? "Sí" : "No"}
-                </p>
-            </div>
-
-            <section
-                class="mt-10 prose prose-lg max-w-none"
-                set:html={contenidoHTML}
-            />
             {
                 galeria.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="mb-6 text-3xl font-bold">Galería</h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Galería</h2>
 
-                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             {galeria.map((imagen: any) => {
                                 const url = getMediaUrl(imagen);
 
                                 return url ? (
-                                    <img
-                                        src={url}
-                                        alt={modelo.nombre}
-                                        class="w-full rounded"
-                                    />
+                                    <div class="overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm">
+                                        <img
+                                            src={url}
+                                            alt={modelo.nombre}
+                                            class="h-64 w-full object-cover"
+                                        />
+                                    </div>
                                 ) : null;
                             })}
                         </div>
@@ -160,24 +198,25 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 )
             }
 
-            <section class="mt-12">
-                <h2 class="mb-6 text-3xl font-bold">Artículos relacionados</h2>
+            <section class="mt-16 border-t border-brand-border pt-12">
+                <h2 class="mb-6">Artículos relacionados</h2>
 
                 {
                     articulos.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
                                 <RelatedCard
                                     type="Artículo"
                                     title={articulo.titulo}
                                     description={articulo.subtitulo}
+                                    meta={formatLabel(articulo.tipo_articulo)}
                                     url={`/articulos/${articulo.slug}`}
                                     image={articulo.imagen_principal}
                                 />
                             ))}
                         </div>
                     ) : (
-                        <p class="text-gray-600">
+                        <p class="text-brand-muted">
                             Todavía no hay artículos relacionados con este
                             modelo.
                         </p>
@@ -185,24 +224,25 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 }
             </section>
 
-            <section class="mt-12">
-                <h2 class="mb-6 text-3xl font-bold">Manuales relacionados</h2>
+            <section class="mt-16 border-t border-brand-border pt-12">
+                <h2 class="mb-6">Manuales relacionados</h2>
 
                 {
                     manuales.length > 0 ? (
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {manuales.map((manual: any) => (
                                 <RelatedCard
                                     type="Manual"
                                     title={manual.titulo}
                                     description={manual.descripcion}
+                                    meta={`${manual.ano_publicacion ?? ""}${manual.idioma ? ` · ${formatLabel(manual.idioma)}` : ""}`}
                                     url={`/manuales/${manual.slug}`}
                                     image={manual.imagen_portada}
                                 />
                             ))}
                         </div>
                     ) : (
-                        <p class="text-gray-600">
+                        <p class="text-brand-muted">
                             Todavía no hay manuales relacionados con este
                             modelo.
                         </p>

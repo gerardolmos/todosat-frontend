@@ -28,113 +28,206 @@ const articulos = (await getArticulos())
 	.slice(0, 3);
 ---
 
-<Layout title="TODOSat">
-	<main class="min-h-screen py-10">
-		<Container>
-			<section class="py-12">
-				<h1 class="font-heading text-5xl font-bold">Todo-Sat</h1>
+<Layout
+	title="Todo-Sat"
+	description="Portal especializado en internet satelital, hardware, cobertura, instalación y actualidad del sector."
+>
+	<main class="min-h-screen pb-20">
+		<section
+			class="relative overflow-hidden border-b border-brand-border py-14 md:py-20"
+		>
+			<video
+				class="absolute inset-0 h-full w-full object-cover"
+				autoplay
+				muted
+				loop
+				playsinline
+				preload="metadata"
+			>
+				<source src="/videos/hero-satcom.mp4" type="video/mp4" />
+			</video>
 
-				<p class="mt-6 max-w-3xl text-xl text-gray-600">
-					Portal especializado en internet satelital, hardware,
-					cobertura, instalación y actualidad del sector.
-				</p>
+			<div class="absolute inset-0 bg-slate-950/75"></div>
 
-				<form
-					action="/buscar"
-					method="get"
-					class="mt-8 flex max-w-2xl gap-3"
-				>
-					<input
-						type="search"
-						name="q"
-						placeholder="Buscar marcas, modelos, artículos o manuales..."
-						class="w-full rounded border px-4 py-3"
-					/>
-
-					<button
-						type="submit"
-						class="rounded bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+			<Container>
+				<div class="relative z-10 max-w-3xl">
+					<h1
+						class="font-body text-3xl font-semibold tracking-tight md:text-5xl"
+						style="color:white;"
 					>
-						Buscar
-					</button>
-				</form>
-			</section>
+						Tu referente en internet satelital y comunicaciones.
+					</h1>
 
+					<p class="mt-5 max-w-2xl text-lg leading-8 text-slate-200">
+						Guías, manuales, operadores, hardware y actualidad sobre
+						comunicaciones satelitales.
+					</p>
+
+					<form
+						action="/buscar"
+						method="get"
+						class="mt-8 flex max-w-lg flex-col gap-2 rounded-2xl border border-white/20 bg-white/90 p-2 shadow-lg backdrop-blur sm:flex-row"
+					>
+						<input
+							type="search"
+							name="q"
+							placeholder="Buscar marcas, modelos, artículos o manuales..."
+							class="min-h-11 w-full rounded-xl border border-transparent bg-white px-4 text-sm outline-none focus:border-info-primary"
+						/>
+
+						<button
+							type="submit"
+							class="rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-info-primary-dark"
+						>
+							Buscar
+						</button>
+					</form>
+				</div>
+			</Container>
+		</section>
+
+		<Container>
 			{
 				marcasDestacadas.length > 0 && (
-					<section class="mt-12">
-						<div class="mb-6 flex items-end justify-between gap-4">
-							<div>
-								<h2 class="text-3xl font-bold">
-									Marcas destacadas
-								</h2>
-								<p class="mt-2 text-gray-600">
-									Una selección de operadores y compañías
-									relevantes del sector.
-								</p>
-							</div>
+					<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+						<div class="h-1.5 bg-info-primary" />
+						<div class="p-6 md:p-8">
+							<div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+								<div>
+									<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
+										Operadores
+									</p>
 
-							<a href="/marcas" class="text-blue-600 underline">
-								Ver todas las marcas →
-							</a>
+									<h2 class="home-section-title mt-3 text-3xl font-semibold">
+										Marcas destacadas
+									</h2>
+
+									<p class="mt-3 max-w-2xl text-brand-muted">
+										Una selección de operadores y compañías
+										relevantes del sector satelital.
+									</p>
+								</div>
+
+								<a
+									href="/marcas"
+									class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
+								>
+									Ver todas las marcas
+									<span>→</span>
+								</a>
+							</div>
 						</div>
 
-						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-							{marcasDestacadas.map((marca: any) => (
-								<BrandCard marca={marca} />
-							))}
+						<div class="border-t border-brand-border bg-sky-50 p-6 md:p-8">
+							<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+								{marcasDestacadas.map((marca: any) => (
+									<BrandCard marca={marca} />
+								))}
+							</div>
 						</div>
 					</section>
 				)
 			}
-
 			{
 				destacados.length > 0 && (
-					<section class="mt-12">
-						<h2 class="mb-6 text-3xl font-bold">
-							Contenido destacado
-						</h2>
+					<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+						<div class="h-1.5 bg-info-primary" />
 
-						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-							{destacados.map((destacado: any) => (
-								<FeaturedCard destacado={destacado} />
-							))}
+						<div class="p-6 md:p-8">
+							<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
+								Selección editorial
+							</p>
+
+							<h2 class="home-section-title mt-3 text-3xl font-semibold">
+								Contenido destacado
+							</h2>
+						</div>
+
+						<div class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8">
+							<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+								{destacados.map((destacado: any) => (
+									<FeaturedCard destacado={destacado} />
+								))}
+							</div>
 						</div>
 					</section>
 				)
 			}
 
-			<section class="mt-16">
-				<h2 class="mb-6 text-3xl font-bold">Últimos artículos</h2>
+			<section
+				class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm"
+			>
+				<div class="h-1.5 bg-info-primary"></div>
 
-				<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-					{
-						articulos.map((articulo: any) => (
-							<ArticleCard articulo={articulo} />
-						))
-					}
+				<div class="p-6 md:p-8">
+					<div
+						class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+					>
+						<div>
+							<p
+								class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white"
+							>
+								Actualidad y guías
+							</p>
+
+							<h2
+								class="home-section-title mt-3 text-3xl font-semibold"
+							>
+								Últimos artículos
+							</h2>
+						</div>
+
+						<a
+							href="/articulos"
+							class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
+						>
+							Ver todos los artículos
+							<span>→</span>
+						</a>
+					</div>
+				</div>
+
+				<div
+					class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8"
+				>
+					<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+						{
+							articulos.map((articulo: any) => (
+								<ArticleCard articulo={articulo} />
+							))
+						}
+					</div>
 				</div>
 			</section>
+
 			{
 				modelos.length > 0 && (
-					<section class="mt-16">
-						<div class="mb-6 flex items-end justify-between gap-4">
+					<section class="mt-16 border-t border-brand-border pt-10">
+						<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 							<div>
-								<h2 class="text-3xl font-bold">
+								<p class="mb-3 text-sm font-semibold uppercase tracking-wider text-info-primary">
+									Hardware
+								</p>
+
+								<h2 class="home-section-title">
 									Modelos recientes
 								</h2>
-								<p class="mt-2 text-gray-600">
+
+								<p class="mt-3 max-w-2xl text-brand-muted">
 									Equipos y terminales destacados del
 									ecosistema satelital.
 								</p>
 							</div>
 
-							<a href="/modelos" class="text-blue-600 underline">
+							<a
+								href="/modelos"
+								class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+							>
 								Ver todos los modelos →
 							</a>
 						</div>
 
-						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+						<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 							{modelos.map((modelo: any) => (
 								<ModelCard modelo={modelo} />
 							))}
@@ -145,24 +238,32 @@ const articulos = (await getArticulos())
 
 			{
 				manuales.length > 0 && (
-					<section class="mt-16">
-						<div class="mb-6 flex items-end justify-between gap-4">
+					<section class="mt-16 border-t border-brand-border pt-10">
+						<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
 							<div>
-								<h2 class="text-3xl font-bold">
+								<p class="mb-3 text-sm font-semibold uppercase tracking-wider text-info-primary">
+									Documentación
+								</p>
+
+								<h2 class="home-section-title">
 									Últimos manuales
 								</h2>
-								<p class="mt-2 text-gray-600">
+
+								<p class="mt-3 max-w-2xl text-brand-muted">
 									Documentación técnica, guías y manuales
 									relacionados.
 								</p>
 							</div>
 
-							<a href="/manuales" class="text-blue-600 underline">
+							<a
+								href="/manuales"
+								class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+							>
 								Ver todos los manuales →
 							</a>
 						</div>
 
-						<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+						<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 							{manuales.map((manual: any) => (
 								<ManualCard manual={manual} />
 							))}

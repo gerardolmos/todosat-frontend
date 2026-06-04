@@ -6,6 +6,7 @@ import { getMediaUrl } from "../../../lib/media";
 import Container from "../../../components/Container.astro";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import { formatLabel } from "../../../lib/format";
 
 export async function getStaticPaths() {
     const articulos = await getArticulos();
@@ -15,12 +16,13 @@ export async function getStaticPaths() {
             slug: articulo.slug,
         },
         props: {
-            articulo: articulo,
+            articulo,
         },
     }));
 }
 
 const { articulo } = Astro.props as any;
+
 const contenidoHTML = renderBlocks(articulo.contenido);
 const imagenUrl = getMediaUrl(articulo.imagen_principal);
 
@@ -30,7 +32,10 @@ const modelos = articulo.modelos || [];
 const manuales = articulo.manuals || [];
 ---
 
-<Layout title={`${articulo.titulo} | TODOSat`}>
+<Layout
+    title={`${articulo.titulo} | Todo-Sat`}
+    description={articulo.subtitulo}
+>
     <main class="min-h-screen py-10">
         <Container>
             <Breadcrumbs
@@ -44,75 +49,88 @@ const manuales = articulo.manuals || [];
                     },
                 ]}
             />
-            <a href="/articulos" class="text-blue-600 underline">
-                ← Volver a artículos
-            </a>
 
-            <h1 class="text-5xl font-bold mt-6">
-                {articulo.titulo}
-            </h1>
+            <article class="mt-8">
+                <a
+                    href="/articulos"
+                    class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                >
+                    ← Volver a artículos
+                </a>
 
-            {
-                articulo.subtitulo && (
-                    <p class="mt-4 text-2xl text-gray-700">
-                        {articulo.subtitulo}
-                    </p>
-                )
-            }
+                <header class="mt-8 max-w-4xl">
+                    <div class="flex flex-wrap gap-3">
+                        {
+                            articulo.tipo_articulo && (
+                                <span class="rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark">
+                                    {formatLabel(articulo.tipo_articulo)}
+                                </span>
+                            )
+                        }
 
-            {
-                imagenUrl && (
-                    <img
-                        src={imagenUrl}
-                        alt={articulo.titulo}
-                        class="mt-8 w-full max-w-4xl rounded"
-                    />
-                )
-            }
+                        {
+                            articulo.fecha_publicacion && (
+                                <span class="rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-muted">
+                                    {articulo.fecha_publicacion}
+                                </span>
+                            )
+                        }
 
-            <div class="mt-10 space-y-2">
+                        {
+                            categoria && (
+                                <a
+                                    href={`/categorias/${categoria.slug}`}
+                                    class="rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-muted hover:text-info-primary"
+                                >
+                                    {categoria.nombre}
+                                </a>
+                            )
+                        }
+                    </div>
+
+                    <h1 class="mt-6">
+                        {articulo.titulo}
+                    </h1>
+
+                    {
+                        articulo.subtitulo && (
+                            <p class="mt-6 text-2xl leading-9 text-brand-muted">
+                                {articulo.subtitulo}
+                            </p>
+                        )
+                    }
+                </header>
+
                 {
-                    articulo.tipo_articulo && (
-                        <p>
-                            Tipo: <strong>{articulo.tipo_articulo}</strong>
-                        </p>
+                    imagenUrl && (
+                        <div class="mt-10 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                            <img
+                                src={imagenUrl}
+                                alt={articulo.titulo}
+                                class="max-h-[520px] w-full object-cover"
+                            />
+                        </div>
                     )
                 }
 
                 {
-                    articulo.fecha_publicacion && (
-                        <p>
-                            Fecha: <strong>{articulo.fecha_publicacion}</strong>
-                        </p>
+                    contenidoHTML && (
+                        <section class="mt-14 border-t border-brand-border pt-12">
+                            <div
+                                class="prose prose-lg max-w-none"
+                                set:html={contenidoHTML}
+                            />
+                        </section>
                     )
                 }
-
-                {
-                    categoria && (
-                        <p>
-                            Categoría:{" "}
-                            <a
-                                href={`/categorias/${categoria.slug}`}
-                                class="text-blue-600 underline"
-                            >
-                                {categoria.nombre}
-                            </a>
-                        </p>
-                    )
-                }
-            </div>
-
-            <section
-                class="mt-10 prose prose-lg max-w-none"
-                set:html={contenidoHTML}
-            />
+            </article>
 
             {
                 marcas.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="text-3xl font-bold">Marcas relacionadas</h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Marcas relacionadas</h2>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {marcas.map((marca: any) => (
                                 <RelatedCard
                                     type="Marca"
@@ -129,10 +147,10 @@ const manuales = articulo.manuals || [];
 
             {
                 modelos.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="text-3xl font-bold">Modelos relacionados</h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Modelos relacionados</h2>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
                                 <RelatedCard
                                     type="Modelo"
@@ -149,12 +167,10 @@ const manuales = articulo.manuals || [];
 
             {
                 manuales.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="text-3xl font-bold">
-                            Manuales relacionados
-                        </h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Manuales relacionados</h2>
 
-                        <div class="mt-4 grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {manuales.map((manual: any) => (
                                 <RelatedCard
                                     type="Manual"

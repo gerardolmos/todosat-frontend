@@ -5,6 +5,7 @@ import { getManuales } from "../../../lib/content";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import { formatLabel } from "../../../lib/format";
 
 export async function getStaticPaths() {
     const manuales = await getManuales();
@@ -26,9 +27,29 @@ const imagenUrl = getMediaUrl(manual.imagen_portada);
 const marcas = manual.marcas || [];
 const modelos = manual.modelos || [];
 const articulos = manual.articulos || [];
+
+const meta = [
+    manual.version && {
+        label: "Versión",
+        value: manual.version,
+    },
+    manual.idioma && {
+        label: "Idioma",
+        value: formatLabel(manual.idioma),
+    },
+    manual.ano_publicacion && {
+        label: "Año",
+        value: manual.ano_publicacion,
+    },
+    manual.oficial !== null &&
+        manual.oficial !== undefined && {
+            label: "Tipo",
+            value: manual.oficial ? "Manual oficial" : "Manual no oficial",
+        },
+].filter(Boolean);
 ---
 
-<Layout title={`${manual.titulo} | TODOSat`}>
+<Layout title={`${manual.titulo} | Todo-Sat`} description={manual.descripcion}>
     <main class="min-h-screen py-10">
         <Container>
             <Breadcrumbs
@@ -42,94 +63,93 @@ const articulos = manual.articulos || [];
                     },
                 ]}
             />
-            <a href="/manuales" class="text-blue-600 underline">
-                ← Volver a manuales
-            </a>
 
-            <h1 class="mt-6 text-5xl font-bold">
-                {manual.titulo}
-            </h1>
+            <section
+                class="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center"
+            >
+                <div>
+                    <a
+                        href="/manuales"
+                        class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                    >
+                        ← Volver a manuales
+                    </a>
+
+                    {
+                        manual.idioma && (
+                            <p class="mt-8 inline-flex rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark">
+                                {formatLabel(manual.idioma)}
+                            </p>
+                        )
+                    }
+
+                    <h1 class="mt-6 max-w-4xl">
+                        {manual.titulo}
+                    </h1>
+
+                    {
+                        manual.descripcion && (
+                            <p class="mt-6 max-w-2xl text-xl leading-8 text-brand-muted">
+                                {manual.descripcion}
+                            </p>
+                        )
+                    }
+
+                    {
+                        archivoPdfUrl && (
+                            <a
+                                href={archivoPdfUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="mt-8 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-info-primary-dark"
+                            >
+                                Abrir PDF →
+                            </a>
+                        )
+                    }
+                </div>
+
+                {
+                    imagenUrl && (
+                        <div class="overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                            <img
+                                src={imagenUrl}
+                                alt={manual.titulo}
+                                class="h-full max-h-[460px] w-full object-cover"
+                            />
+                        </div>
+                    )
+                }
+            </section>
 
             {
-                manual.descripcion && (
-                    <p class="mt-4 text-xl text-gray-700">
-                        {manual.descripcion}
-                    </p>
-                )
-            }
+                meta.length > 0 && (
+                    <section class="mt-16 rounded-3xl border border-brand-border bg-white p-6 shadow-sm md:p-8">
+                        <h2 class="mb-6 text-3xl">Datos del manual</h2>
 
-            {
-                imagenUrl && (
-                    <img
-                        src={imagenUrl}
-                        alt={manual.titulo}
-                        class="mt-8 w-full max-w-4xl rounded"
-                    />
-                )
-            }
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            {meta.map((item: any) => (
+                                <div class="rounded-2xl bg-brand-soft p-4">
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-brand-muted">
+                                        {item.label}
+                                    </p>
 
-            <div class="mt-10 space-y-2">
-                {
-                    manual.version && (
-                        <p>
-                            Versión: <strong>{manual.version}</strong>
-                        </p>
-                    )
-                }
-
-                {
-                    manual.idioma && (
-                        <p>
-                            Idioma: <strong>{manual.idioma}</strong>
-                        </p>
-                    )
-                }
-
-                {
-                    manual.ano_publicacion && (
-                        <p>
-                            Año: <strong>{manual.ano_publicacion}</strong>
-                        </p>
-                    )
-                }
-
-                {
-                    manual.oficial !== null && manual.oficial !== undefined && (
-                        <p>
-                            Tipo:{" "}
-                            <strong>
-                                {manual.oficial
-                                    ? "Manual oficial"
-                                    : "Manual no oficial"}
-                            </strong>
-                        </p>
-                    )
-                }
-            </div>
-
-            {
-                archivoPdfUrl && (
-                    <p class="mt-8">
-                        <a
-                            href={archivoPdfUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="inline-block rounded bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
-                        >
-                            Abrir PDF
-                        </a>
-                    </p>
+                                    <p class="mt-2 text-lg font-semibold text-brand-base">
+                                        {item.value}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
                 )
             }
 
             {
                 marcas.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="mb-6 text-3xl font-bold">
-                            Marcas relacionadas
-                        </h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Marcas relacionadas</h2>
 
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {marcas.map((marca: any) => (
                                 <RelatedCard
                                     type="Marca"
@@ -146,12 +166,10 @@ const articulos = manual.articulos || [];
 
             {
                 modelos.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="mb-6 text-3xl font-bold">
-                            Modelos relacionados
-                        </h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Modelos relacionados</h2>
 
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
                                 <RelatedCard
                                     type="Modelo"
@@ -168,12 +186,10 @@ const articulos = manual.articulos || [];
 
             {
                 articulos.length > 0 && (
-                    <section class="mt-12">
-                        <h2 class="mb-6 text-3xl font-bold">
-                            Artículos relacionados
-                        </h2>
+                    <section class="mt-16 border-t border-brand-border pt-12">
+                        <h2 class="mb-6">Artículos relacionados</h2>
 
-                        <div class="grid gap-4 md:grid-cols-2">
+                        <div class="grid gap-5 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
                                 <RelatedCard
                                     type="Artículo"

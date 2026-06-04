@@ -130,7 +130,7 @@
 
 @theme {
     --font-body: "Inter", sans-serif;
-    --font-heading: "Source Serif 4", serif;
+    --font-heading: "Inter", sans-serif;
 
     --color-brand-base: var(--color-slate-950);
     --color-brand-muted: var(--color-slate-600);
@@ -175,18 +175,24 @@ h6 {
 }
 
 h1 {
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-size: clamp(2rem, 4vw, 3.25rem);
     font-weight: 700;
 }
 
 h2 {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 700;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 600;
 }
 
 h3 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
     font-weight: 600;
+}
+
+.home-section-title {
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: -0.02em;
 }
 
 p {
