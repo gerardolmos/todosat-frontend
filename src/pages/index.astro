@@ -13,6 +13,7 @@ import BrandCard from "../components/BrandCard.astro";
 import FeaturedCard from "../components/FeaturedCard.astro";
 import ModelCard from "../components/ModelCard.astro";
 import ManualCard from "../components/ManualCard.astro";
+import HomeOperatorsSection from "../components/HomeOperatorsSection.astro";
 
 const destacados = await getDestacados();
 const marcasDestacadas = await getMarcasDestacadas();
@@ -86,8 +87,9 @@ const articulos = (await getArticulos())
 			</Container>
 		</section>
 
-		<Container>
-			{
+		<section class="bg-slate-950">
+			<Container>
+				<!-- {
 				marcasDestacadas.length > 0 && (
 					<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
 						<div class="h-1.5 bg-info-primary" />
@@ -98,13 +100,16 @@ const articulos = (await getArticulos())
 										Operadores
 									</p>
 
-									<h2 class="home-section-title mt-3 text-3xl font-semibold">
-										Marcas destacadas
+									<h2 class="home-section-title mt-3 text-4xl font-black tracking-tight">
+										Operadores y compañías satelitales
 									</h2>
 
-									<p class="mt-3 max-w-2xl text-brand-muted">
-										Una selección de operadores y compañías
-										relevantes del sector satelital.
+									<p class="mt-3 max-w-3xl text-base leading-7 text-brand-muted">
+										Explora las principales empresas del
+										ecosistema satelital: operadores de
+										internet, constelaciones, proveedores de
+										conectividad y compañías clave del
+										sector.
 									</p>
 								</div>
 
@@ -127,150 +132,186 @@ const articulos = (await getArticulos())
 						</div>
 					</section>
 				)
-			}
-			{
-				destacados.length > 0 && (
-					<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
-						<div class="h-1.5 bg-info-primary" />
+			} -->
+				<HomeOperatorsSection />
+				{
+					destacados.length > 0 && (
+						<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+							<div class="h-1.5 bg-info-primary" />
 
-						<div class="p-6 md:p-8">
-							<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
-								Selección editorial
-							</p>
+							<div class="p-6 md:p-8">
+								<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
+									Selección editorial
+								</p>
 
-							<h2 class="home-section-title mt-3 text-3xl font-semibold">
-								Contenido destacado
-							</h2>
-						</div>
+								<h2 class="home-section-title mt-3 text-4xl font-black tracking-tight">
+									Selección destacada
+								</h2>
 
-						<div class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8">
-							<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-								{destacados.map((destacado: any) => (
-									<FeaturedCard destacado={destacado} />
-								))}
+								<p class="mt-3 max-w-3xl text-base leading-7 text-brand-muted">
+									Accede rápidamente a contenidos relevantes
+									del portal: marcas, modelos, artículos y
+									manuales seleccionados por su utilidad
+									dentro del ecosistema satelital.
+								</p>
 							</div>
-						</div>
-					</section>
-				)
-			}
 
-			<section
-				class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm"
-			>
-				<div class="h-1.5 bg-info-primary"></div>
+							<div class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8">
+								<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+									{destacados.map((destacado: any) => (
+										<FeaturedCard destacado={destacado} />
+									))}
+								</div>
+							</div>
+						</section>
+					)
+				}
 
-				<div class="p-6 md:p-8">
-					<div
-						class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
-					>
-						<div>
-							<p
-								class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white"
-							>
-								Actualidad y guías
-							</p>
-
-							<h2
-								class="home-section-title mt-3 text-3xl font-semibold"
-							>
-								Últimos artículos
-							</h2>
-						</div>
-
-						<a
-							href="/articulos"
-							class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
-						>
-							Ver todos los artículos
-							<span>→</span>
-						</a>
-					</div>
-				</div>
-
-				<div
-					class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8"
+				<section
+					class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm"
 				>
-					<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-						{
-							articulos.map((articulo: any) => (
-								<ArticleCard articulo={articulo} />
-							))
-						}
+					<div class="h-1.5 bg-info-primary"></div>
+
+					<div class="p-6 md:p-8">
+						<div
+							class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"
+						>
+							<div>
+								<p
+									class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white"
+								>
+									Actualidad y guías
+								</p>
+
+								<h2
+									class="home-section-title mt-3 text-4xl font-black tracking-tight"
+								>
+									Guías y actualidad satelital
+								</h2>
+
+								<p
+									class="mt-3 max-w-3xl text-base leading-7 text-brand-muted"
+								>
+									Lee guías, análisis, comparativas y noticias
+									sobre internet satelital, instalación,
+									cobertura, operadores, hardware y evolución
+									del sector.
+								</p>
+							</div>
+
+							<a
+								href="/articulos"
+								class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
+							>
+								Ver todos los artículos
+								<span>→</span>
+							</a>
+						</div>
 					</div>
-				</div>
-			</section>
 
-			{
-				modelos.length > 0 && (
-					<section class="mt-16 border-t border-brand-border pt-10">
-						<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-							<div>
-								<p class="mb-3 text-sm font-semibold uppercase tracking-wider text-info-primary">
-									Hardware
-								</p>
+					<div
+						class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8"
+					>
+						<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+							{
+								articulos.map((articulo: any) => (
+									<ArticleCard articulo={articulo} />
+								))
+							}
+						</div>
+					</div>
+				</section>
 
-								<h2 class="home-section-title">
-									Modelos recientes
-								</h2>
+				{
+					modelos.length > 0 && (
+						<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+							<div class="h-1.5 bg-info-primary" />
 
-								<p class="mt-3 max-w-2xl text-brand-muted">
-									Equipos y terminales destacados del
-									ecosistema satelital.
-								</p>
+							<div class="p-6 md:p-8">
+								<div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+									<div>
+										<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
+											Hardware
+										</p>
+
+										<h2 class="home-section-title mt-3 text-4xl font-black tracking-tight">
+											Equipos y terminales satelitales
+										</h2>
+
+										<p class="mt-3 max-w-3xl text-base leading-7 text-brand-muted">
+											Consulta modelos de antenas,
+											routers, kits de instalación y
+											terminales utilizados para acceder a
+											servicios de conectividad satelital.
+										</p>
+									</div>
+
+									<a
+										href="/modelos"
+										class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
+									>
+										Ver todos los modelos
+										<span>→</span>
+									</a>
+								</div>
 							</div>
 
-							<a
-								href="/modelos"
-								class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
-							>
-								Ver todos los modelos →
-							</a>
-						</div>
+							<div class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8">
+								<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+									{modelos.map((modelo: any) => (
+										<ModelCard modelo={modelo} />
+									))}
+								</div>
+							</div>
+						</section>
+					)
+				}
+				{
+					manuales.length > 0 && (
+						<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+							<div class="h-1.5 bg-info-primary" />
 
-						<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-							{modelos.map((modelo: any) => (
-								<ModelCard modelo={modelo} />
-							))}
-						</div>
-					</section>
-				)
-			}
+							<div class="p-6 md:p-8">
+								<div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+									<div>
+										<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
+											Documentación
+										</p>
 
-			{
-				manuales.length > 0 && (
-					<section class="mt-16 border-t border-brand-border pt-10">
-						<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-							<div>
-								<p class="mb-3 text-sm font-semibold uppercase tracking-wider text-info-primary">
-									Documentación
-								</p>
+										<h2 class="home-section-title mt-3 text-4xl font-black tracking-tight">
+											Manuales y documentación técnica
+										</h2>
 
-								<h2 class="home-section-title">
-									Últimos manuales
-								</h2>
+										<p class="mt-3 max-w-3xl text-base leading-7 text-brand-muted">
+											Encuentra manuales de usuario,
+											documentos técnicos, guías de
+											instalación y recursos prácticos
+											para configurar y entender equipos
+											satelitales.
+										</p>
+									</div>
 
-								<p class="mt-3 max-w-2xl text-brand-muted">
-									Documentación técnica, guías y manuales
-									relacionados.
-								</p>
+									<a
+										href="/manuales"
+										class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
+									>
+										Ver todos los manuales
+										<span>→</span>
+									</a>
+								</div>
 							</div>
 
-							<a
-								href="/manuales"
-								class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
-							>
-								Ver todos los manuales →
-							</a>
-						</div>
-
-						<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-							{manuales.map((manual: any) => (
-								<ManualCard manual={manual} />
-							))}
-						</div>
-					</section>
-				)
-			}
-		</Container>
+							<div class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8">
+								<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+									{manuales.map((manual: any) => (
+										<ManualCard manual={manual} />
+									))}
+								</div>
+							</div>
+						</section>
+					)
+				}
+			</Container>
+		</section>
 	</main>
 </Layout>

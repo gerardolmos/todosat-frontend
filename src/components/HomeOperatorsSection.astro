@@ -1,0 +1,220 @@
+---
+import starlinkLogo from "../assets/BrandLogos/starlink.png";
+import kuiperLogo from "../assets/BrandLogos/kuipersystems.png";
+import viasatLogo from "../assets/BrandLogos/viasat.png";
+import onewebLogo from "../assets/BrandLogos/oneweb.png";
+import eutelsatLogo from "../assets/BrandLogos/eutelsat.png";
+import iridiumLogo from "../assets/BrandLogos/iridium.png";
+import sesLogo from "../assets/BrandLogos/ses.png";
+import intelsatLogo from "../assets/BrandLogos/intelsat.png";
+import globalstarLogo from "../assets/BrandLogos/globalstar.png";
+import telesatLogo from "../assets/BrandLogos/telesat.png";
+import hughesLogo from "../assets/BrandLogos/hughes.png";
+import echostarLogo from "../assets/BrandLogos/echostar.png";
+import ligadoLogo from "../assets/BrandLogos/ligado.png";
+import inmarsatLogo from "../assets/BrandLogos/inmarsat.png";
+import starlinkHero from "../assets/operators/starlink-home.png";
+
+const operators = [
+    { name: "Starlink", type: "Internet satelital", logo: starlinkLogo },
+    { name: "Project Kuiper", type: "Internet satelital", logo: kuiperLogo },
+    { name: "Viasat", type: "Conectividad satelital", logo: viasatLogo },
+    { name: "OneWeb", type: "Internet satelital", logo: onewebLogo },
+    { name: "Eutelsat", type: "Operador satelital", logo: eutelsatLogo },
+    { name: "Iridium", type: "Conectividad global", logo: iridiumLogo },
+    { name: "SES", type: "Operador satelital", logo: sesLogo },
+    { name: "Intelsat", type: "Conectividad global", logo: intelsatLogo },
+    { name: "Globalstar", type: "Comunicaciones", logo: globalstarLogo },
+    { name: "Telesat", type: "Operador satelital", logo: telesatLogo },
+    { name: "Hughes", type: "Internet satelital", logo: hughesLogo },
+    { name: "Echostar", type: "Operador satelital", logo: echostarLogo },
+    { name: "Ligado", type: "Conectividad 5G NTN", logo: ligadoLogo },
+    { name: "Inmarsat", type: "Conectividad satelital", logo: inmarsatLogo },
+];
+
+const metrics = [
+    {
+        label: "Cobertura",
+        value: "Global",
+        description: "Disponible en más de 100 países",
+    },
+    {
+        label: "Órbita",
+        value: "LEO",
+        description: "Órbita baja terrestre",
+    },
+    {
+        label: "Satélites",
+        value: "+7.000",
+        description: "Constelación activa y en crecimiento",
+    },
+    {
+        label: "Latencia",
+        value: "25-50 ms",
+        description: "Baja latencia para mejor experiencia",
+    },
+    {
+        label: "Velocidad",
+        value: "50-250 Mbps",
+        description: "Descarga típica según ubicación",
+    },
+];
+---
+
+<section
+    class="mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-10 md:py-12"
+>
+    <div class="grid gap-10 lg:grid-cols-4">
+        <div class="lg:col-span-1">
+            <p
+                class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400"
+            >
+                Operadores
+            </p>
+
+            <h2
+                class="mt-6 text-4xl font-black leading-tight tracking-tight !text-white md:text-5xl"
+            >
+                Operadores y compañías satelitales
+            </h2>
+
+            <p class="mt-5 text-base leading-7 text-slate-300">
+                Explora las principales empresas del ecosistema satelital:
+                operadores de internet, constelaciones, proveedores de
+                conectividad y compañías clave del sector.
+            </p>
+
+            <a
+                href="/marcas"
+                class="mt-8 inline-flex items-center gap-3 rounded-full border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
+            >
+                Ver todas las marcas
+                <span>→</span>
+            </a>
+        </div>
+
+        <div
+            class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 lg:col-span-3"
+        >
+            {
+                operators.map((operator, index) => (
+                    <button
+                        type="button"
+                        class={`flex h-40 flex-col justify-between rounded-xl border p-4 text-center text-white transition ${
+                            index === 0
+                                ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-950"
+                                : "border-slate-700 bg-slate-900/70 hover:border-blue-500/70 hover:bg-slate-900"
+                        }`}
+                    >
+                        <div class="flex h-16 items-center justify-center">
+                            <div class="flex h-16 w-30 items-center justify-center">
+                                <img
+                                    src={operator.logo.src}
+                                    alt={operator.name}
+                                    class="max-h-full max-w-full object-contain"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="h-10">
+                            <p class="text-sm font-normal leading-tight !text-slate-200">
+                                {operator.name}
+                            </p>
+
+                            <p class="text-xs leading-tight !text-slate-400">
+                                {operator.type}
+                            </p>
+                        </div>
+                    </button>
+                ))
+            }
+        </div>
+    </div>
+
+    <div class="relative mt-10 overflow-hidden rounded-2xl bg-slate-950">
+        <img
+            src={starlinkHero.src}
+            alt=""
+            class="absolute inset-0 h-full w-full object-cover opacity-65"
+        />
+
+        <div
+            class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/10"
+        >
+        </div>
+
+        <div class="relative p-8 md:p-10">
+            <div class="max-w-xl">
+                <div class="flex items-center gap-3">
+                    <img
+                        src={starlinkLogo.src}
+                        alt="Starlink"
+                        class="h-28 max-w-32 object-contain"
+                    />
+
+                    <p
+                        class="inline-flex rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-blue-400"
+                    >
+                        Operador destacado
+                    </p>
+                </div>
+
+                <p
+                    class="mt-4 text-5xl font-semibold leading-none tracking-tight !text-white"
+                >
+                    Starlink
+                </p>
+
+                <p class="mt-1 text-xl leading-7 text-slate-100">
+                    Internet satelital de órbita baja con cobertura global.
+                </p>
+
+                <p class="mt-4 text-sm leading-7 text-slate-300">
+                    Starlink, de SpaceX, ofrece internet de alta velocidad y
+                    baja latencia en numerosos países gracias a su constelación
+                    de satélites en órbita baja.
+                </p>
+
+                <div class="mt-7 flex flex-wrap gap-3">
+                    <a
+                        href="/marcas/starlink"
+                        class="inline-flex items-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
+                    >
+                        Ver operador
+                        <span>→</span>
+                    </a>
+
+                    <a
+                        href="https://www.starlink.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-3 rounded-full border border-slate-600 bg-slate-950/40 px-6 py-3 text-sm font-bold text-white transition hover:border-blue-500 hover:text-blue-400"
+                    >
+                        Sitio oficial
+                        <span>↗</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative grid bg-slate-950/80 backdrop-blur md:grid-cols-5">
+            {
+                metrics.map((item) => (
+                    <div class="p-5">
+                        <p class="text-xs font-bold uppercase tracking-widest text-blue-400">
+                            {item.label}
+                        </p>
+
+                        <p class="mt-2 text-lg font-bold !text-white">
+                            {item.value}
+                        </p>
+
+                        <p class="mt-1 text-sm text-slate-400">
+                            {item.description}
+                        </p>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>

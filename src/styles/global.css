@@ -44,49 +44,17 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: "Inter";
+    src: url("../assets/fonts/Inter/Inter-Black.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* =========================
    SOURCE SERIF 4
 ========================= */
-
-@font-face {
-    font-family: "Inter";
-    src: url("../assets/fonts/Inter/Inter-Regular.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Inter";
-    src: url("../assets/fonts/Inter/Inter-Italic.woff2") format("woff2");
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Inter";
-    src: url("../assets/fonts/Inter/Inter-Medium.woff2") format("woff2");
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Inter";
-    src: url("../assets/fonts/Inter/Inter-SemiBold.woff2") format("woff2");
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Inter";
-    src: url("../assets/fonts/Inter/Inter-Bold.woff2") format("woff2");
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
 
 @font-face {
     font-family: "Source Serif 4";
@@ -191,8 +159,7 @@ h3 {
 
 .home-section-title {
     font-family: var(--font-body);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
 }
 
 p {
@@ -206,5 +173,4 @@ a {
 img {
     display: block;
     max-width: 100%;
-    height: auto;
 }
