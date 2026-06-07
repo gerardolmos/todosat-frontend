@@ -138,9 +138,7 @@ h4,
 h5,
 h6 {
     font-family: var(--font-heading);
-    color: var(--color-brand-base);
     line-height: 1.1;
-    font-weight: inherit;
 }
 
 

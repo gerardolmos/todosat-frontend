@@ -15,10 +15,10 @@ const manuales = await getManuales();
 
 const datosBusqueda = [
     ...marcas.map((item: any) => ({
-        tipo: "Marca",
+        tipo: "Operador",
         titulo: item.nombre,
         descripcion: item.descripcion_corta,
-        url: `/marcas/${item.slug}`,
+        url: `/operadores/${item.slug}`,
         texto: `${item.nombre} ${item.descripcion_corta} ${item.pais_origen} ${item.tipo_orbita}`,
     })),
     ...modelos.map((item: any) => ({
@@ -59,7 +59,7 @@ const datosBusqueda = [
                     id="search-input"
                     type="search"
                     name="q"
-                    placeholder="Buscar marcas, modelos, artículos o manuales..."
+                    placeholder="Buscar operadores, modelos, artículos o manuales..."
                     class="w-full rounded border px-4 py-3"
                 />
 
@@ -120,7 +120,7 @@ const datosBusqueda = [
                 );
 
                 const marcas = resultados.filter(
-                    (item: SearchItem) => item.tipo === "Marca",
+                    (item: SearchItem) => item.tipo === "Operador",
                 );
 
                 const modelos = resultados.filter(
@@ -151,7 +151,7 @@ const datosBusqueda = [
                        marcas.length > 0
                            ? `
 <section class="mt-8">
-    <h2 class="mb-4 text-2xl font-bold">Marcas</h2>
+    <h2 class="mb-4 text-2xl font-bold">Operadores</h2>
 
     <ul class="space-y-4">
         ${marcas

@@ -1,0 +1,61 @@
+---
+import FeaturedCard from "./FeaturedCard.astro";
+import seleccionBg from "../assets/images/seleccionbg.png";
+
+interface Props {
+    destacados: any[];
+}
+
+const { destacados } = Astro.props;
+---
+
+{
+    destacados.length > 0 && (
+        <section class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12">
+            <img
+                src={seleccionBg.src}
+                alt=""
+                class="pointer-events-none absolute right-0 top-0 h-[430px] w-full object-cover opacity-70"
+            />
+
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/5 via-slate-950/50 to-slate-950" />
+
+            <div class="relative z-10">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
+                            SELECCIÓN TODOSATCOM
+                        </p>
+
+                        <h2 class="mt-6 text-4xl font-bold leading-tight tracking-tight !text-white md:text-5xl">
+                            Selección destacada
+                        </h2>
+
+                        <p class="mt-5 max-w-md text-base leading-7 text-slate-300">
+                            Accede rápidamente a contenidos relevantes del
+                            portal: operadores, modelos, artículos y manuales
+                            seleccionados por su utilidad dentro del ecosistema
+                            satelital.
+                        </p>
+                    </div>
+
+                    <a
+                        href="/buscar"
+                        class="inline-flex w-fit items-center gap-3 rounded-full border border-blue-500 px-5 py-2 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
+                    >
+                        Explorar contenido
+                        <span>→</span>
+                    </a>
+                </div>
+
+                <div class="mt-8">
+                    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                        {destacados.map((destacado: any) => (
+                            <FeaturedCard destacado={destacado} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}

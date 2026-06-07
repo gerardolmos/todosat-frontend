@@ -50,16 +50,16 @@ const manuales = (await getManuales()).filter((manual: any) =>
 ---
 
 <Layout
-    title={`${marca.nombre} | Todo-Sat`}
+    title={`${marca.nombre} | TodoSatcom`}
     description={marca.descripcion_corta}
 >
-    <main class="min-h-screen py-10">
+    <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
             <Breadcrumbs
                 items={[
                     {
-                        label: "Marcas",
-                        href: "/marcas",
+                        label: "Operadores",
+                        href: "/operadores",
                     },
                     {
                         label: marca.nombre,
@@ -72,10 +72,10 @@ const manuales = (await getManuales()).filter((manual: any) =>
             >
                 <div>
                     <a
-                        href="/marcas"
-                        class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                        href="/operadores"
+                        class="text-sm font-semibold text-sky-400 hover:text-sky-300"
                     >
-                        ← Volver a marcas
+                        ← Volver a operadores
                     </a>
 
                     {
@@ -88,13 +88,15 @@ const manuales = (await getManuales()).filter((manual: any) =>
                         )
                     }
 
-                    <h1 class="mt-6 max-w-4xl">
+                    <h1
+                        class="mt-6 max-w-4xl text-5xl font-bold tracking-tight !text-white"
+                    >
                         {marca.nombre}
                     </h1>
 
                     {
                         marca.descripcion_corta && (
-                            <p class="mt-6 max-w-2xl text-xl leading-8 text-brand-muted">
+                            <p class="mt-6 max-w-2xl text-xl leading-8 text-slate-300">
                                 {marca.descripcion_corta}
                             </p>
                         )
@@ -103,7 +105,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                     <div class="mt-8 flex flex-wrap gap-3">
                         {
                             marca.tipo_orbita && (
-                                <span class="rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark">
+                                <span class="rounded-full bg-sky-400/15 px-4 py-2 text-sm font-semibold text-sky-300">
                                     {marca.tipo_orbita}
                                 </span>
                             )
@@ -111,7 +113,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
 
                         {
                             marca.pais_origen && (
-                                <span class="rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-muted">
+                                <span class="rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300">
                                     {marca.pais_origen}
                                 </span>
                             )
@@ -124,7 +126,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                                 href={marca.web_oficial}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="mt-8 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-info-primary-dark"
+                                class="mt-8 inline-flex rounded-full border border-sky-400 px-5 py-3 text-sm font-semibold text-sky-400 transition hover:bg-sky-400 hover:text-white"
                             >
                                 Web oficial →
                             </a>
@@ -134,7 +136,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
 
                 {
                     imagenPortadaUrl && (
-                        <div class="overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                        <div class="overflow-hidden rounded-3xl border border-white/15 bg-slate-900/90 shadow-sm">
                             <img
                                 src={imagenPortadaUrl}
                                 alt={marca.nombre}
@@ -147,17 +149,17 @@ const manuales = (await getManuales()).filter((manual: any) =>
 
             {
                 descripcionHTML && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
+                    <section class="mt-16 border-t border-white/10 pt-12">
                         <div
-                            class="prose prose-lg max-w-none"
+                            class="prose prose-invert prose-lg max-w-none"
                             set:html={descripcionHTML}
                         />
                     </section>
                 )
             }
 
-            <section class="mt-16 border-t border-brand-border pt-12">
-                <h2 class="mb-6">
+            <section class="mt-16 border-t border-white/10 pt-12">
+                <h2 class="mb-6 text-3xl font-bold !text-white">
                     Modelos de {marca.nombre}
                 </h2>
 
@@ -176,15 +178,18 @@ const manuales = (await getManuales()).filter((manual: any) =>
                             ))}
                         </div>
                     ) : (
-                        <p class="text-brand-muted">
-                            Todavía no hay modelos publicados para esta marca.
+                        <p class="text-slate-300">
+                            Todavía no hay modelos publicados para este
+                            operador.
                         </p>
                     )
                 }
             </section>
 
-            <section class="mt-16 border-t border-brand-border pt-12">
-                <h2 class="mb-6">Artículos relacionados</h2>
+            <section class="mt-16 border-t border-white/10 pt-12">
+                <h2 class="mb-6 text-3xl font-bold !text-white">
+                    Artículos relacionados
+                </h2>
 
                 {
                     articulos.length > 0 ? (
@@ -201,16 +206,18 @@ const manuales = (await getManuales()).filter((manual: any) =>
                             ))}
                         </div>
                     ) : (
-                        <p class="text-brand-muted">
-                            Todavía no hay artículos relacionados con esta
-                            marca.
+                        <p class="text-slate-300">
+                            Todavía no hay artículos relacionados con este
+                            operador.
                         </p>
                     )
                 }
             </section>
 
-            <section class="mt-16 border-t border-brand-border pt-12">
-                <h2 class="mb-6">Manuales relacionados</h2>
+            <section class="mt-16 border-t border-white/10 pt-12">
+                <h2 class="mb-6 text-3xl font-bold !text-white">
+                    Manuales relacionados
+                </h2>
 
                 {
                     manuales.length > 0 ? (
@@ -227,8 +234,9 @@ const manuales = (await getManuales()).filter((manual: any) =>
                             ))}
                         </div>
                     ) : (
-                        <p class="text-brand-muted">
-                            Todavía no hay manuales relacionados con esta marca.
+                        <p class="text-slate-300">
+                            Todavía no hay manuales relacionados con este
+                            operador.
                         </p>
                     )
                 }

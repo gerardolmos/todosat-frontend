@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import logoTodoSatcom from "../assets/logoTodoSatcom.png";
+import Header from "../components/Header.astro";
 
 interface Props {
     title?: string;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const {
-    title = "Todo-Sat",
+    title = "TodoSatcom",
     description = "Portal especializado en internet satelital.",
 } = Astro.props;
 ---
@@ -24,76 +25,7 @@ const {
     </head>
 
     <body>
-        <header
-            id="site-header"
-            class="sticky top-0 z-50 border-b border-brand-border/80 bg-white/90 backdrop-blur transition-transform duration-300"
-        >
-            <div
-                class="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-6 lg:px-8"
-            >
-                <a href="/" class="block shrink-0">
-                    <img
-                        src={logoTodoSatcom.src}
-                        alt="TodoSatcom"
-                        class="w-[120px] md:w-[180px]"
-                    />
-                </a>
-
-                <button
-                    id="menu-toggle"
-                    type="button"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-brand-border text-brand-base md:hidden"
-                    aria-label="Abrir menú"
-                    aria-expanded="false"
-                >
-                    <span class="text-2xl leading-none">☰</span>
-                </button>
-
-                <nav
-                    class="hidden items-center gap-7 text-sm font-semibold text-brand-muted md:flex"
-                >
-                    <a href="/marcas" class="hover:text-info-primary">Marcas</a>
-                    <a href="/modelos" class="hover:text-info-primary"
-                        >Modelos</a
-                    >
-                    <a href="/articulos" class="hover:text-info-primary"
-                        >Artículos</a
-                    >
-                    <a href="/manuales" class="hover:text-info-primary"
-                        >Manuales</a
-                    >
-                    <a href="/categorias" class="hover:text-info-primary"
-                        >Categorías</a
-                    >
-                </nav>
-            </div>
-
-            <nav
-                id="mobile-menu"
-                class="hidden border-t border-brand-border bg-white px-5 py-4 md:hidden"
-            >
-                <div
-                    class="flex flex-col gap-3 text-sm font-semibold text-brand-muted"
-                >
-                    <a href="/marcas" class="py-2 hover:text-info-primary"
-                        >Marcas</a
-                    >
-                    <a href="/modelos" class="py-2 hover:text-info-primary"
-                        >Modelos</a
-                    >
-                    <a href="/articulos" class="py-2 hover:text-info-primary"
-                        >Artículos</a
-                    >
-                    <a href="/manuales" class="py-2 hover:text-info-primary"
-                        >Manuales</a
-                    >
-                    <a href="/categorias" class="py-2 hover:text-info-primary"
-                        >Categorías</a
-                    >
-                </div>
-            </nav>
-        </header>
-
+        <Header />
         <script is:inline>
             const button = document.getElementById("menu-toggle");
             const menu = document.getElementById("mobile-menu");
@@ -120,7 +52,7 @@ const {
                     return;
                 }
 
-                if (currentScrollY > lastScrollY) {
+                if (currentScrollY > lastScrollY && currentScrollY > 120) {
                     header.classList.add("-translate-y-full");
                 } else {
                     header.classList.remove("-translate-y-full");
@@ -131,17 +63,15 @@ const {
         </script>
         <slot />
 
-        <footer
-            class="mt-24 border-t border-brand-border bg-slate-950 text-white"
-        >
+        <footer class="border-t border-white/10 bg-slate-950 text-white">
             <div class="mx-auto max-w-7xl px-5 py-12 sm:px-6 lg:px-8">
                 <div class="grid gap-10 md:grid-cols-2">
                     <div>
-                        <p
-                            class="font-heading text-3xl font-bold tracking-tight"
-                        >
-                            Todo-Sat
-                        </p>
+                        <img
+                            src={logoTodoSatcom.src}
+                            alt="TodoSatcom"
+                            class="w-[220px]"
+                        />
 
                         <p
                             class="mt-4 max-w-md text-sm leading-6 text-slate-300"
@@ -182,7 +112,7 @@ const {
                 <div
                     class="mt-10 border-t border-white/10 pt-6 text-sm text-slate-400"
                 >
-                    © {new Date().getFullYear()} Todo-Sat.
+                    © {new Date().getFullYear()} TodoSatcom.
                 </div>
             </div>
         </footer>

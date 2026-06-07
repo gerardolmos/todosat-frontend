@@ -3,16 +3,19 @@ import { getMediaUrl } from "../lib/media";
 
 interface Props {
     destacado: any;
+    variant?: "default" | "large";
 }
 
-const { destacado } = Astro.props;
+const { destacado, variant = "default" } = Astro.props;
+
+const isLarge = variant === "large";
 
 const imagenUrl = getMediaUrl(destacado.imagen);
 
 const relaciones = [
     destacado.marca && {
         tipo: "Operador",
-        href: `/marcas/${destacado.marca.slug}`,
+        href: `/operadores/${destacado.marca.slug}`,
     },
     destacado.modelo && {
         tipo: "Modelo",
@@ -35,40 +38,62 @@ const tieneRelacionValida = relaciones.length === 1;
 
 <a
     href={href}
-    class={`group flex h-full min-h-[390px] flex-col overflow-hidden rounded-2xl border-2 border-brand-muted bg-slate-50 shadow-sm transition-all duration-300 ease-out ${
+    class={`group relative flex ${
+        isLarge ? "" : "min-h-[340px] flex-col"
+    } overflow-hidden rounded-2xl bg-slate-900/90 shadow-sm transition-all duration-300 ease-out ${
+        isLarge ? "" : "border border-white/15"
+    } ${
         tieneRelacionValida
-            ? "hover:-translate-y-0.5 hover:border-info-primary/30 hover:shadow-md"
+            ? "hover:-translate-y-0.5 hover:border-blue-400/50 hover:shadow-md"
             : "pointer-events-none opacity-60"
     }`}
 >
-    <div class="h-32 overflow-hidden bg-brand-soft">
-        {
-            imagenUrl && (
-                <img
-                    src={imagenUrl}
-                    alt={destacado.titulo}
-                    class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
-                />
-            )
-        }
-    </div>
+    {
+        imagenUrl && (
+            <img
+                src={imagenUrl}
+                alt={destacado.titulo}
+                class={`${
+                    isLarge ? "absolute inset-0 h-full w-full" : "h-40 w-full"
+                } object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
+            />
+        )
+    }
 
-    <div class="flex flex-1 flex-col p-4">
+    {
+        isLarge && (
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/75 to-slate-950/20" />
+        )
+    }
+
+    <div
+        class={`relative z-10 flex flex-1 flex-col ${
+            isLarge ? "max-w-lg p-8 md:p-10" : "p-5"
+        }`}
+    >
         <p
-            class="mb-4 inline-flex w-fit rounded-full bg-info-primary-soft px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-info-primary"
+            class="mb-4 inline-flex w-fit rounded-full bg-sky-400/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-300"
         >
             {tipo}
         </p>
 
         <h3
-            class="text-2xl font-semibold leading-tight tracking-tight text-brand-base"
+            class={`${
+                isLarge ? "text-4xl md:text-5xl" : "text-xl"
+            } font-semibold leading-tight tracking-tight !text-white`}
         >
             {destacado.titulo}
         </h3>
 
         {
             destacado.descripcion && (
-                <p class="mt-3 line-clamp-3 text-sm leading-6 text-brand-muted">
+                <p
+                    class={`${
+                        isLarge
+                            ? "mt-4 max-w-xl text-base leading-7"
+                            : "mt-3 line-clamp-3 text-sm leading-6"
+                    } text-slate-300`}
+                >
                     {destacado.descripcion}
                 </p>
             )
@@ -76,8 +101,8 @@ const tieneRelacionValida = relaciones.length === 1;
 
         {
             tieneRelacionValida && (
-                <div class="mt-auto border-t border-brand-border pt-4">
-                    <p class="text-sm font-semibold text-info-primary">
+                <div class="mt-6 border-t border-white/10 pt-5">
+                    <p class="text-sm font-semibold text-sky-400">
                         Ver destacado →
                     </p>
                 </div>

@@ -1,0 +1,84 @@
+---
+import logoTodoSatcom from "../assets/logoTodoSatcom.png";
+
+const navItems = [
+    { href: "/operadores", label: "Operadores" },
+    { href: "/modelos", label: "Modelos" },
+    { href: "/articulos", label: "Artículos" },
+    { href: "/manuales", label: "Manuales" },
+    { href: "/categorias", label: "Categorías" },
+];
+---
+
+<header
+    id="site-header"
+    class="sticky top-0 z-50 border-b border-white/10 bg-slate-950 transition-transform duration-300"
+>
+    <div
+        class="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 sm:px-6 lg:px-8"
+    >
+        <a href="/" class="shrink-0">
+            <img
+                src={logoTodoSatcom.src}
+                alt="TodoSatcom"
+                class="w-[150px] md:w-[190px]"
+            />
+        </a>
+
+        <nav
+            class="hidden items-center text-sm font-semibold text-slate-300 md:flex"
+        >
+            {
+                navItems.map((item, index) => (
+                    <>
+                        <a
+                            href={item.href}
+                            class="px-5 py-2 transition hover:text-white"
+                        >
+                            {item.label}
+                        </a>
+
+                        {index < navItems.length - 1 && (
+                            <span class="h-5 w-px bg-slate-500" />
+                        )}
+                    </>
+                ))
+            }
+        </nav>
+
+        <button
+            id="menu-toggle"
+            type="button"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white md:hidden"
+            aria-label="Abrir menú"
+            aria-expanded="false"
+        >
+            <span class="text-2xl leading-none">☰</span>
+        </button>
+    </div>
+
+    <nav
+        id="mobile-menu"
+        class="hidden border-t border-white/10 bg-slate-950/95 px-5 py-5 backdrop-blur-xl md:hidden"
+    >
+        <div class="flex flex-col gap-2 text-sm font-semibold text-slate-300">
+            {
+                navItems.map((item) => (
+                    <a
+                        href={item.href}
+                        class="rounded-xl px-4 py-3 transition hover:bg-white/5 hover:text-white"
+                    >
+                        {item.label}
+                    </a>
+                ))
+            }
+
+            <a
+                href="/buscar"
+                class="mt-2 rounded-xl border border-sky-400/30 bg-sky-400/10 px-4 py-3 font-bold text-sky-100 transition hover:bg-sky-400/20"
+            >
+                Buscar
+            </a>
+        </div>
+    </nav>
+</header>

@@ -2,208 +2,350 @@
 const { marcas = [] } = Astro.props;
 
 const STRAPI_URL =
-    import.meta.env.PUBLIC_STRAPI_URL ||
-    import.meta.env.STRAPI_URL ||
-    "http://localhost:1337";
+	import.meta.env.PUBLIC_STRAPI_URL ||
+	import.meta.env.STRAPI_URL ||
+	"http://localhost:1337";
 
 function getMediaUrl(media: any) {
-    if (!media?.url) return null;
-    return media.url.startsWith("http")
-        ? media.url
-        : `${STRAPI_URL}${media.url}`;
+	if (!media?.url) return null;
+	return media.url.startsWith("http")
+		? media.url
+		: `${STRAPI_URL}${media.url}`;
 }
 
 function getExternalUrl(url: string | null | undefined) {
-    if (!url) return null;
-    return url.startsWith("http") ? url : `https://${url}`;
+	if (!url) return null;
+	return url.startsWith("http") ? url : `https://${url}`;
 }
 
-const selectedMarca = marcas[0];
+function getOperatorData(marca: any) {
+	return {
+		nombre: marca?.nombre || "Operador",
+		slug: marca?.slug || "#",
+		logo: getMediaUrl(marca?.logo),
+		imagen: getMediaUrl(marca?.imagen_portada),
+		descripcion_corta: marca?.descripcion_corta || "Operador satelital",
+		descripcion_home:
+			marca?.descripcion_home ||
+			marca?.descripcion_corta ||
+			"Información pendiente de completar.",
+		web_oficial: getExternalUrl(marca?.web_oficial),
+		tipo_orbita: marca?.tipo_orbita || "Operador satelital",
+		metrics: [
+			{
+				label: "Cobertura",
+				value: marca?.cobertura || "Sin datos",
+			},
+			{
+				label: "Órbita",
+				value: marca?.tipo_orbita || "Sin datos",
+			},
+			{
+				label: "Satélites",
+				value: marca?.satelites || "Sin datos",
+			},
+			{
+				label: "Latencia",
+				value: marca?.latencia || "Sin datos",
+			},
+			{
+				label: "Velocidad",
+				value: marca?.velocidad || "Sin datos",
+			},
+		],
+	};
+}
 
-const selectedLogo = getMediaUrl(selectedMarca?.logo);
-const selectedImage = getMediaUrl(selectedMarca?.imagen_portada);
-
-const metrics = [
-    {
-        label: "Cobertura",
-        value: selectedMarca?.cobertura || "Sin datos",
-        description: selectedMarca?.cobertura_descripcion,
-    },
-    {
-        label: "Órbita",
-        value: selectedMarca?.tipo_orbita || "Sin datos",
-        description: selectedMarca?.orbita_descripcion,
-    },
-    {
-        label: "Satélites",
-        value: selectedMarca?.satelites || "Sin datos",
-        description: selectedMarca?.satelites_descripcion,
-    },
-    {
-        label: "Latencia",
-        value: selectedMarca?.latencia || "Sin datos",
-        description: selectedMarca?.latencia_descripcion,
-    },
-    {
-        label: "Velocidad",
-        value: selectedMarca?.velocidad || "Sin datos",
-        description: selectedMarca?.velocidad_descripcion,
-    },
-];
-
-const officialUrl = getExternalUrl(selectedMarca?.web_oficial);
+const operators = marcas.map((marca: any) => getOperatorData(marca));
+const selectedOperator = operators[0];
 ---
 
 {
-    selectedMarca && (
-        <section class="overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-10 md:py-20">
-            <div class="grid gap-10 lg:grid-cols-4">
-                <div class="lg:col-span-1">
-                    <p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
-                        Operadores
-                    </p>
+	selectedOperator && (
+		<section class="overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-10 md:py-20">
+			<script
+				id="operators-data"
+				type="application/json"
+				set:html={JSON.stringify(operators)}
+			/>
 
-                    <h2 class="mt-6 text-4xl font-black leading-tight tracking-tight !text-white">
-                        Operadores y compañías satelitales
-                    </h2>
+			<div class="grid gap-10 lg:grid-cols-4">
+				<div class="lg:col-span-1">
+					<p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
+						Operadores
+					</p>
 
-                    <p class="mt-5 text-base leading-7 text-slate-300">
-                        Explora las principales empresas del ecosistema
-                        satelital: operadores de internet, constelaciones,
-                        proveedores de conectividad y compañías clave del
-                        sector.
-                    </p>
+					<h2 class="mt-6 text-4xl font-bold leading-tight tracking-tight !text-white">
+						Operadores y compañías satelitales
+					</h2>
 
-                    <a
-                        href="/marcas"
-                        class="mt-8 inline-flex items-center gap-3 rounded-full border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
-                    >
-                        Ver todas las marcas
-                        <span>→</span>
-                    </a>
-                </div>
+					<p class="mt-5 text-base leading-7 text-slate-300">
+						Explora las principales empresas del ecosistema
+						satelital: operadores de internet, constelaciones,
+						proveedores de conectividad y compañías clave del
+						sector.
+					</p>
 
-                <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 lg:col-span-3">
-                    {marcas.map((marca: any, index: number) => {
-                        const logoUrl = getMediaUrl(marca.logo);
+					<a
+						href="/operadores"
+						class="mt-8 inline-flex items-center gap-3 rounded-full border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
+					>
+						Ver todos los operadores
+						<span>→</span>
+					</a>
+				</div>
 
-                        return (
-                            <button
-                                type="button"
-                                class={`flex h-40 flex-col justify-between rounded-xl border p-4 text-center text-white transition ${
-                                    index === 0
-                                        ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-950"
-                                        : "border-slate-700 bg-slate-900/70 hover:border-blue-500/70 hover:bg-slate-900"
-                                }`}
-                            >
-                                <div class="flex h-16 items-center justify-center">
-                                    <div class="flex h-16 w-32 items-center justify-center">
-                                        {logoUrl ? (
-                                            <img
-                                                src={logoUrl}
-                                                alt={marca.nombre}
-                                                class="max-h-full max-w-full object-contain"
-                                            />
-                                        ) : (
-                                            <span class="text-sm font-semibold text-slate-200">
-                                                {marca.nombre}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
+				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 lg:col-span-3">
+					{operators.map((operator: any, index: number) => (
+						<button
+							type="button"
+							data-operator-button
+							data-index={index}
+							class={`flex h-40 flex-col justify-between rounded-xl border p-4 text-center text-white transition ${
+								index === 0
+									? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-950"
+									: "border-slate-700 bg-slate-900/70 hover:border-blue-500/70 hover:bg-slate-900"
+							}`}
+						>
+							<div class="flex h-16 items-center justify-center">
+								<div class="flex h-16 w-32 items-center justify-center">
+									{operator.logo ? (
+										<img
+											src={operator.logo}
+											alt={operator.nombre}
+											class="max-h-full max-w-full object-contain"
+										/>
+									) : (
+										<span class="text-sm font-semibold text-slate-200">
+											{operator.nombre}
+										</span>
+									)}
+								</div>
+							</div>
 
-                                <div class="h-10">
-                                    <p class="text-sm font-normal leading-tight !text-slate-200">
-                                        {marca.nombre}
-                                    </p>
+							<div class="h-10">
+								<p class="text-sm font-normal leading-tight !text-slate-200">
+									{operator.nombre}
+								</p>
 
-                                    <p class="text-xs leading-tight !text-slate-400">
-                                        {marca.tipo_orbita ||
-                                            "Operador satelital"}
-                                    </p>
-                                </div>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
+								<p class="text-xs leading-tight !text-slate-400">
+									{operator.tipo_orbita}
+								</p>
+							</div>
+						</button>
+					))}
+				</div>
+			</div>
 
-            <div class="relative mt-10 overflow-hidden rounded-2xl bg-slate-950">
-                {selectedImage && (
-                    <img
-                        src={selectedImage}
-                        alt=""
-                        class="absolute inset-0 h-full w-full object-cover opacity-65"
-                    />
-                )}
+			<div class="relative mt-10 overflow-hidden rounded-2xl bg-slate-950">
+				<img
+					data-selected-image
+					src={selectedOperator.imagen || ""}
+					alt=""
+					class={`absolute inset-0 h-full w-full object-cover opacity-65 ${
+						selectedOperator.imagen ? "" : "hidden"
+					}`}
+				/>
 
-                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/10" />
+				<div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/10" />
 
-                <div class="relative p-8 md:p-10">
-                    <div class="max-w-xl">
-                        <div class="flex items-center gap-3">
-                            {selectedLogo && (
-                                <img
-                                    src={selectedLogo}
-                                    alt={selectedMarca.nombre}
-                                    class="h-24 max-w-32 object-contain"
-                                />
-                            )}
-                        </div>
-
-                        <p class="mt-4 text-5xl font-semibold leading-none tracking-tight !text-white">
-                            {selectedMarca.nombre}
-                        </p>
-
-                        <p class="text-xl leading-7 text-slate-100">
-                            {selectedMarca.descripcion_corta ||
-                                "Operador satelital"}
-                        </p>
-
-                        <p class="mt-2 text-sm leading-7 text-slate-400">
-                            {selectedMarca.descripcion_home ||
-                                selectedMarca.descripcion_corta ||
-                                "Información pendiente de completar."}
-                        </p>
-
-                        <div class="mt-7 flex flex-wrap gap-3">
-                            <a
-                                href={`/marcas/${selectedMarca.slug}`}
-                                class="inline-flex items-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
-                            >
-                                Ver operador
-                                <span>→</span>
-                            </a>
-
-                            {officialUrl && (
-                                <a
-                                    href={officialUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-3 rounded-full border border-slate-600 bg-slate-950/40 px-6 py-3 text-sm font-bold text-white transition hover:border-blue-500 hover:text-blue-400"
-                                >
-                                    Sitio oficial
-                                    <span>↗</span>
-                                </a>
-                            )}
-                        </div>
+				<div class="relative min-h-[420px] p-8 md:p-10">
+					<div class="flex min-h-[340px] max-w-xl flex-col">
+						<div class="flex h-14 w-44 items-center">
+                        <img
+                            data-selected-logo
+                            src={selectedOperator.logo || ""}
+                            alt={selectedOperator.nombre}
+                            class={`max-h-full max-w-full object-contain ${
+                                selectedOperator.logo ? "" : "hidden"
+                            }`}
+                        />
                     </div>
-                </div>
 
-                <div class="relative grid border-t border-slate-800 bg-slate-950/80 backdrop-blur md:grid-cols-5">
-                    {metrics.map((item) => (
-                        <div class="p-5 md:border-r md:border-slate-800 last:border-r-0">
-                            <p class="text-xs font-bold uppercase tracking-widest text-blue-400">
-                                {item.label}
-                            </p>
+						<p
+							data-selected-name
+							class="mt-4 text-5xl font-semibold leading-none tracking-tight !text-white"
+						>
+							{selectedOperator.nombre}
+						</p>
 
-                            <p class="mt-2 text-lg font-bold !text-white">
-                                {item.value}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
+						<p
+							data-selected-short
+							class="text-xl leading-7 text-slate-100"
+						>
+							{selectedOperator.descripcion_corta}
+						</p>
+
+						<p
+							data-selected-home
+							class="mt-2 text-sm leading-7 text-slate-400"
+						>
+							{selectedOperator.descripcion_home}
+						</p>
+
+						<div class="mt-auto flex flex-wrap gap-3 pt-7">
+							<a
+								data-selected-link
+								href={`/operadores/${selectedOperator.slug}`}
+								class="inline-flex items-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
+							>
+								Ver operador
+								<span>→</span>
+							</a>
+
+							<a
+								data-selected-official
+								href={selectedOperator.web_oficial || "#"}
+								target="_blank"
+								rel="noopener noreferrer"
+								class={`inline-flex items-center gap-3 rounded-full border border-slate-600 bg-slate-950/40 px-6 py-3 text-sm font-bold text-white transition hover:border-blue-500 hover:text-blue-400 ${
+									selectedOperator.web_oficial
+										? ""
+										: "hidden"
+								}`}
+							>
+								Sitio oficial
+								<span>↗</span>
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="relative grid border-t border-slate-800 bg-slate-950/80 backdrop-blur md:grid-cols-5">
+					{selectedOperator.metrics.map((item: any, index: number) => (
+						<div class="p-5 md:border-r md:border-slate-800 last:border-r-0">
+							<p
+								data-metric-label={index}
+								class="text-xs font-bold uppercase tracking-widest text-blue-400"
+							>
+								{item.label}
+							</p>
+
+							<p
+								data-metric-value={index}
+								class="mt-2 text-lg font-bold !text-white"
+							>
+								{item.value}
+							</p>
+						</div>
+					))}
+				</div>
+			</div>
+
+			<script is:inline>
+				const dataElement = document.getElementById("operators-data");
+				const operators = JSON.parse(dataElement?.textContent || "[]");
+
+				const buttons = document.querySelectorAll(
+					"[data-operator-button]",
+				);
+
+				const selectedImage = document.querySelector(
+					"[data-selected-image]",
+				);
+				const selectedLogo = document.querySelector(
+					"[data-selected-logo]",
+				);
+				const selectedName = document.querySelector(
+					"[data-selected-name]",
+				);
+				const selectedShort = document.querySelector(
+					"[data-selected-short]",
+				);
+				const selectedHome = document.querySelector(
+					"[data-selected-home]",
+				);
+				const selectedLink = document.querySelector(
+					"[data-selected-link]",
+				);
+				const selectedOfficial = document.querySelector(
+					"[data-selected-official]",
+				);
+
+				function setActiveButton(activeIndex) {
+					buttons.forEach((button, index) => {
+						const isActive = index === activeIndex;
+
+						button.classList.toggle("border-blue-500", isActive);
+						button.classList.toggle("bg-blue-500/10", isActive);
+						button.classList.toggle(
+							"shadow-lg",
+							isActive,
+						);
+						button.classList.toggle(
+							"shadow-blue-950",
+							isActive,
+						);
+
+						button.classList.toggle("border-slate-700", !isActive);
+						button.classList.toggle("bg-slate-900/70", !isActive);
+					});
+				}
+
+				function updateOperator(index) {
+					const operator = operators[index];
+					if (!operator) return;
+
+					setActiveButton(index);
+
+					if (selectedImage) {
+						if (operator.imagen) {
+							selectedImage.src = operator.imagen;
+							selectedImage.classList.remove("hidden");
+						} else {
+							selectedImage.classList.add("hidden");
+						}
+					}
+
+					if (selectedLogo) {
+						if (operator.logo) {
+							selectedLogo.src = operator.logo;
+							selectedLogo.alt = operator.nombre;
+							selectedLogo.classList.remove("hidden");
+						} else {
+							selectedLogo.classList.add("hidden");
+						}
+					}
+
+					if (selectedName) selectedName.textContent = operator.nombre;
+					if (selectedShort)
+						selectedShort.textContent = operator.descripcion_corta;
+					if (selectedHome)
+						selectedHome.textContent = operator.descripcion_home;
+
+					if (selectedLink) {
+						selectedLink.href = `/operadores/${operator.slug}`;
+					}
+
+					if (selectedOfficial) {
+						if (operator.web_oficial) {
+							selectedOfficial.href = operator.web_oficial;
+							selectedOfficial.classList.remove("hidden");
+						} else {
+							selectedOfficial.classList.add("hidden");
+						}
+					}
+
+					operator.metrics.forEach((metric, metricIndex) => {
+						const label = document.querySelector(
+							`[data-metric-label="${metricIndex}"]`,
+						);
+						const value = document.querySelector(
+							`[data-metric-value="${metricIndex}"]`,
+						);
+
+						if (label) label.textContent = metric.label;
+						if (value) value.textContent = metric.value;
+					});
+				}
+
+				buttons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const index = Number(button.dataset.index);
+						updateOperator(index);
+					});
+				});
+			</script>
+		</section>
+	)
 }

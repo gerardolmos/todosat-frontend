@@ -12,7 +12,7 @@ const portadaUrl = getMediaUrl(marca.imagen_portada);
 ---
 
 <a
-    href={`/marcas/${marca.slug}`}
+    href={`/operadores/${marca.slug}`}
     class="group flex h-full min-h-[390px] flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-info-primary/30 hover:shadow-md"
 >
     <div class="h-32 overflow-hidden bg-brand-soft">
@@ -55,7 +55,9 @@ const portadaUrl = getMediaUrl(marca.imagen_portada);
         }
 
         <div class="mt-auto border-t border-brand-border pt-4">
-            <p class="text-sm font-semibold text-info-primary">Ver marca →</p>
+            <p class="text-sm font-semibold text-info-primary">
+                Ver operador →
+            </p>
         </div>
     </div>
 </a>

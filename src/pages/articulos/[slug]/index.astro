@@ -128,15 +128,15 @@ const manuales = articulo.manuals || [];
             {
                 marcas.length > 0 && (
                     <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Marcas relacionadas</h2>
+                        <h2 class="mb-6">Operadores relacionados</h2>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             {marcas.map((marca: any) => (
                                 <RelatedCard
-                                    type="Marca"
+                                    type="Operador"
                                     title={marca.nombre}
                                     description={marca.descripcion_corta}
-                                    url={`/marcas/${marca.slug}`}
+                                    url={`/operadores/${marca.slug}`}
                                     image={marca.imagen_portada}
                                 />
                             ))}
