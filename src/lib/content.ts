@@ -37,6 +37,22 @@ export async function getMarcas() {
         .sort(sortByName);
 }
 
+export async function getMarcasHome() {
+    const data = await fetchAPI("/api/marcas?populate=*");
+
+    return data.data
+        .filter((marca: any) => marca.activa)
+        .filter((marca: any) => marca.mostrar_en_home)
+        .sort((a: any, b: any) => {
+            const ordenA = a.orden_home ?? 999;
+            const ordenB = b.orden_home ?? 999;
+
+            if (ordenA !== ordenB) return ordenA - ordenB;
+
+            return a.nombre.localeCompare(b.nombre);
+        });
+}
+
 export async function getArticulos() {
     const data = await fetchAPI(
         "/api/articulos?populate[imagen_principal]=true&populate[categoria_tematica]=true&populate[marcas][populate][imagen_portada]=true&populate[marcas][populate][logo]=true&populate[modelos][populate][imagen_principal]=true&populate[manuals][populate][imagen_portada]=true"

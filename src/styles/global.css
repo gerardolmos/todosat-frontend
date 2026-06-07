@@ -140,22 +140,10 @@ h6 {
     font-family: var(--font-heading);
     color: var(--color-brand-base);
     line-height: 1.1;
+    font-weight: inherit;
 }
 
-h1 {
-    font-size: clamp(2rem, 4vw, 3.25rem);
-    font-weight: 700;
-}
 
-h2 {
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
-    font-weight: 600;
-}
-
-h3 {
-    font-size: clamp(1.125rem, 2vw, 1.5rem);
-    font-weight: 600;
-}
 
 .home-section-title {
     font-family: var(--font-body);
@@ -163,7 +151,7 @@ h3 {
 }
 
 p {
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 a {

@@ -2,23 +2,22 @@
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
 import {
-	getMarcasDestacadas,
 	getArticulos,
 	getDestacados,
 	getModelos,
 	getManuales,
+	getMarcasHome,
 } from "../lib/content";
 import ArticleCard from "../components/ArticleCard.astro";
-import BrandCard from "../components/BrandCard.astro";
 import FeaturedCard from "../components/FeaturedCard.astro";
 import ModelCard from "../components/ModelCard.astro";
 import ManualCard from "../components/ManualCard.astro";
 import HomeOperatorsSection from "../components/HomeOperatorsSection.astro";
 
 const destacados = await getDestacados();
-const marcasDestacadas = await getMarcasDestacadas();
 const modelos = (await getModelos()).slice(0, 3);
 const manuales = (await getManuales()).slice(0, 3);
+const marcasHome = await getMarcasHome();
 
 const articulos = (await getArticulos())
 	.sort(
@@ -34,9 +33,7 @@ const articulos = (await getArticulos())
 	description="Portal especializado en internet satelital, hardware, cobertura, instalación y actualidad del sector."
 >
 	<main class="min-h-screen pb-20">
-		<section
-			class="relative overflow-hidden border-b border-brand-border py-14 md:py-20"
-		>
+		<section class="relative overflow-hidden py-14 md:py-36">
 			<video
 				class="absolute inset-0 h-full w-full object-cover"
 				autoplay
@@ -53,7 +50,7 @@ const articulos = (await getArticulos())
 			<Container>
 				<div class="relative z-10 max-w-3xl">
 					<h1
-						class="font-body text-3xl font-semibold tracking-tight md:text-5xl"
+						class="font-body text-3xl font-semibold tracking-tight md:text-6xl"
 						style="color:white;"
 					>
 						Tu referente en internet satelital y comunicaciones.
@@ -89,79 +86,42 @@ const articulos = (await getArticulos())
 
 		<section class="bg-slate-950">
 			<Container>
-				<!-- {
-				marcasDestacadas.length > 0 && (
-					<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
-						<div class="h-1.5 bg-info-primary" />
-						<div class="p-6 md:p-8">
+				<HomeOperatorsSection marcas={marcasHome} />
+				{
+					destacados.length > 0 && (
+						<section class="mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12">
 							<div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 								<div>
-									<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
-										Operadores
+									<p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
+										Selección editorial
 									</p>
 
-									<h2 class="home-section-title mt-3 text-4xl font-black tracking-tight">
-										Operadores y compañías satelitales
+									<h2 class="mt-6 text-4xl font-black leading-tight tracking-tight !text-white">
+										Selección destacada
 									</h2>
 
-									<p class="mt-3 max-w-3xl text-base leading-7 text-brand-muted">
-										Explora las principales empresas del
-										ecosistema satelital: operadores de
-										internet, constelaciones, proveedores de
-										conectividad y compañías clave del
-										sector.
+									<p class="mt-5 max-w-3xl text-base leading-7 text-slate-300">
+										Accede rápidamente a contenidos
+										relevantes del portal: marcas, modelos,
+										artículos y manuales seleccionados por
+										su utilidad dentro del ecosistema
+										satelital.
 									</p>
 								</div>
 
 								<a
-									href="/marcas"
-									class="inline-flex w-fit items-center gap-2 rounded-full border border-brand-border px-5 py-3 text-sm font-semibold transition hover:border-info-primary hover:text-info-primary"
+									href="/buscar"
+									class="inline-flex w-fit items-center gap-3 rounded-full border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
 								>
-									Ver todas las marcas
+									Explorar contenido
 									<span>→</span>
 								</a>
 							</div>
-						</div>
 
-						<div class="border-t border-brand-border bg-sky-50 p-6 md:p-8">
-							<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-								{marcasDestacadas.map((marca: any) => (
-									<BrandCard marca={marca} />
+							<div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+								{destacados.map((destacado: any) => (
+									<FeaturedCard destacado={destacado} />
 								))}
-							</div>
-						</div>
-					</section>
-				)
-			} -->
-				<HomeOperatorsSection />
-				{
-					destacados.length > 0 && (
-						<section class="mt-16 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
-							<div class="h-1.5 bg-info-primary" />
-
-							<div class="p-6 md:p-8">
-								<p class="inline-flex rounded-full bg-info-primary px-3 py-1 text-xs font-bold uppercase tracking-[0.15em] text-white">
-									Selección editorial
-								</p>
-
-								<h2 class="home-section-title mt-3 text-4xl font-black tracking-tight">
-									Selección destacada
-								</h2>
-
-								<p class="mt-3 max-w-3xl text-base leading-7 text-brand-muted">
-									Accede rápidamente a contenidos relevantes
-									del portal: marcas, modelos, artículos y
-									manuales seleccionados por su utilidad
-									dentro del ecosistema satelital.
-								</p>
-							</div>
-
-							<div class="border-t border-brand-border bg-sky-50/40 p-6 md:p-8">
-								<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-									{destacados.map((destacado: any) => (
-										<FeaturedCard destacado={destacado} />
-									))}
-								</div>
 							</div>
 						</section>
 					)

@@ -11,7 +11,7 @@ const imagenUrl = getMediaUrl(destacado.imagen);
 
 const relaciones = [
     destacado.marca && {
-        tipo: "Marca",
+        tipo: "Operador",
         href: `/marcas/${destacado.marca.slug}`,
     },
     destacado.modelo && {
@@ -35,7 +35,7 @@ const tieneRelacionValida = relaciones.length === 1;
 
 <a
     href={href}
-    class={`group flex h-full min-h-[390px] flex-col overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm transition-all duration-300 ease-out ${
+    class={`group flex h-full min-h-[390px] flex-col overflow-hidden rounded-2xl border-2 border-brand-muted bg-slate-50 shadow-sm transition-all duration-300 ease-out ${
         tieneRelacionValida
             ? "hover:-translate-y-0.5 hover:border-info-primary/30 hover:shadow-md"
             : "pointer-events-none opacity-60"
