@@ -19,6 +19,10 @@ function getExternalUrl(url: string | null | undefined) {
 }
 
 function getOperatorData(marca: any) {
+	const cobertura = marca?.cobertura || "Cobertura en expansión";
+	const velocidad = marca?.velocidad || "Velocidad según disponibilidad";
+	const latencia = marca?.latencia || "Latencia variable";
+
 	return {
 		nombre: marca?.nombre || "Operador",
 		slug: marca?.slug || "#",
@@ -31,26 +35,18 @@ function getOperatorData(marca: any) {
 			"Información pendiente de completar.",
 		web_oficial: getExternalUrl(marca?.web_oficial),
 		tipo_orbita: marca?.tipo_orbita || "Operador satelital",
-		metrics: [
+		features: [
 			{
-				label: "Cobertura",
-				value: marca?.cobertura || "Sin datos",
+				title: "Cobertura",
+				description: cobertura,
 			},
 			{
-				label: "Órbita",
-				value: marca?.tipo_orbita || "Sin datos",
+				title: "Velocidad",
+				description: velocidad,
 			},
 			{
-				label: "Satélites",
-				value: marca?.satelites || "Sin datos",
-			},
-			{
-				label: "Latencia",
-				value: marca?.latencia || "Sin datos",
-			},
-			{
-				label: "Velocidad",
-				value: marca?.velocidad || "Sin datos",
+				title: "Latencia",
+				description: latencia,
 			},
 		],
 	};
@@ -69,17 +65,17 @@ const selectedOperator = operators[0];
 				set:html={JSON.stringify(operators)}
 			/>
 
-			<div class="grid gap-10 lg:grid-cols-4">
-				<div class="lg:col-span-1">
-					<p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
+			<div class="grid gap-10 xl:grid-cols-2 xl:items-start">
+				<div class="flex flex-col">
+					<p class="inline-flex w-fit rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
 						Operadores
 					</p>
 
-					<h2 class="mt-6 text-4xl font-bold leading-tight tracking-tight !text-white">
-						Operadores y compañías satelitales
+					<h2 class="mt-6 max-w-4xl text-4xl font-bold leading-tight tracking-tight !text-white md:text-5xl">
+						Operadores satelitales
 					</h2>
 
-					<p class="mt-5 text-base leading-7 text-slate-300">
+					<p class="mt-5 max-w-2xl text-base leading-7 text-slate-300">
 						Explora las principales empresas del ecosistema
 						satelital: operadores de internet, constelaciones,
 						proveedores de conectividad y compañías clave del
@@ -88,32 +84,31 @@ const selectedOperator = operators[0];
 
 					<a
 						href="/operadores"
-						class="mt-8 inline-flex items-center gap-3 rounded border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
+						class="self-start mt-8 inline-flex items-center gap-3 rounded border border-[#00ccff] bg-[#00ccff] px-6 py-3 text-sm font-bold text-slate-950 shadow-[0_0_18px_rgba(0,204,255,0.35)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-white hover:text-slate-950 hover:shadow-[0_0_24px_rgba(0,204,255,0.65)]"
 					>
-						Ver todos los operadores
+						Ver operadores en detalle
 						<span>→</span>
 					</a>
-				</div>
 
-				<div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 lg:col-span-3">
-					{operators.map((operator: any, index: number) => (
-						<button
-							type="button"
-							data-operator-button
-							data-index={index}
-							class={`flex h-40 flex-col justify-between rounded border p-4 text-center text-white transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 ${
-    index === 0
-        ? "border-[#00ccff] bg-slate-900/80 shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
-        : "border-transparent bg-slate-900/70 hover:border-[#00ccff] hover:bg-slate-900 hover:shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
-}`}
-						>
-							<div class="flex h-16 items-center justify-center">
-								<div class="flex h-16 w-32 items-center justify-center">
+					<div class="mt-8 h-[420px] overflow-y-auto pr-2">
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
+						{operators.map((operator: any, index: number) => (
+							<button
+								type="button"
+								data-operator-button
+								data-index={index}
+								class={`group flex h-64 flex-col rounded border p-5 text-left transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 ${
+									index === 0
+										? "border-[#00ccff] bg-slate-900/80 shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
+										: "border-transparent bg-slate-900/70 hover:border-[#00ccff] hover:bg-slate-900 hover:shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
+								}`}
+							>
+								<div class="flex h-20 items-center justify-center">
 									{operator.logo ? (
 										<img
 											src={operator.logo}
 											alt={operator.nombre}
-											class="max-h-full max-w-full object-contain"
+											class="max-h-14 max-w-full object-contain"
 										/>
 									) : (
 										<span class="text-sm font-semibold text-slate-200">
@@ -121,114 +116,110 @@ const selectedOperator = operators[0];
 										</span>
 									)}
 								</div>
-							</div>
 
-							<div class="h-10">
-								<p class="text-sm font-normal leading-tight !text-slate-200">
-									{operator.nombre}
-								</p>
-
-								<p class="text-xs leading-tight !text-slate-400">
+								<p class="mt-4 inline-flex w-fit rounded-full bg-sky-400/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-300">
 									{operator.tipo_orbita}
 								</p>
-							</div>
-						</button>
-					))}
-				</div>
-			</div>
 
-			<div class="relative mt-10 overflow-hidden rounded-2xl bg-slate-950">
-				<img
-					data-selected-image
-					src={selectedOperator.imagen || ""}
-					alt=""
-					class={`absolute inset-0 h-full w-full object-cover opacity-65 ${
-						selectedOperator.imagen ? "" : "hidden"
-					}`}
-				/>
+								<h3 class="mt-5 text-xl font-semibold leading-[1.1] !text-white">
+									{operator.nombre}
+								</h3>
 
-				<div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/10" />
-
-				<div class="relative min-h-[420px] p-8 md:p-10">
-					<div class="flex min-h-[340px] max-w-xl flex-col">
-						<div class="flex h-14 w-44 items-center">
-                        <img
-                            data-selected-logo
-                            src={selectedOperator.logo || ""}
-                            alt={selectedOperator.nombre}
-                            class={`max-h-full max-w-full object-contain ${
-                                selectedOperator.logo ? "" : "hidden"
-                            }`}
-                        />
-                    </div>
-
-						<p
-							data-selected-name
-							class="mt-4 text-5xl font-semibold leading-none tracking-tight !text-white"
-						>
-							{selectedOperator.nombre}
-						</p>
-
-						<p
-							data-selected-short
-							class="text-xl leading-7 text-slate-100"
-						>
-							{selectedOperator.descripcion_corta}
-						</p>
-
-						<p
-							data-selected-home
-							class="mt-2 text-sm leading-7 text-slate-400"
-						>
-							{selectedOperator.descripcion_home}
-						</p>
-
-						<div class="mt-auto flex flex-wrap gap-3 pt-7">
-							<a
-								data-selected-link
-								href={`/operadores/${selectedOperator.slug}`}
-								class="inline-flex items-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
-							>
-								Ver operador
-								<span>→</span>
-							</a>
-
-							<a
-								data-selected-official
-								href={selectedOperator.web_oficial || "#"}
-								target="_blank"
-								rel="noopener noreferrer"
-								class={`inline-flex items-center gap-3 rounded-full border border-slate-600 bg-slate-950/40 px-6 py-3 text-sm font-bold text-white transition hover:border-blue-500 hover:text-blue-400 ${
-									selectedOperator.web_oficial
-										? ""
-										: "hidden"
-								}`}
-							>
-								Sitio oficial
-								<span>↗</span>
-							</a>
+								<p class="mt-3 text-sm leading-5 text-slate-300">
+									{operator.descripcion_corta}
+								</p>
+							</button>
+						))}
 						</div>
 					</div>
 				</div>
 
-				<div class="relative grid border-t border-slate-800 bg-slate-950/80 backdrop-blur md:grid-cols-5">
-					{selectedOperator.metrics.map((item: any, index: number) => (
-						<div class="p-5 md:border-r md:border-slate-800 last:border-r-0">
-							<p
-								data-metric-label={index}
-								class="text-xs font-bold uppercase tracking-widest text-blue-400"
+				<div class="relative mt-10 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl xl:sticky xl:top-24 xl:mt-0">
+					<img
+						data-selected-image
+						src={selectedOperator.imagen || ""}
+						alt=""
+						class={`absolute inset-0 h-full w-full object-cover opacity-70 ${
+							selectedOperator.imagen ? "" : "hidden"
+						}`}
+					/>
+
+					<div class="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/55 to-slate-950" />
+					<div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-slate-950/10" />
+
+					<div class="relative flex min-h-[720px] flex-col p-8 md:p-10">
+					 
+
+						<div class="mt-8">
+							<img
+								data-selected-logo
+								src={selectedOperator.logo || ""}
+								alt={selectedOperator.nombre}
+								class={`max-h-16 max-w-56 object-contain ${
+									selectedOperator.logo ? "" : "hidden"
+								}`}
+							/>
+
+							<h3
+								data-selected-name
+								class="mt-8 text-5xl font-bold leading-none tracking-tight !text-white"
 							>
-								{item.label}
+								{selectedOperator.nombre}
+							</h3>
+
+							<p class="mt-5 inline-flex w-fit rounded-full bg-sky-400/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-sky-300">
+								<span data-selected-orbit>
+									{selectedOperator.tipo_orbita}
+								</span>
 							</p>
 
 							<p
-								data-metric-value={index}
-								class="mt-2 text-lg font-bold !text-white"
+								data-selected-home
+								class="mt-6 max-w-xl text-base leading-7 text-slate-200"
 							>
-								{item.value}
+								{selectedOperator.descripcion_home}
 							</p>
 						</div>
-					))}
+
+						<div class="mt-10 border-t border-white/10 pt-8">
+							<div class="grid gap-6 md:grid-cols-3 xl:grid-cols-3">
+								{selectedOperator.features.map(
+									(feature: any, index: number) => (
+										<div>
+											<div class="flex h-14 w-14 items-center justify-center rounded-full border border-[#00ccff]/40 bg-slate-950/60 text-xs font-bold text-[#00ccff]">
+												icono
+											</div>
+
+											<p
+												data-feature-title={index}
+												class="mt-4 text-lg font-bold !text-white"
+											>
+												{feature.title}
+											</p>
+
+											<p
+												data-feature-description={index}
+												class="mt-2 text-sm leading-6 text-slate-300"
+											>
+												{feature.description}
+											</p>
+										</div>
+									),
+								)}
+							</div>
+						</div>
+
+						<div class="mt-auto pt-10">
+							<a
+								data-selected-link
+								href={`/operadores/${selectedOperator.slug}`}
+								class="flex w-full items-center justify-center gap-3 rounded border border-[#00ccff] bg-slate-950/50 px-6 py-4 text-sm font-bold text-[#00ccff] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-[#00ccff] hover:text-slate-950 hover:shadow-[0_0_24px_rgba(0,204,255,0.65)]"
+							>
+								Ver detalles del operador
+								<span>→</span>
+							</a>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -249,17 +240,14 @@ const selectedOperator = operators[0];
 				const selectedName = document.querySelector(
 					"[data-selected-name]",
 				);
-				const selectedShort = document.querySelector(
-					"[data-selected-short]",
-				);
 				const selectedHome = document.querySelector(
 					"[data-selected-home]",
 				);
+				const selectedOrbit = document.querySelector(
+					"[data-selected-orbit]",
+				);
 				const selectedLink = document.querySelector(
 					"[data-selected-link]",
-				);
-				const selectedOfficial = document.querySelector(
-					"[data-selected-official]",
 				);
 
 				function setActiveButton(activeIndex) {
@@ -267,14 +255,17 @@ const selectedOperator = operators[0];
 						const isActive = index === activeIndex;
 
 						button.classList.toggle("border-[#00ccff]", isActive);
-button.classList.toggle("bg-slate-900/80", isActive);
-button.classList.toggle(
-    "shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]",
-    isActive,
-);
+						button.classList.toggle("bg-slate-900/80", isActive);
+						button.classList.toggle(
+							"shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]",
+							isActive,
+						);
 
-button.classList.toggle("border-transparent", !isActive);
-button.classList.toggle("bg-slate-900/70", !isActive);
+						button.classList.toggle(
+							"border-transparent",
+							!isActive,
+						);
+						button.classList.toggle("bg-slate-900/70", !isActive);
 					});
 				}
 
@@ -304,34 +295,26 @@ button.classList.toggle("bg-slate-900/70", !isActive);
 					}
 
 					if (selectedName) selectedName.textContent = operator.nombre;
-					if (selectedShort)
-						selectedShort.textContent = operator.descripcion_corta;
 					if (selectedHome)
 						selectedHome.textContent = operator.descripcion_home;
+					if (selectedOrbit)
+						selectedOrbit.textContent = operator.tipo_orbita;
 
 					if (selectedLink) {
 						selectedLink.href = `/operadores/${operator.slug}`;
 					}
 
-					if (selectedOfficial) {
-						if (operator.web_oficial) {
-							selectedOfficial.href = operator.web_oficial;
-							selectedOfficial.classList.remove("hidden");
-						} else {
-							selectedOfficial.classList.add("hidden");
-						}
-					}
-
-					operator.metrics.forEach((metric, metricIndex) => {
-						const label = document.querySelector(
-							`[data-metric-label="${metricIndex}"]`,
+					operator.features.forEach((feature, featureIndex) => {
+						const title = document.querySelector(
+							`[data-feature-title="${featureIndex}"]`,
 						);
-						const value = document.querySelector(
-							`[data-metric-value="${metricIndex}"]`,
+						const description = document.querySelector(
+							`[data-feature-description="${featureIndex}"]`,
 						);
 
-						if (label) label.textContent = metric.label;
-						if (value) value.textContent = metric.value;
+						if (title) title.textContent = feature.title;
+						if (description)
+							description.textContent = feature.description;
 					});
 				}
 

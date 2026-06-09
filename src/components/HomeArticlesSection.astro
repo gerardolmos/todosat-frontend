@@ -9,52 +9,79 @@ interface Props {
 const { articulos } = Astro.props;
 ---
 
-{
-    articulos.length > 0 && (
-        <section class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12">
-            <img
-                src={noticias.src}
-                alt=""
-                class="pointer-events-none absolute right-0 top-0 h-[430px] w-full object-cover opacity-60"
-            />
+<section
+    class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12"
+>
+    <img
+        src={noticias.src}
+        alt=""
+        class="pointer-events-none absolute right-0 top-0 h-[430px] w-full object-cover opacity-60"
+    />
 
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/5 via-slate-950/50 to-slate-950" />
+    <div
+        class="absolute inset-0 bg-gradient-to-b from-slate-950/5 via-slate-950/50 to-slate-950"
+    >
+    </div>
 
-            <div class="relative z-10">
-                <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div class="relative z-10">
+        <div>
+            <p
+                class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400"
+            >
+                ACTUALIDAD SATELITAL
+            </p>
+
+            <h2
+                class="mt-6 text-4xl font-bold leading-tight tracking-tight !text-white md:text-5xl"
+            >
+                Noticias y actualidad
+            </h2>
+
+            <p class="mt-5 max-w-md text-base leading-7 text-slate-300">
+                Noticias, análisis y novedades sobre operadores, internet
+                satelital, hardware, cobertura y evolución del sector de las
+                comunicaciones.
+            </p>
+        </div>
+
+        <div class="mt-8">
+            <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {
+                    articulos.map((articulo: any) => (
+                        <ArticleCard articulo={articulo} />
+                    ))
+                }
+
+                <a
+                    href="/articulos"
+                    class="group flex h-full min-h-[340px] flex-col justify-between overflow-hidden rounded border border-[#00ccff] bg-[#00ccff] p-6 text-slate-950 shadow-[0_0_18px_rgba(0,204,255,0.35)] transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_0_24px_rgba(0,204,255,0.65)]"
+                >
                     <div>
-                        <p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
-                            ACTUALIDAD SATELITAL
+                        <p
+                            class="text-xs font-bold uppercase tracking-[0.16em] text-slate-800"
+                        >
+                            Más contenido
                         </p>
 
-                        <h2 class="mt-6 text-4xl font-bold leading-tight tracking-tight !text-white md:text-5xl">
-                            Noticias y actualidad
-                        </h2>
+                        <h3
+                            class="mt-5 text-3xl font-bold leading-tight tracking-tight text-slate-950"
+                        >
+                            Ver todos los artículos
+                        </h3>
 
-                        <p class="mt-5 max-w-md text-base leading-7 text-slate-300">
-                            Noticias, análisis y novedades sobre operadores,
-                            internet satelital, hardware, cobertura y evolución
-                            del sector de las comunicaciones.
+                        <p class="mt-4 text-sm leading-6 text-slate-800">
+                            Accede al archivo completo de noticias, análisis y
+                            actualidad satelital.
                         </p>
                     </div>
 
-                    <a
-                        href="/articulos"
-                        class="inline-flex w-fit items-center gap-3 rounded border border-[#00ccff] bg-[#00ccff] px-8 py-3 text-sm font-bold text-slate-950 shadow-[0_0_18px_rgba(0,204,255,0.35)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:bg-white hover:text-slate-950 hover:shadow-[0_0_24px_rgba(0,204,255,0.65)]"
-                    >
-                        Ver todos los artículos
-                        <span>→</span>
-                    </a>
-                </div>
-
-                <div class="mt-8">
-                    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                        {articulos.map((articulo: any) => (
-                            <ArticleCard articulo={articulo} />
-                        ))}
+                    <div class="mt-8 border-t border-slate-950/20 pt-5">
+                        <p class="text-sm font-bold text-slate-950">
+                            Explorar artículos →
+                        </p>
                     </div>
-                </div>
+                </a>
             </div>
-        </section>
-    )
-}
+        </div>
+    </div>
+</section>

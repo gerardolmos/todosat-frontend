@@ -42,15 +42,9 @@ export async function getMarcasHome() {
 
     return data.data
         .filter((marca: any) => marca.activa)
-        .filter((marca: any) => marca.mostrar_en_home)
-        .sort((a: any, b: any) => {
-            const ordenA = a.orden_home ?? 999;
-            const ordenB = b.orden_home ?? 999;
-
-            if (ordenA !== ordenB) return ordenA - ordenB;
-
-            return a.nombre.localeCompare(b.nombre);
-        });
+        .sort((a: any, b: any) =>
+            a.nombre.localeCompare(b.nombre, "es"),
+        );
 }
 
 export async function getArticulos() {

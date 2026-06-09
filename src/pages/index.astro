@@ -19,8 +19,8 @@ import HomeManualsSection from "../components/HomeManualsSection.astro";
 import SectionDivider from "../components/SectionDivider.astro";
 
 const destacados = await getDestacados();
-const modelos = (await getModelos()).slice(0, 3);
-const manuales = (await getManuales()).slice(0, 3);
+const modelos = (await getModelos()).slice(0, 7);
+const manuales = (await getManuales()).slice(0, 7);
 const marcasHome = await getMarcasHome();
 
 const articulos = (await getArticulos())
@@ -29,7 +29,7 @@ const articulos = (await getArticulos())
 			new Date(b.fecha_publicacion).getTime() -
 			new Date(a.fecha_publicacion).getTime(),
 	)
-	.slice(0, 3);
+	.slice(0, 7);
 ---
 
 <Layout
