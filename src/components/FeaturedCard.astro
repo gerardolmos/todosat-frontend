@@ -40,23 +40,31 @@ const tieneRelacionValida = relaciones.length === 1;
     href={href}
     class={`group relative flex ${
         isLarge ? "" : "min-h-[340px] flex-col"
-    } overflow-hidden rounded-2xl bg-slate-900/90 shadow-sm transition-all duration-300 ease-out ${
-        isLarge ? "" : "border border-white/15"
+    } overflow-hidden rounded bg-slate-900/90 shadow-sm transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        isLarge ? "" : "border border-transparent"
     } ${
         tieneRelacionValida
-            ? "hover:-translate-y-0.5 hover:border-blue-400/50 hover:shadow-md"
+            ? "hover:-translate-y-0.5 hover:border-[#00ccff] hover:shadow-[0_0_8px_rgba(0,204,255,0.90),0_0_18px_rgba(0,204,255,0.30)]"
             : "pointer-events-none opacity-60"
     }`}
 >
     {
         imagenUrl && (
-            <img
-                src={imagenUrl}
-                alt={destacado.titulo}
-                class={`${
-                    isLarge ? "absolute inset-0 h-full w-full" : "h-40 w-full"
-                } object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
-            />
+            <>
+                <img
+                    src={imagenUrl}
+                    alt={destacado.titulo}
+                    class={`${
+                        isLarge
+                            ? "absolute inset-0 h-full w-full"
+                            : "h-40 w-full"
+                    } object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
+                />
+
+                <p class="absolute left-5 top-5 z-20 inline-flex rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-300 backdrop-blur">
+                    {tipo}
+                </p>
+            </>
         )
     }
 
@@ -71,12 +79,6 @@ const tieneRelacionValida = relaciones.length === 1;
             isLarge ? "max-w-lg p-8 md:p-10" : "p-5"
         }`}
     >
-        <p
-            class="mb-4 inline-flex w-fit rounded-full bg-sky-400/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-300"
-        >
-            {tipo}
-        </p>
-
         <h3
             class={`${
                 isLarge ? "text-4xl md:text-5xl" : "text-xl"
@@ -90,8 +92,8 @@ const tieneRelacionValida = relaciones.length === 1;
                 <p
                     class={`${
                         isLarge
-                            ? "mt-4 max-w-xl text-base leading-7"
-                            : "mt-3 line-clamp-3 text-sm leading-6"
+                            ? "mt-4 mb-4 max-w-xl text-base leading-7"
+                            : "mt-3 mb-4 line-clamp-3 text-sm leading-6"
                     } text-slate-300`}
                 >
                     {destacado.descripcion}
@@ -101,7 +103,7 @@ const tieneRelacionValida = relaciones.length === 1;
 
         {
             tieneRelacionValida && (
-                <div class="mt-6 border-t border-white/10 pt-5">
+                <div class="mt-auto border-t border-white/10 pt-5">
                     <p class="text-sm font-semibold text-sky-400">
                         Ver destacado →
                     </p>

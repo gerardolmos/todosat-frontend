@@ -88,7 +88,7 @@ const selectedOperator = operators[0];
 
 					<a
 						href="/operadores"
-						class="mt-8 inline-flex items-center gap-3 rounded-full border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
+						class="mt-8 inline-flex items-center gap-3 rounded border border-blue-500 px-5 py-3 text-sm font-bold text-blue-400 transition hover:bg-blue-500 hover:text-white"
 					>
 						Ver todos los operadores
 						<span>→</span>
@@ -101,11 +101,11 @@ const selectedOperator = operators[0];
 							type="button"
 							data-operator-button
 							data-index={index}
-							class={`flex h-40 flex-col justify-between rounded-xl border p-4 text-center text-white transition ${
-								index === 0
-									? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-950"
-									: "border-slate-700 bg-slate-900/70 hover:border-blue-500/70 hover:bg-slate-900"
-							}`}
+							class={`flex h-40 flex-col justify-between rounded border p-4 text-center text-white transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 ${
+    index === 0
+        ? "border-[#00ccff] bg-slate-900/80 shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
+        : "border-transparent bg-slate-900/70 hover:border-[#00ccff] hover:bg-slate-900 hover:shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
+}`}
 						>
 							<div class="flex h-16 items-center justify-center">
 								<div class="flex h-16 w-32 items-center justify-center">
@@ -266,19 +266,15 @@ const selectedOperator = operators[0];
 					buttons.forEach((button, index) => {
 						const isActive = index === activeIndex;
 
-						button.classList.toggle("border-blue-500", isActive);
-						button.classList.toggle("bg-blue-500/10", isActive);
-						button.classList.toggle(
-							"shadow-lg",
-							isActive,
-						);
-						button.classList.toggle(
-							"shadow-blue-950",
-							isActive,
-						);
+						button.classList.toggle("border-[#00ccff]", isActive);
+button.classList.toggle("bg-slate-900/80", isActive);
+button.classList.toggle(
+    "shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]",
+    isActive,
+);
 
-						button.classList.toggle("border-slate-700", !isActive);
-						button.classList.toggle("bg-slate-900/70", !isActive);
+button.classList.toggle("border-transparent", !isActive);
+button.classList.toggle("bg-slate-900/70", !isActive);
 					});
 				}
 

@@ -16,6 +16,7 @@ import HomeFeaturedSection from "../components/HomeFeaturedSection.astro";
 import HomeArticlesSection from "../components/HomeArticlesSection.astro";
 import HomeModelsSection from "../components/HomeModelsSection.astro";
 import HomeManualsSection from "../components/HomeManualsSection.astro";
+import SectionDivider from "../components/SectionDivider.astro";
 
 const destacados = await getDestacados();
 const modelos = (await getModelos()).slice(0, 3);
@@ -98,9 +99,13 @@ const articulos = (await getArticulos())
 		<section class="bg-slate-950">
 			<Container>
 				<HomeOperatorsSection marcas={marcasHome} />
+				<SectionDivider />
 				<HomeFeaturedSection destacados={destacados} />
+				<SectionDivider />
 				<HomeArticlesSection articulos={articulos} />
+				<SectionDivider />
 				<HomeModelsSection modelos={modelos} />
+				<SectionDivider />
 				<HomeManualsSection manuales={manuales} />
 			</Container>
 		</section>
