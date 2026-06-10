@@ -1,6 +1,5 @@
 ---
 import { getMediaUrl } from "../lib/media";
-import { formatLabel } from "../lib/format";
 
 interface Props {
     articulo: any;
@@ -24,9 +23,9 @@ const imagenUrl = getMediaUrl(articulo.imagen_principal);
                         class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                     />
 
-                    {articulo.tipo_articulo && (
+                    {articulo.categoria_tematica?.nombre && (
                         <p class="absolute left-5 top-5 z-20 inline-flex rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-300 backdrop-blur">
-                            {formatLabel(articulo.tipo_articulo)}
+                            {articulo.categoria_tematica.nombre}
                         </p>
                     )}
                 </>

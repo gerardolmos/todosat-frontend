@@ -199,7 +199,7 @@ const manuales = (await getManuales()).filter((manual: any) =>
                                     type="Artículo"
                                     title={articulo.titulo}
                                     description={articulo.subtitulo}
-                                    meta={formatLabel(articulo.tipo_articulo)}
+                                    meta={articulo.categoria_tematica?.nombre}
                                     url={`/articulos/${articulo.slug}`}
                                     image={articulo.imagen_principal}
                                 />

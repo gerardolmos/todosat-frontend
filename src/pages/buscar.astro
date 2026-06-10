@@ -33,7 +33,7 @@ const datosBusqueda = [
         titulo: item.titulo,
         descripcion: item.subtitulo,
         url: `/articulos/${item.slug}`,
-        texto: `${item.titulo} ${item.subtitulo} ${item.tipo_articulo}`,
+        texto: `${item.titulo} ${item.subtitulo} ${item.categoria_tematica?.nombre || ""}`,
     })),
     ...manuales.map((item: any) => ({
         tipo: "Manual",
