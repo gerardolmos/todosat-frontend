@@ -11,24 +11,34 @@ type Props = {
 const { items } = Astro.props;
 ---
 
-<nav aria-label="Breadcrumb" class="mb-8 text-sm text-slate-500">
+<nav
+    aria-label="Breadcrumb"
+    class="mb-8 inline-flex rounded-lg border border-blue-500/20 bg-blue-500/5 px-4 py-2 text-sm"
+>
     <ol class="flex flex-wrap items-center gap-2">
         <li>
-            <a href="/" class="hover:text-slate-900">Inicio</a>
+            <a href="/" class="text-slate-400 transition hover:text-white">
+                Inicio
+            </a>
         </li>
 
         {
             items.map((item) => (
                 <>
-                    <li aria-hidden="true">/</li>
+                    <li aria-hidden="true" class="text-slate-600">
+                        /
+                    </li>
 
                     <li>
                         {item.href ? (
-                            <a href={item.href} class="hover:text-slate-900">
+                            <a
+                                href={item.href}
+                                class="text-slate-400 transition hover:text-white"
+                            >
                                 {item.label}
                             </a>
                         ) : (
-                            <span class="font-medium text-slate-900">
+                            <span class="font-medium text-slate-200">
                                 {item.label}
                             </span>
                         )}

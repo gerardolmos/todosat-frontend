@@ -13,6 +13,12 @@ import RelatedCard from "../../../components/RelatedCard.astro";
 import { formatLabel } from "../../../lib/format";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
+import coberturaIcon from "../../../assets/images/pictostecnicos/cobertura.png";
+import satelitesIcon from "../../../assets/images/pictostecnicos/satelites.png";
+import velocidadIcon from "../../../assets/images/pictostecnicos/velocidad.png";
+import latenciaIcon from "../../../assets/images/pictostecnicos/latencia.png";
+import orbitaIcon from "../../../assets/images/pictostecnicos/orbita.png";
+
 export async function getStaticPaths() {
     const marcas = await getMarcas();
 
@@ -47,6 +53,57 @@ const manuales = (await getManuales()).filter((manual: any) =>
         (marcaRelacionada: any) => marcaRelacionada.slug === marca.slug,
     ),
 );
+
+const metricas = [
+    {
+        label: "Cobertura",
+        value: marca.cobertura,
+        icon: coberturaIcon,
+    },
+    {
+        label: "Satélites",
+        value: marca.satelites,
+        icon: satelitesIcon,
+    },
+    {
+        label: "Velocidad",
+        value: marca.velocidad,
+        icon: velocidadIcon,
+    },
+    {
+        label: "Latencia",
+        value: marca.latencia,
+        icon: latenciaIcon,
+    },
+].filter((item) => item.value);
+
+const detallesTecnicos = [
+    {
+        title: "Cobertura",
+        text: marca.cobertura_descripcion,
+        icon: coberturaIcon,
+    },
+    {
+        title: "Satélites",
+        text: marca.satelites_descripcion,
+        icon: satelitesIcon,
+    },
+    {
+        title: "Velocidad",
+        text: marca.velocidad_descripcion,
+        icon: velocidadIcon,
+    },
+    {
+        title: "Latencia",
+        text: marca.latencia_descripcion,
+        icon: latenciaIcon,
+    },
+    {
+        title: "Tipo de órbita",
+        text: marca.orbita_descripcion,
+        icon: orbitaIcon,
+    },
+].filter((item) => item.text);
 ---
 
 <Layout
@@ -68,104 +125,182 @@ const manuales = (await getManuales()).filter((manual: any) =>
             />
 
             <section
-                class="mt-8 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center"
+                class="mt-8 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8"
             >
-                <div>
-                    <a
-                        href="/operadores"
-                        class="text-sm font-semibold text-sky-400 hover:text-sky-300"
-                    >
-                        ← Volver a operadores
-                    </a>
+                <a
+                    href="/operadores"
+                    class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
+                >
+                    ← Volver a operadores
+                </a>
 
-                    {
-                        logoUrl && (
-                            <img
-                                src={logoUrl}
-                                alt={`Logo de ${marca.nombre}`}
-                                class="mt-8 max-h-20 w-auto"
-                            />
-                        )
-                    }
-
-                    <h1
-                        class="mt-6 max-w-4xl text-5xl font-bold tracking-tight !text-white"
-                    >
-                        {marca.nombre}
-                    </h1>
-
-                    {
-                        marca.descripcion_corta && (
-                            <p class="mt-6 max-w-2xl text-xl leading-8 text-slate-300">
-                                {marca.descripcion_corta}
-                            </p>
-                        )
-                    }
-
-                    <div class="mt-8 flex flex-wrap gap-3">
+                <div
+                    class="mt-8 grid gap-10 lg:grid-cols-[40%_60%] lg:items-center"
+                >
+                    <div>
                         {
-                            marca.tipo_orbita && (
-                                <span class="rounded-full bg-sky-400/15 px-4 py-2 text-sm font-semibold text-sky-300">
-                                    {marca.tipo_orbita}
-                                </span>
+                            logoUrl && (
+                                <img
+                                    src={logoUrl}
+                                    alt={`Logo de ${marca.nombre}`}
+                                    class="max-h-20 w-auto"
+                                />
+                            )
+                        }
+
+                        <h1
+                            class="mt-5 text-4xl font-bold tracking-tight text-white md:text-5xl"
+                        >
+                            {marca.nombre}
+                        </h1>
+
+                        {
+                            marca.descripcion_corta && (
+                                <p class="mt-5 max-w-xl text-2xl font-semibold leading-tight text-white">
+                                    {marca.descripcion_corta}
+                                </p>
                             )
                         }
 
                         {
-                            marca.pais_origen && (
-                                <span class="rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300">
-                                    {marca.pais_origen}
-                                </span>
+                            marca.descripcion_home && (
+                                <p class="mt-4 max-w-xl text-[1.05rem] leading-8 text-slate-400">
+                                    {marca.descripcion_home}
+                                </p>
+                            )
+                        }
+
+                        <div class="mt-7 flex flex-wrap gap-3">
+                            {
+                                marca.tipo_orbita && (
+                                    <span class="rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
+                                        {marca.tipo_orbita}
+                                    </span>
+                                )
+                            }
+
+                            {
+                                marca.pais_origen && (
+                                    <span class="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-slate-300">
+                                        {marca.pais_origen}
+                                    </span>
+                                )
+                            }
+                        </div>
+
+                        {
+                            marca.web_oficial && (
+                                <a
+                                    href={marca.web_oficial}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="mt-10 inline-flex rounded-xl bg-[#005EFF] px-10 py-4 text-lg font-bold text-white transition hover:brightness-110"
+                                >
+                                    Web oficial →
+                                </a>
                             )
                         }
                     </div>
 
                     {
-                        marca.web_oficial && (
-                            <a
-                                href={marca.web_oficial}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="mt-8 inline-flex rounded-full border border-sky-400 px-5 py-3 text-sm font-semibold text-sky-400 transition hover:bg-sky-400 hover:text-white"
-                            >
-                                Web oficial →
-                            </a>
+                        imagenPortadaUrl && (
+                            <div class="overflow-hidden rounded-3xl border border-white/10">
+                                <img
+                                    src={imagenPortadaUrl}
+                                    alt={marca.nombre}
+                                    class="w-full object-cover"
+                                />
+                            </div>
                         )
                     }
                 </div>
-
-                {
-                    imagenPortadaUrl && (
-                        <div class="overflow-hidden rounded-3xl border border-white/15 bg-slate-900/90 shadow-sm">
-                            <img
-                                src={imagenPortadaUrl}
-                                alt={marca.nombre}
-                                class="h-full max-h-[460px] w-full object-cover"
-                            />
-                        </div>
-                    )
-                }
             </section>
 
             {
+                metricas.length > 0 && (
+                    <section class="mt-8 grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
+                        {metricas.map((item, index) => (
+                            <div class="relative px-6 py-5">
+                                <div class="flex items-center gap-4">
+                                    <img
+                                        src={item.icon.src}
+                                        alt={item.label}
+                                        class="h-12 w-12 object-contain"
+                                    />
+
+                                    <p class="font-bold uppercase tracking-[0.2em] text-blue-400">
+                                        {item.label}
+                                    </p>
+                                </div>
+
+                                <p class="mt-2 text-4xl font-extrabold tracking-tight text-white">
+                                    {item.value}
+                                </p>
+
+                                {index < metricas.length - 1 && (
+                                    <div class="absolute right-0 top-5 hidden h-[70%] w-px bg-[#005EFF]/70 lg:block" />
+                                )}
+                            </div>
+                        ))}
+                    </section>
+                )
+            }
+
+            {
                 descripcionHTML && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
+                    <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
+                        <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
+                            Acerca de {marca.nombre}
+                        </h2>
+
                         <div
-                            class="prose prose-invert prose-lg max-w-none"
+                            class="prose prose-invert prose-lg max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
                             set:html={descripcionHTML}
                         />
                     </section>
                 )
             }
 
-            <section class="mt-16 border-t border-white/10 pt-12">
-                <h2 class="mb-6 text-3xl font-bold !text-white">
+            {
+                detallesTecnicos.length > 0 && (
+                    <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
+                        <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
+                            Información técnica
+                        </h2>
+
+                        <div class="grid gap-5 lg:grid-cols-2">
+                            {detallesTecnicos.map((item) => (
+                                <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-6">
+                                    <div class="mb-4 flex items-center gap-3">
+                                        <img
+                                            src={item.icon.src}
+                                            alt={item.title}
+                                            class="h-12 w-12 object-contain"
+                                        />
+
+                                        <h3 class="text-2xl font-bold text-white">
+                                            {item.title}
+                                        </h3>
+                                    </div>
+
+                                    <p class="leading-7 text-slate-300">
+                                        {item.text}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )
+            }
+
+            <section class="mt-12 border-t border-white/10 pt-10">
+                <h2 class="mb-6 text-3xl font-bold text-white">
                     Modelos de {marca.nombre}
                 </h2>
 
                 {
                     modelos.length > 0 ? (
-                        <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
                                 <RelatedCard
                                     type="Modelo"
@@ -186,14 +321,14 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 }
             </section>
 
-            <section class="mt-16 border-t border-white/10 pt-12">
-                <h2 class="mb-6 text-3xl font-bold !text-white">
+            <section class="mt-12 border-t border-white/10 pt-10">
+                <h2 class="mb-6 text-3xl font-bold text-white">
                     Artículos relacionados
                 </h2>
 
                 {
                     articulos.length > 0 ? (
-                        <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
                                 <RelatedCard
                                     type="Artículo"
@@ -214,14 +349,14 @@ const manuales = (await getManuales()).filter((manual: any) =>
                 }
             </section>
 
-            <section class="mt-16 border-t border-white/10 pt-12">
-                <h2 class="mb-6 text-3xl font-bold !text-white">
+            <section class="mt-12 border-t border-white/10 pt-10">
+                <h2 class="mb-6 text-3xl font-bold text-white">
                     Manuales relacionados
                 </h2>
 
                 {
                     manuales.length > 0 ? (
-                        <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
                             {manuales.map((manual: any) => (
                                 <RelatedCard
                                     type="Manual"

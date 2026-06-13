@@ -75,3 +75,29 @@ function renderChildren(children: any[]) {
         })
         .join('');
 }
+
+export function getReadingTime(blocks: any[]) {
+    if (!blocks || !Array.isArray(blocks)) {
+        return null;
+    }
+
+    const text = blocks
+        .map((block) => {
+            if (!block.children || !Array.isArray(block.children)) {
+                return "";
+            }
+
+            return block.children
+                .map((child: any) => child.text || "")
+                .join(" ");
+        })
+        .join(" ");
+
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+
+    if (words === 0) {
+        return null;
+    }
+
+    return Math.max(1, Math.ceil(words / 200));
+}

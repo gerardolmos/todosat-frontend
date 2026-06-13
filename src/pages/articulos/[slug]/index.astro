@@ -1,7 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import { getArticulos } from "../../../lib/content";
-import { renderBlocks } from "../../../lib/renderBlocks";
+import { renderBlocks, getReadingTime } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import Container from "../../../components/Container.astro";
 import RelatedCard from "../../../components/RelatedCard.astro";
@@ -29,13 +29,23 @@ const categoria = articulo.categoria_tematica;
 const marcas = articulo.marcas || [];
 const modelos = articulo.modelos || [];
 const manuales = articulo.manuals || [];
+
+const fecha = articulo.fecha_publicacion
+    ? new Date(articulo.fecha_publicacion).toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+      })
+    : null;
+
+const readingTime = getReadingTime(articulo.contenido);
 ---
 
 <Layout
-    title={`${articulo.titulo} | Todo-Sat`}
+    title={`${articulo.titulo} | TodoSatcom`}
     description={articulo.subtitulo}
 >
-    <main class="min-h-screen py-10">
+    <main class="min-h-screen bg-slate-950 py-16 text-white">
         <Container>
             <Breadcrumbs
                 items={[
@@ -52,7 +62,7 @@ const manuales = articulo.manuals || [];
             <article class="mt-8">
                 <a
                     href="/articulos"
-                    class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                    class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
                 >
                     ← Volver a artículos
                 </a>
@@ -60,32 +70,41 @@ const manuales = articulo.manuals || [];
                 <header class="mt-8 max-w-4xl">
                     <div class="flex flex-wrap gap-3">
                         {
-                            articulo.fecha_publicacion && (
-                                <span class="rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-muted">
-                                    {articulo.fecha_publicacion}
-                                </span>
-                            )
-                        }
-
-                        {
                             categoria && (
                                 <a
                                     href={`/articulos/${categoria.slug}`}
-                                    class="rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-muted hover:text-info-primary"
+                                    class="rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300 transition hover:border-[#005EFF] hover:text-white"
                                 >
                                     {categoria.nombre}
                                 </a>
                             )
                         }
+
+                        {
+                            fecha && (
+                                <span class="rounded-full border border-white/10 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-300">
+                                    {fecha}
+                                </span>
+                            )
+                        }
+                        {
+                            readingTime && (
+                                <span class="rounded-full border border-white/10 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-300">
+                                    {readingTime} min lectura
+                                </span>
+                            )
+                        }
                     </div>
 
-                    <h1 class="mt-6">
+                    <h1
+                        class="mt-8 max-w-5xl text-4xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                    >
                         {articulo.titulo}
                     </h1>
 
                     {
                         articulo.subtitulo && (
-                            <p class="mt-6 text-2xl leading-9 text-brand-muted">
+                            <p class="mt-6 max-w-3xl text-xl leading-8 text-slate-300 md:text-2xl md:leading-9">
                                 {articulo.subtitulo}
                             </p>
                         )
@@ -94,11 +113,11 @@ const manuales = articulo.manuals || [];
 
                 {
                     imagenUrl && (
-                        <div class="mt-10 overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                        <div class="mt-12 overflow-hidden rounded-3xl">
                             <img
                                 src={imagenUrl}
                                 alt={articulo.titulo}
-                                class="max-h-[520px] w-full object-cover"
+                                class="max-h-[560px] w-full object-cover"
                             />
                         </div>
                     )
@@ -106,9 +125,9 @@ const manuales = articulo.manuals || [];
 
                 {
                     contenidoHTML && (
-                        <section class="mt-14 border-t border-brand-border pt-12">
+                        <section class="mt-12">
                             <div
-                                class="prose prose-lg max-w-none"
+                                class="prose prose-invert prose-lg max-w-4xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
                                 set:html={contenidoHTML}
                             />
                         </section>
@@ -118,10 +137,12 @@ const manuales = articulo.manuals || [];
 
             {
                 marcas.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Operadores relacionados</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-3xl font-bold !text-white">
+                            Operadores relacionados
+                        </h2>
 
-                        <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
                             {marcas.map((marca: any) => (
                                 <RelatedCard
                                     type="Operador"
@@ -138,8 +159,10 @@ const manuales = articulo.manuals || [];
 
             {
                 modelos.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Modelos relacionados</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-3xl font-bold !text-white">
+                            Modelos relacionados
+                        </h2>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
@@ -158,8 +181,10 @@ const manuales = articulo.manuals || [];
 
             {
                 manuales.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Manuales relacionados</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-3xl font-bold !text-white">
+                            Manuales relacionados
+                        </h2>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             {manuales.map((manual: any) => (
