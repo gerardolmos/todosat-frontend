@@ -80,30 +80,35 @@ const metricas = [
 const detallesTecnicos = [
     {
         title: "Cobertura",
+        value: marca.cobertura,
         text: marca.cobertura_descripcion,
         icon: coberturaIcon,
     },
     {
         title: "Satélites",
+        value: marca.satelites,
         text: marca.satelites_descripcion,
         icon: satelitesIcon,
     },
     {
         title: "Velocidad",
+        value: marca.velocidad,
         text: marca.velocidad_descripcion,
         icon: velocidadIcon,
     },
     {
         title: "Latencia",
+        value: marca.latencia,
         text: marca.latencia_descripcion,
         icon: latenciaIcon,
     },
     {
         title: "Tipo de órbita",
+        value: marca.tipo_orbita,
         text: marca.orbita_descripcion,
         icon: orbitaIcon,
     },
-].filter((item) => item.text);
+].filter((item) => item.text || item.value);
 ---
 
 <Layout
@@ -217,51 +222,6 @@ const detallesTecnicos = [
             </section>
 
             {
-                metricas.length > 0 && (
-                    <section class="mt-8 grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
-                        {metricas.map((item, index) => (
-                            <div class="relative px-6 py-5">
-                                <div class="flex items-center gap-4">
-                                    <img
-                                        src={item.icon.src}
-                                        alt={item.label}
-                                        class="h-12 w-12 object-contain"
-                                    />
-
-                                    <p class="font-bold uppercase tracking-[0.2em] text-blue-400">
-                                        {item.label}
-                                    </p>
-                                </div>
-
-                                <p class="mt-2 text-4xl font-extrabold tracking-tight text-white">
-                                    {item.value}
-                                </p>
-
-                                {index < metricas.length - 1 && (
-                                    <div class="absolute right-0 top-5 hidden h-[70%] w-px bg-[#005EFF]/70 lg:block" />
-                                )}
-                            </div>
-                        ))}
-                    </section>
-                )
-            }
-
-            {
-                descripcionHTML && (
-                    <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
-                        <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
-                            Acerca de {marca.nombre}
-                        </h2>
-
-                        <div
-                            class="prose prose-invert prose-lg max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
-                            set:html={descripcionHTML}
-                        />
-                    </section>
-                )
-            }
-
-            {
                 detallesTecnicos.length > 0 && (
                     <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
                         <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
@@ -278,8 +238,13 @@ const detallesTecnicos = [
                                             class="h-12 w-12 object-contain"
                                         />
 
-                                        <h3 class="text-2xl font-bold text-white">
-                                            {item.title}
+                                        <h3 class="text-xl font-bold text-white">
+                                            {item.title}:
+                                            {item.value && (
+                                                <span class="text-blue-400">
+                                                    {item.value}
+                                                </span>
+                                            )}
                                         </h3>
                                     </div>
 
@@ -289,6 +254,21 @@ const detallesTecnicos = [
                                 </div>
                             ))}
                         </div>
+                    </section>
+                )
+            }
+
+            {
+                descripcionHTML && (
+                    <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
+                        <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
+                            Acerca de {marca.nombre}
+                        </h2>
+
+                        <div
+                            class="prose prose-invert prose-lg max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
+                            set:html={descripcionHTML}
+                        />
                     </section>
                 )
             }

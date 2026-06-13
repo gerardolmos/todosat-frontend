@@ -1,0 +1,20 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import { getMarcas } from "../../lib/content";
+import BrandCard from "../../components/BrandCard.astro";
+
+const marcas = await getMarcas();
+---
+
+<Layout title="Operadores | TodoSatcom">
+    <main class="min-h-screen bg-slate-950 py-10">
+        <Container>
+            <h1 class="mb-8 text-4xl font-bold !text-white">Operadores</h1>
+
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {marcas.map((marca: any) => <BrandCard marca={marca} />)}
+            </div>
+        </Container>
+    </main>
+</Layout>
