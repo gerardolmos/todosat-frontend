@@ -10,7 +10,68 @@ const marcas = await getMarcas();
 <Layout title="Operadores | TodoSatcom">
     <main class="min-h-screen bg-slate-950 py-10">
         <Container>
-            <h1 class="mb-8 text-4xl font-bold !text-white">Operadores</h1>
+            <section
+                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-20"
+            >
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.28),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(0,204,255,0.16),transparent_30%)]"
+                >
+                </div>
+                <div
+                    class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
+                >
+                </div>
+                <div
+                    class="absolute -right-32 top-10 h-72 w-72 rounded-full border border-blue-400/20"
+                >
+                </div>
+                <div
+                    class="absolute -right-20 top-24 h-96 w-96 rounded-full border border-cyan-400/10"
+                >
+                </div>
+
+                <div class="relative max-w-4xl">
+                    <p
+                        class="inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                    >
+                        Ecosistema satelital
+                    </p>
+
+                    <h1
+                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                    >
+                        Operadores satelitales
+                    </h1>
+
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                        Explora las principales constelaciones, redes y
+                        compañías que impulsan la conectividad satelital global.
+                    </p>
+
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            LEO
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            MEO
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            GEO
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Conectividad global
+                        </span>
+                    </div>
+                </div>
+            </section>
 
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {marcas.map((marca: any) => <BrandCard marca={marca} />)}

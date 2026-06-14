@@ -16,10 +16,72 @@ export async function getStaticPaths({ paginate }: any) {
 const { page } = Astro.props as any;
 ---
 
-<Layout title="Manuales | TODOSat">
-    <main class="min-h-screen py-10">
+<Layout title="Manuales | TodoSatcom">
+    <main class="min-h-screen bg-slate-950 py-10">
         <Container>
-            <h1 class="mb-8 text-4xl font-bold">Manuales</h1>
+            <section
+                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-20"
+            >
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.22),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.12),transparent_32%)]"
+                >
+                </div>
+                <div
+                    class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
+                >
+                </div>
+                <div
+                    class="absolute -right-32 top-10 h-72 w-72 rounded-full border border-blue-400/20"
+                >
+                </div>
+                <div
+                    class="absolute -right-20 top-24 h-96 w-96 rounded-full border border-cyan-400/10"
+                >
+                </div>
+
+                <div class="relative max-w-4xl">
+                    <p
+                        class="inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                    >
+                        Documentación técnica
+                    </p>
+
+                    <h1
+                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                    >
+                        Manuales y documentación
+                    </h1>
+
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                        Accede a manuales oficiales, guías de instalación,
+                        fichas técnicas, documentación de producto y recursos
+                        para operadores y equipos satelitales.
+                    </p>
+
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Instalación
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Firmware
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Fichas técnicas
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Guías oficiales
+                        </span>
+                    </div>
+                </div>
+            </section>
 
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {page.data.map((manual: any) => <ManualCard manual={manual} />)}

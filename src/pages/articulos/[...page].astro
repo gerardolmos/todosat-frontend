@@ -90,100 +90,159 @@ const basePath = categoriaActual
 <Layout title={title}>
     <main class="min-h-screen bg-slate-950 py-16 text-white">
         <Container>
-            <div class="mb-10">
-                <p
-                    class="inline-flex w-fit rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400"
-                >
-                    Actualidad satelital
-                </p>
-
-                <h1
-                    class="mt-6 text-4xl font-bold tracking-tight !text-white md:text-5xl"
-                >
-                    {categoriaActual ? categoriaActual.nombre : "Artículos"}
-                </h1>
-
-                <p class="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                    {
-                        categoriaActual?.descripcion ||
-                            "Noticias, análisis y contenidos sobre operadores, gaming, tecnología espacial y comunicaciones satelitales."
-                    }
-                </p>
-            </div>
-
-            <div
-                class="mb-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+            <section
+                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-20"
             >
-                <a
-                    href="/articulos"
-                    class={`group flex flex-col items-center rounded-xl border bg-transparent px-4 py-5 transition-all duration-150  hover:border-[#005EFF] hover:shadow-[0_0_14px_rgba(0,94,255,0.25)] ${
-                        !categoriaActual
-                            ? "border-[#005EFF] bg-slate-900/50 shadow-[0_0_18px_rgba(0,94,255,0.35)]"
-                            : "border-transparent"
-                    }`}
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
                 >
-                    <img
-                        src={todasIcon.src}
-                        alt="Todas las categorías"
-                        class="h-36 w-36 object-contain transition-transform duration-150 group-hover:scale-105"
-                    />
+                </div>
+                <div
+                    class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
+                >
+                </div>
+                <div
+                    class="absolute -right-32 top-10 h-72 w-72 rounded-full border border-blue-400/20"
+                >
+                </div>
+                <div
+                    class="absolute -right-20 top-24 h-96 w-96 rounded-full border border-cyan-400/10"
+                >
+                </div>
 
+                <div class="relative max-w-4xl">
                     <p
-                        class="mt-3 text-center text-base font-semibold tracking-wide text-white"
+                        class="inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
                     >
-                        Todas
+                        Actualidad satelital
                     </p>
-                </a>
 
-                {
-                    categorias.map((categoria: any) => {
-                        const iconoUrl = getMediaUrl(categoria.icono);
+                    <h1
+                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                    >
+                        {
+                            categoriaActual
+                                ? categoriaActual.nombre
+                                : "Actualidad y guías"
+                        }
+                    </h1>
 
-                        return (
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                        {
+                            categoriaActual?.descripcion ||
+                                "Noticias, análisis, guías y contenidos para entender mejor los operadores, equipos, servicios y tendencias del ecosistema satelital."
+                        }
+                    </p>
+
+                    <div class="mt-8 flex flex-wrap gap-3">
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Noticias
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Guías
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Comparativas
+                        </span>
+                        <span
+                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                        >
+                            Análisis
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid gap-10 lg:grid-cols-[260px_1fr]">
+                <aside class="lg:sticky lg:top-24 lg:self-start">
+                    <div>
+                        <p
+                            class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Categorías
+                        </p>
+
+                        <nav>
                             <a
-                                href={`/articulos/${categoria.slug}`}
-                                class={`group flex flex-col items-center rounded border bg-transparent px-4 py-5 transition-all duration-200 hover:border-[#005EFF] hover:shadow-[0_0_14px_rgba(0,94,255,0.25)]  ${
-                                    categoriaActual?.slug === categoria.slug
-                                        ? "border-[#005EFF] bg-slate-900/50 shadow-[0_0_18px_rgba(0,94,255,0.35)]"
-                                        : "border-transparent"
+                                href="/articulos"
+                                class={`group flex items-center gap-4 border-b border-white/10 px-1 py-2.5 transition-all duration-200 hover:bg-slate-900/30 ${
+                                    !categoriaActual
+                                        ? "text-blue-400"
+                                        : "text-white"
                                 }`}
                             >
-                                {iconoUrl && (
-                                    <img
-                                        src={iconoUrl}
-                                        alt={categoria.nombre}
-                                        class="h-36 w-36 object-contain transition-transform duration-150 group-hover:scale-105"
-                                    />
-                                )}
+                                <img
+                                    src={todasIcon.src}
+                                    alt="Todas las categorías"
+                                    class="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110"
+                                />
 
-                                <p class="mt-3 text-center text-base font-semibold tracking-wide text-white">
-                                    {categoria.nombre}
-                                </p>
+                                <span class="font-semibold"> Todas </span>
                             </a>
-                        );
-                    })
-                }
-            </div>
 
-            {
-                page.data.length > 0 ? (
-                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {page.data.map((articulo: any) => (
-                            <ArticleCard articulo={articulo} />
-                        ))}
+                            {
+                                categorias.map((categoria: any) => {
+                                    const iconoUrl = getMediaUrl(
+                                        categoria.icono,
+                                    );
+
+                                    return (
+                                        <a
+                                            href={`/articulos/${categoria.slug}`}
+                                            class={`group flex items-center gap-4 border-b border-white/10 px-1 py-2.5 transition-all duration-200 hover:bg-slate-900/30 ${
+                                                categoriaActual?.slug ===
+                                                categoria.slug
+                                                    ? "text-blue-400"
+                                                    : "text-white"
+                                            }`}
+                                        >
+                                            {iconoUrl && (
+                                                <img
+                                                    src={iconoUrl}
+                                                    alt={categoria.nombre}
+                                                    class="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110"
+                                                />
+                                            )}
+
+                                            <span class="font-semibold">
+                                                {categoria.nombre}
+                                            </span>
+                                        </a>
+                                    );
+                                })
+                            }
+                        </nav>
                     </div>
-                ) : (
-                    <p class="rounded border border-white/10 bg-slate-900 p-6 text-slate-300">
-                        Todavía no hay artículos en esta categoría.
-                    </p>
-                )
-            }
+                </aside>
 
-            <Pagination
-                currentPage={page.currentPage}
-                totalPages={page.lastPage}
-                basePath={basePath}
-            />
+                <section>
+                    {
+                        page.data.length > 0 ? (
+                            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {page.data.map((articulo: any) => (
+                                    <ArticleCard articulo={articulo} />
+                                ))}
+                            </div>
+                        ) : (
+                            <p class="rounded border border-white/10 bg-slate-900 p-6 text-slate-300">
+                                Todavía no hay artículos en esta categoría.
+                            </p>
+                        )
+                    }
+
+                    <Pagination
+                        currentPage={page.currentPage}
+                        totalPages={page.lastPage}
+                        basePath={basePath}
+                    />
+                </section>
+            </div>
         </Container>
-    </main>
-</Layout>
+    </main></Layout
+>

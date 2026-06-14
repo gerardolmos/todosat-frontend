@@ -44,7 +44,7 @@ const tieneRelacionValida = relaciones.length === 1;
         isLarge ? "" : "border border-transparent"
     } ${
         tieneRelacionValida
-            ? "hover:-translate-y-0.5 hover:border-[#00ccff] hover:shadow-[0_0_8px_rgba(0,204,255,0.90),0_0_18px_rgba(0,204,255,0.30)]"
+            ? "hover:border-[#005EFF] hover:shadow-[0_0_8px_rgba(0,94,255,0.80),0_0_18px_rgba(0,94,255,0.30)]"
             : "pointer-events-none opacity-60"
     }`}
 >
@@ -61,7 +61,7 @@ const tieneRelacionValida = relaciones.length === 1;
                     } object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
                 />
 
-                <p class="absolute left-5 top-5 z-20 inline-flex rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-300 backdrop-blur">
+                <p class="absolute left-5 top-5 z-20 inline-flex rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-300 text-blue-400 backdrop-blur">
                     {tipo}
                 </p>
             </>
@@ -105,7 +105,7 @@ const tieneRelacionValida = relaciones.length === 1;
             tieneRelacionValida && (
                 <div class="mt-auto border-t border-white/10 pt-5">
                     <p class="text-sm font-semibold text-sky-400">
-                        Ver destacado →
+                        Ver contenido →
                     </p>
                 </div>
             )

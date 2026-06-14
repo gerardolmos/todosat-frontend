@@ -13,7 +13,7 @@ const chipPrincipal = manual.tipo_documento || manual.idioma;
 
 <a
     href={`/manuales/${manual.slug}`}
-    class="group flex h-full min-h-[340px] flex-col overflow-hidden rounded border border-transparent bg-slate-900/90 shadow-sm transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-[#00ccff] hover:shadow-[0_0_8px_rgba(0,204,255,0.90),0_0_18px_rgba(0,204,255,0.30)]"
+    class="group flex h-full min-h-[340px] flex-col overflow-hidden rounded border border-transparent bg-slate-900/90 shadow-sm transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[#005EFF] hover:shadow-[0_0_8px_rgba(0,94,255,0.80),0_0_18px_rgba(0,94,255,0.30)]"
 >
     <div class="h-40 overflow-hidden bg-slate-800">
         {
@@ -30,7 +30,7 @@ const chipPrincipal = manual.tipo_documento || manual.idioma;
     <div class="relative z-10 flex flex-1 flex-col p-5">
         {
             chipPrincipal && (
-                <p class="mb-4 inline-flex w-fit rounded-full bg-sky-400/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-sky-300">
+                <p class="mb-4 inline-flex w-fit rounded-full bg-sky-400/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-300">
                     {formatLabel(chipPrincipal)}
                 </p>
             )
@@ -85,7 +85,7 @@ const chipPrincipal = manual.tipo_documento || manual.idioma;
         </div>
 
         <div class="mt-auto border-t border-white/10 pt-5">
-            <p class="text-sm font-semibold text-sky-400">Ver manual →</p>
+            <p class="text-sm font-semibold text-blue-400">Ver manual →</p>
         </div>
     </div>
 </a>
