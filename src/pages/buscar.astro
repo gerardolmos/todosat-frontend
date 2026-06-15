@@ -8,10 +8,19 @@ import {
     getManuales,
 } from "../lib/content";
 
+import { getMediaUrl } from "../lib/media";
+
 const marcas = await getMarcas();
 const modelos = await getModelos();
 const articulos = await getArticulos();
 const manuales = await getManuales();
+
+function limpiarTexto(valor: any) {
+    return String(valor || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
 
 const datosBusqueda = [
     ...marcas.map((item: any) => ({
@@ -19,57 +28,130 @@ const datosBusqueda = [
         titulo: item.nombre,
         descripcion: item.descripcion_corta,
         url: `/operadores/${item.slug}`,
-        texto: `${item.nombre} ${item.descripcion_corta} ${item.pais_origen} ${item.tipo_orbita}`,
+        imageUrl: getMediaUrl(item.imagen_portada || item.logo),
+        texto: limpiarTexto(`
+			${item.nombre}
+			${item.descripcion_home}
+			${item.descripcion_corta}
+			${item.descripcion_completa}
+			${item.pais_origen}
+			${item.tipo_orbita}
+			${item.cobertura}
+			${item.velocidad}
+			${item.latencia}
+		`),
     })),
     ...modelos.map((item: any) => ({
-        tipo: "Modelo",
+        tipo: "Hardware",
         titulo: item.nombre,
         descripcion: item.descripcion_corta,
         url: `/modelos/${item.slug}`,
-        texto: `${item.nombre} ${item.descripcion_corta} ${item.uso_recomendado} ${item.marca?.nombre}`,
+        imageUrl: getMediaUrl(item.imagen_principal),
+        texto: limpiarTexto(`
+			${item.nombre}
+			${item.descripcion_corta}
+			${item.descripcion_completa}
+			${item.uso_recomendado}
+			${item.marca?.nombre}
+		`),
     })),
     ...articulos.map((item: any) => ({
         tipo: "Artículo",
         titulo: item.titulo,
         descripcion: item.subtitulo,
         url: `/articulos/${item.slug}`,
-        texto: `${item.titulo} ${item.subtitulo} ${item.categoria_tematica?.nombre || ""}`,
+        imageUrl: getMediaUrl(item.imagen_principal),
+        texto: limpiarTexto(`
+			${item.titulo}
+			${item.subtitulo}
+			${item.contenido}
+			${item.categoria_tematica?.nombre || ""}
+		`),
     })),
     ...manuales.map((item: any) => ({
         tipo: "Manual",
         titulo: item.titulo,
         descripcion: item.descripcion,
         url: `/manuales/${item.slug}`,
-        texto: `${item.titulo} ${item.descripcion} ${item.idioma} ${item.ano_publicacion}`,
+        imageUrl: getMediaUrl(item.imagen_portada),
+        texto: limpiarTexto(`
+			${item.titulo}
+			${item.descripcion}
+			${item.idioma}
+			${item.version}
+			${item.ano_publicacion}
+			${item.marcas?.map((marca: any) => marca.nombre).join(" ")}
+			${item.modelos?.map((modelo: any) => modelo.nombre).join(" ")}
+		`),
     })),
 ];
 ---
 
-<Layout title="Buscar | TODOSat">
-    <main class="min-h-screen py-10">
+<Layout title="Buscar | TodoSatcom">
+    <main class="min-h-screen bg-slate-950 py-16 text-white">
         <Container>
-            <h1 class="text-4xl font-bold">Buscar en TODOSat</h1>
-
-            <form
-                action="/buscar"
-                method="get"
-                class="mt-8 flex max-w-2xl gap-3"
+            <section
+                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-16"
             >
-                <input
-                    id="search-input"
-                    type="search"
-                    name="q"
-                    placeholder="Buscar operadores, modelos, artículos o manuales..."
-                    class="w-full rounded border px-4 py-3"
-                />
-
-                <button
-                    type="submit"
-                    class="rounded bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
                 >
-                    Buscar
-                </button>
-            </form>
+                </div>
+                <div
+                    class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
+                >
+                </div>
+
+                <div class="relative max-w-4xl">
+                    <p
+                        class="inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                    >
+                        Buscador global
+                    </p>
+
+                    <h1
+                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                    >
+                        Buscar en TodoSatcom
+                    </h1>
+
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                        Encuentra operadores, hardware, artículos y manuales
+                        desde una única búsqueda.
+                    </p>
+
+                    <form
+                        action="/buscar"
+                        method="get"
+                        class="mt-8 flex max-w-3xl items-center gap-2 rounded-full border border-white/15 bg-slate-950/55 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-md"
+                    >
+                        <div
+                            class="flex min-h-12 flex-1 items-center gap-3 rounded-full px-4"
+                        >
+                            <span class="text-3xl leading-none text-slate-400">
+                                ⌕
+                            </span>
+
+                            <input
+                                id="search-input"
+                                type="search"
+                                name="q"
+                                autocomplete="off"
+                                spellcheck="false"
+                                placeholder="Buscar operadores, hardware, artículos o manuales..."
+                                class="w-full appearance-none bg-transparent text-base text-white outline-none placeholder:text-slate-400"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
+                        >
+                            Buscar
+                        </button>
+                    </form>
+                </div>
+            </section>
 
             <div id="search-results" class="mt-10"></div>
 
@@ -88,10 +170,28 @@ const datosBusqueda = [
             descripcion?: string;
             url: string;
             texto: string;
+            imageUrl?: string;
         };
 
+        function limpiarTexto(valor: string) {
+            return String(valor || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function escapeHtml(valor: string) {
+            return String(valor || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         const params = new URLSearchParams(window.location.search);
-        const query = params.get("q")?.toLowerCase().trim() || "";
+        const queryOriginal = params.get("q")?.trim() || "";
+        const query = limpiarTexto(queryOriginal);
 
         const input = document.getElementById("search-input");
         const resultsContainer = document.getElementById("search-results");
@@ -102,7 +202,7 @@ const datosBusqueda = [
             resultsContainer instanceof HTMLElement &&
             dataElement instanceof HTMLScriptElement
         ) {
-            input.value = query;
+            input.value = queryOriginal;
 
             const data = JSON.parse(
                 dataElement.textContent || "[]",
@@ -110,179 +210,121 @@ const datosBusqueda = [
 
             if (!query) {
                 resultsContainer.innerHTML = `
-                <p class="text-gray-600">
-                    Escribe una búsqueda para encontrar contenido en TODOSat.
-                </p>
-            `;
+					<p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
+						Escribe una búsqueda para encontrar contenido en TodoSatcom.
+					</p>
+				`;
             } else {
+                const palabras = query.split(/\s+/).filter(Boolean);
+
                 const resultados = data.filter((item: SearchItem) =>
-                    item.texto.toLowerCase().includes(query),
+                    palabras.every((palabra) => item.texto.includes(palabra)),
                 );
 
-                const marcas = resultados.filter(
-                    (item: SearchItem) => item.tipo === "Operador",
-                );
-
-                const modelos = resultados.filter(
-                    (item: SearchItem) => item.tipo === "Modelo",
-                );
-
-                const articulos = resultados.filter(
-                    (item: SearchItem) => item.tipo === "Artículo",
-                );
-
-                const manuales = resultados.filter(
-                    (item: SearchItem) => item.tipo === "Manual",
-                );
+                const grupos = [
+                    {
+                        titulo: "Operadores",
+                        items: resultados.filter(
+                            (item: SearchItem) => item.tipo === "Operador",
+                        ),
+                    },
+                    {
+                        titulo: "Hardware",
+                        items: resultados.filter(
+                            (item: SearchItem) => item.tipo === "Hardware",
+                        ),
+                    },
+                    {
+                        titulo: "Artículos",
+                        items: resultados.filter(
+                            (item: SearchItem) => item.tipo === "Artículo",
+                        ),
+                    },
+                    {
+                        titulo: "Manuales",
+                        items: resultados.filter(
+                            (item: SearchItem) => item.tipo === "Manual",
+                        ),
+                    },
+                ];
 
                 if (resultados.length === 0) {
                     resultsContainer.innerHTML = `
-                    <p class="text-gray-600">
-                        No se han encontrado resultados para <strong>${query}</strong>.
-                    </p>
-                `;
+						<p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
+							No se han encontrado resultados para <strong class="text-white">${escapeHtml(queryOriginal)}</strong>.
+						</p>
+					`;
                 } else {
                     resultsContainer.innerHTML = `
-                    <p class="mb-8 text-gray-700">
-                        ${resultados.length} resultado${resultados.length === 1 ? "" : "s"} para <strong>${query}</strong>
-                    </p>
+						<p class="mb-8 text-slate-300">
+							<span class="font-bold text-white">${resultados.length}</span>
+							resultado${resultados.length === 1 ? "" : "s"} para
+							<strong class="text-white">${escapeHtml(queryOriginal)}</strong>
+						</p>
 
-                   ${
-                       marcas.length > 0
-                           ? `
-<section class="mt-8">
-    <h2 class="mb-4 text-2xl font-bold">Operadores</h2>
+						${grupos
+                            .map((grupo) =>
+                                grupo.items.length > 0
+                                    ? `
+										<section class="mt-10">
+											<h2 class="mb-4 text-2xl font-bold !text-white">${grupo.titulo}</h2>
 
-    <ul class="space-y-4">
-        ${marcas
-            .map(
-                (item: SearchItem) => `
-            <li class="rounded border p-5">
-                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
-                    ${item.titulo}
-                </a>
+											<ul class="grid gap-4 md:grid-cols-2">
+												${grupo.items
+                                                    .map(
+                                                        (item: SearchItem) => `
+															<li>
+	<a href="${item.url}" class="group flex h-full">
+		<div class="flex min-h-[150px] w-full gap-5 border-b border-white/10 py-6 transition-colors duration-200 group-hover:border-[#005EFF]">
+			${
+                item.imageUrl
+                    ? `
+						<div class="h-24 w-24 shrink-0 overflow-hidden rounded">
+							<img
+								src="${item.imageUrl}"
+								alt="${escapeHtml(item.titulo)}"
+								class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+								loading="lazy"
+							/>
+						</div>
+					`
+                    : ""
+            }
 
-                ${
+			<div class="flex min-w-0 flex-1 flex-col">
+				<div class="mb-3 flex flex-wrap gap-2">
+					<span class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-300">
+						${escapeHtml(item.tipo)}
+					</span>
+				</div>
+
+				<h3 class="line-clamp-2 text-lg font-bold leading-snug tracking-tight !text-white">
+					${escapeHtml(item.titulo)}
+				</h3>
+
+				${
                     item.descripcion
                         ? `
-                    <p class="mt-2 text-gray-600">
-                        ${item.descripcion}
-                    </p>
-                `
+							<p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-300">
+								${escapeHtml(item.descripcion)}
+							</p>
+						`
                         : ""
                 }
-            </li>
-        `,
-            )
-            .join("")}
-    </ul>
-</section>
-`
-                           : ""
-                   }
-
-${
-    modelos.length > 0
-        ? `
-<section class="mt-8">
-    <h2 class="mb-4 text-2xl font-bold">Modelos</h2>
-
-    <ul class="space-y-4">
-        ${modelos
-            .map(
-                (item: SearchItem) => `
-            <li class="rounded border p-5">
-                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
-                    ${item.titulo}
-                </a>
-
-                ${
-                    item.descripcion
-                        ? `
-                    <p class="mt-2 text-gray-600">
-                        ${item.descripcion}
-                    </p>
-                `
-                        : ""
-                }
-            </li>
-        `,
-            )
-            .join("")}
-    </ul>
-</section>
-`
-        : ""
-}
-
-${
-    articulos.length > 0
-        ? `
-<section class="mt-8">
-    <h2 class="mb-4 text-2xl font-bold">Artículos</h2>
-
-    <ul class="space-y-4">
-        ${articulos
-            .map(
-                (item: SearchItem) => `
-            <li class="rounded border p-5">
-                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
-                    ${item.titulo}
-                </a>
-
-                ${
-                    item.descripcion
-                        ? `
-                    <p class="mt-2 text-gray-600">
-                        ${item.descripcion}
-                    </p>
-                `
-                        : ""
-                }
-            </li>
-        `,
-            )
-            .join("")}
-    </ul>
-</section>
-`
-        : ""
-}
-
-${
-    manuales.length > 0
-        ? `
-<section class="mt-8">
-    <h2 class="mb-4 text-2xl font-bold">Manuales</h2>
-
-    <ul class="space-y-4">
-        ${manuales
-            .map(
-                (item: SearchItem) => `
-            <li class="rounded border p-5">
-                <a href="${item.url}" class="text-2xl font-bold text-blue-600 underline">
-                    ${item.titulo}
-                </a>
-
-                ${
-                    item.descripcion
-                        ? `
-                    <p class="mt-2 text-gray-600">
-                        ${item.descripcion}
-                    </p>
-                `
-                        : ""
-                }
-            </li>
-        `,
-            )
-            .join("")}
-    </ul>
-</section>
-`
-        : ""
-}
-                `;
+			</div>
+		</div>
+	</a>
+</li>
+														`,
+                                                    )
+                                                    .join("")}
+											</ul>
+										</section>
+									`
+                                    : "",
+                            )
+                            .join("")}
+					`;
                 }
             }
         }

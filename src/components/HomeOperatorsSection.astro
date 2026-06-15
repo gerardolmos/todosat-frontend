@@ -74,8 +74,8 @@ const selectedOperator = operators[0];
 				set:html={JSON.stringify(operators)}
 			/>
 
-			<div class="grid gap-10 xl:grid-cols-2 xl:items-start">
-				<div class="flex flex-col">
+			<div class="grid h-[820px] gap-10 xl:grid-cols-2 xl:items-stretch">
+				<div class="flex h-full min-h-0 flex-col">
 					<p class="inline-flex w-fit rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
 						Operadores
 					</p>
@@ -84,7 +84,7 @@ const selectedOperator = operators[0];
 						Operadores satelitales
 					</h2>
 
-					<p class="mt-5 max-w-2xl text-base leading-7 text-slate-300">
+					<p class="mt-5 max-w-2xl text-xl leading-7 text-slate-300">
 						Explora las principales empresas del ecosistema
 						satelital: operadores de internet, constelaciones,
 						proveedores de conectividad y compañías clave del
@@ -99,7 +99,7 @@ const selectedOperator = operators[0];
 						<span>→</span>
 					</a>
 
-					<div class="mt-8 h-[460px] overflow-y-auto pr-2">
+					<div class="mt-8 min-h-0 flex-1 overflow-y-auto pr-2">
     <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
 						{operators.map((operator: any, index: number) => (
 							<button
@@ -156,10 +156,10 @@ const selectedOperator = operators[0];
 					<div class="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/55 to-slate-950" />
 					<div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-slate-950/10" />
 
-					<div class="relative flex min-h-[720px] flex-col p-8 md:p-10">
+					<div class="relative flex h-full min-h-0 flex-col overflow-hidden p-8 md:p-10">
 					 
 
-						<div class="mt-8">
+						<div class="min-h-0 overflow-y-auto pr-2">
 							<img
 	data-selected-logo
 	src={selectedOperator.logo || ""}
@@ -210,9 +210,9 @@ const selectedOperator = operators[0];
 				</p>
 
 				<p
-					data-feature-description={index}
-					class="mt-1 text-xl leading-7 text-slate-300"
-				>
+	data-feature-description={index}
+	class=" text-sm font-medium leading-6 text-slate-400"
+>
 					{feature.description}
 				</p>
 			</div>

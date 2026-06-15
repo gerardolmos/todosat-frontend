@@ -6,6 +6,7 @@ import {
 	getDestacados,
 	getModelos,
 	getManuales,
+	getMarcas,
 	getMarcasHome,
 } from "../lib/content";
 import ArticleCard from "../components/ArticleCard.astro";
@@ -22,6 +23,7 @@ const destacados = await getDestacados();
 const modelos = (await getModelos()).slice(0, 7);
 const manuales = (await getManuales()).slice(0, 7);
 const marcasHome = await getMarcasHome();
+const marcasBusqueda = await getMarcas();
 
 const articulos = (await getArticulos())
 	.sort(
@@ -30,14 +32,171 @@ const articulos = (await getArticulos())
 			new Date(a.fecha_publicacion).getTime(),
 	)
 	.slice(0, 7);
+
+function limpiarTexto(valor: any) {
+	return String(valor || "")
+		.toLowerCase()
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "");
+}
+
+const datosBusqueda = [
+	...marcasBusqueda.map((item: any) => ({
+		tipo: "Operador",
+		titulo: item.nombre,
+		url: `/operadores/${item.slug}`,
+		texto: limpiarTexto(
+			`${item.nombre} ${item.descripcion_corta} ${item.descripcion_home}`,
+		),
+	})),
+
+	...modelos.map((item: any) => ({
+		tipo: "Hardware",
+		titulo: item.nombre,
+		url: `/modelos/${item.slug}`,
+		texto: limpiarTexto(
+			`${item.nombre} ${item.descripcion_corta} ${item.marca?.nombre}`,
+		),
+	})),
+
+	...articulos.map((item: any) => ({
+		tipo: "Artículo",
+		titulo: item.titulo,
+		url: `/articulos/${item.slug}`,
+		texto: limpiarTexto(
+			`${item.titulo} ${item.subtitulo} ${
+				item.categoria_tematica?.nombre || ""
+			}`,
+		),
+	})),
+
+	...manuales.map((item: any) => ({
+		tipo: "Manual",
+		titulo: item.titulo,
+		url: `/manuales/${item.slug}`,
+		texto: limpiarTexto(
+			`${item.titulo} ${item.descripcion} ${item.idioma}`,
+		),
+	})),
+];
 ---
+
+<script>
+	function limpiarTexto(valor: string) {
+		return String(valor || "")
+			.toLowerCase()
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "");
+	}
+
+	function escapeHtml(valor: string) {
+		return String(valor || "")
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
+	}
+
+	type SearchItem = {
+		tipo: string;
+		titulo: string;
+		url: string;
+		texto: string;
+	};
+
+	const input = document.querySelector(
+		'form[action="/buscar"] input[name="q"]',
+	);
+	const suggestions = document.getElementById("hero-search-suggestions");
+	const dataElement = document.getElementById("hero-search-data");
+
+	if (
+		input instanceof HTMLInputElement &&
+		suggestions instanceof HTMLElement &&
+		dataElement instanceof HTMLScriptElement
+	) {
+		const data = JSON.parse(
+			dataElement.textContent || "[]",
+		) as SearchItem[];
+
+		input.addEventListener("input", () => {
+			const queryOriginal = input.value.trim();
+			const query = limpiarTexto(queryOriginal);
+
+			if (query.length < 2) {
+				suggestions.classList.add("hidden");
+				suggestions.innerHTML = "";
+				return;
+			}
+
+			const palabras = query.split(/\s+/).filter(Boolean);
+
+			const resultados = data
+				.filter((item: SearchItem) =>
+					palabras.every((palabra) => item.texto.includes(palabra)),
+				)
+				.slice(0, 6);
+
+			if (resultados.length === 0) {
+				suggestions.classList.add("hidden");
+				suggestions.innerHTML = "";
+				return;
+			}
+
+			suggestions.innerHTML = `
+				<div class="p-2">
+					${resultados
+						.map(
+							(item: SearchItem) => `
+								<a
+									href="${item.url}"
+									class="group flex items-center justify-between gap-4 rounded-xl px-4 py-3 transition hover:bg-slate-900"
+								>
+									<div>
+										<p class="text-sm font-bold text-white group-hover:text-[#4EA1FF]">
+											${escapeHtml(item.titulo)}
+										</p>
+										<p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-400">
+											${escapeHtml(item.tipo)}
+										</p>
+									</div>
+
+									<span class="text-slate-500 group-hover:text-[#4EA1FF]">→</span>
+								</a>
+							`,
+						)
+						.join("")}
+				</div>
+
+				<a
+					href="/buscar?q=${encodeURIComponent(queryOriginal)}"
+					class="block border-t border-white/10 px-6 py-4 text-sm font-bold text-[#4EA1FF] hover:bg-slate-900"
+				>
+					Ver todos los resultados →
+				</a>
+			`;
+
+			suggestions.classList.remove("hidden");
+		});
+
+		document.addEventListener("click", (event) => {
+			if (
+				!suggestions.contains(event.target as Node) &&
+				event.target !== input
+			) {
+				suggestions.classList.add("hidden");
+			}
+		});
+	}
+</script>
 
 <Layout
 	title="TodoSatcom"
 	description="Portal especializado en internet satelital, hardware, cobertura, instalación y actualidad del sector."
 >
 	<main class="min-h-screen bg-slate-950">
-		<section class="relative overflow-hidden py-14 md:py-36">
+		<section class="relative overflow-visible py-14 md:py-36">
 			<video
 				class="absolute inset-0 h-full w-full object-cover"
 				autoplay
@@ -52,7 +211,7 @@ const articulos = (await getArticulos())
 			<div class="absolute inset-0 bg-slate-950/75"></div>
 
 			<Container>
-				<div class="relative z-10 max-w-3xl">
+				<div class="relative z-40 max-w-3xl">
 					<h1
 						class="font-body text-3xl font-semibold tracking-tight md:text-6xl"
 						style="color:white;"
@@ -68,12 +227,14 @@ const articulos = (await getArticulos())
 					<form
 						action="/buscar"
 						method="get"
-						class="mt-8 flex max-w-2xl items-center gap-2 rounded-full border border-white/15 bg-slate-950/55 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-md"
+						class="relative z-50 mt-8 flex max-w-2xl items-center gap-2 rounded-full border border-white/15 bg-slate-950/55 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-md"
 					>
 						<div
 							class="flex min-h-12 flex-1 items-center gap-3 rounded-full px-4"
 						>
-							<span class="text-slate-400">⌕</span>
+							<span class="text-6xl leading-none text-slate-400"
+								>⌕</span
+							>
 
 							<input
 								type="search"
@@ -81,17 +242,27 @@ const articulos = (await getArticulos())
 								autocomplete="off"
 								spellcheck="false"
 								placeholder="Buscar operadores, modelos, artículos o manuales..."
-								class="w-full appearance-none bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
+								class="w-full appearance-none bg-transparent text-base text-white outline-none placeholder:text-slate-400"
 							/>
 						</div>
 
 						<button
 							type="submit"
-							class="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
+							class="rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500 mr-2"
 						>
 							Buscar
 						</button>
+						<div
+							id="hero-search-suggestions"
+							class="absolute left-0 top-full z-50 mt-3 hidden w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl shadow-slate-950/60 backdrop-blur-md"
+						>
+						</div>
 					</form>
+					<script
+						type="application/json"
+						id="hero-search-data"
+						set:html={JSON.stringify(datosBusqueda)}
+					/>
 				</div>
 			</Container>
 		</section>
