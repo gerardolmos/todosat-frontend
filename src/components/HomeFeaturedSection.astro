@@ -11,11 +11,11 @@ const { destacados } = Astro.props;
 
 {
     destacados.length > 0 && (
-        <section class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12">
+        <section class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-14 text-white shadow-2xl md:px-10 md:py-20">
             <img
                 src={seleccionBg.src}
                 alt=""
-                class="pointer-events-none absolute right-0 top-0 h-[430px] w-full object-cover opacity-70"
+                class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-55"
             />
 
             <div class="absolute inset-0 bg-gradient-to-b from-slate-950/5 via-slate-950/50 to-slate-950" />
@@ -31,7 +31,7 @@ const { destacados } = Astro.props;
                             Recomendados por TodoSatcom
                         </h2>
 
-                        <p class="mt-5 max-w-md text-xl leading-7 text-slate-300">
+                        <p class="mt-5 max-w-2xl text-xl leading-8 text-slate-300">
                             Una selección editorial de operadores, equipos,
                             guías y contenidos clave para entender mejor el
                             ecosistema satelital.

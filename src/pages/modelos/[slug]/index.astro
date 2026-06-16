@@ -40,6 +40,10 @@ const manuales = (await getManuales()).filter((manual: any) =>
 );
 
 const specs = [
+    modelo.tipo_hardware && {
+        label: "Tipo",
+        value: modelo.tipo_hardware,
+    },
     modelo.ano_lanzamiento && {
         label: "Año",
         value: modelo.ano_lanzamiento,
@@ -80,80 +84,95 @@ const specs = [
     title={`${modelo.nombre} | Todo-Sat`}
     description={modelo.descripcion_corta}
 >
-    <main class="min-h-screen py-10">
+    <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
             <Breadcrumbs
                 items={[
-                    {
-                        label: "Modelos",
-                        href: "/modelos",
-                    },
-                    {
-                        label: modelo.nombre,
-                    },
+                    { label: "Hardware", href: "/modelos" },
+                    { label: modelo.nombre },
                 ]}
             />
 
             <section
-                class="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center"
+                class="relative mt-8 overflow-hidden rounded-3xl bg-slate-950 p-8 shadow-2xl md:p-10"
             >
-                <div>
-                    <a
-                        href="/modelos"
-                        class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
-                    >
-                        ← Volver a modelos
-                    </a>
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
+                >
+                </div>
+
+                <div
+                    class="relative grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center"
+                >
+                    <div>
+                        <a
+                            href="/modelos"
+                            class="text-sm font-semibold text-blue-400 hover:text-white mr-4"
+                        >
+                            ← Volver a hardware
+                        </a>
+
+                        {
+                            modelo.marca && (
+                                <a
+                                    href={`/operadores/${modelo.marca.slug}`}
+                                    class="mt-8 inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-300 hover:border-blue-400"
+                                >
+                                    {modelo.marca.nombre}
+                                </a>
+                            )
+                        }
+
+                        <h1
+                            class="mt-6 max-w-4xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                        >
+                            {modelo.nombre}
+                        </h1>
+
+                        {
+                            modelo.descripcion_corta && (
+                                <p class="mt-6 max-w-2xl text-xl leading-8 text-slate-300">
+                                    {modelo.descripcion_corta}
+                                </p>
+                            )
+                        }
+                    </div>
 
                     {
-                        modelo.marca && (
-                            <a
-                                href={`/operadores/${modelo.marca.slug}`}
-                                class="mt-8 inline-flex rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark hover:bg-sky-200"
-                            >
-                                {modelo.marca.nombre}
-                            </a>
-                        )
-                    }
-
-                    <h1 class="mt-6 max-w-4xl">
-                        {modelo.nombre}
-                    </h1>
-
-                    {
-                        modelo.descripcion_corta && (
-                            <p class="mt-6 max-w-2xl text-xl leading-8 text-brand-muted">
-                                {modelo.descripcion_corta}
-                            </p>
+                        imagenUrl && (
+                            <div class="overflow-hidden rounded-3xl bg-slate-900 shadow-2xl">
+                                <img
+                                    src={imagenUrl}
+                                    alt={modelo.nombre}
+                                    class="h-full max-h-[500px] w-full object-cover"
+                                />
+                            </div>
                         )
                     }
                 </div>
-
-                {
-                    imagenUrl && (
-                        <div class="overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
-                            <img
-                                src={imagenUrl}
-                                alt={modelo.nombre}
-                                class="h-full max-h-[460px] w-full object-cover"
-                            />
-                        </div>
-                    )
-                }
             </section>
 
             {
                 specs.length > 0 && (
-                    <section class="mt-16 rounded-3xl border border-brand-border bg-white p-6 shadow-sm md:p-8">
-                        <h2 class="mb-6 text-3xl">Ficha técnica</h2>
+                    <section class="mt-12 md:p-2">
+                        <h2 class="mb-6 text-3xl font-bold !text-white">
+                            Ficha técnica
+                        </h2>
 
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            {specs.map((spec: any) => (
-                                <div class="rounded-2xl bg-brand-soft p-4">
-                                    <p class="text-xs font-semibold uppercase tracking-wider text-brand-muted">
+                        <div class="grid gap-x-12 gap-y-0 md:grid-cols-2 xl:grid-cols-3">
+                            {specs.map((spec: any, index: number) => (
+                                <div
+                                    class={`py-5 ${
+                                        index < specs.length - 3
+                                            ? "border-b border-white/10"
+                                            : ""
+                                    }`}
+                                >
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-blue-300">
                                         {spec.label}
                                     </p>
-                                    <p class="mt-2 text-lg font-semibold text-brand-base">
+
+                                    <p class="mt-2 text-lg font-semibold leading-snug text-white">
                                         {spec.value}
                                     </p>
                                 </div>
@@ -165,9 +184,9 @@ const specs = [
 
             {
                 contenidoHTML && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
+                    <section class="mt-16 border-t border-white/10 pt-12">
                         <div
-                            class="prose prose-lg max-w-none"
+                            class="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400"
                             set:html={contenidoHTML}
                         />
                     </section>
@@ -176,15 +195,17 @@ const specs = [
 
             {
                 galeria.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Galería</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-3xl font-bold !text-white">
+                            Galería
+                        </h2>
 
                         <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             {galeria.map((imagen: any) => {
                                 const url = getMediaUrl(imagen);
 
                                 return url ? (
-                                    <div class="overflow-hidden rounded-2xl border border-brand-border bg-white shadow-sm">
+                                    <div class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-sm">
                                         <img
                                             src={url}
                                             alt={modelo.nombre}
@@ -198,12 +219,14 @@ const specs = [
                 )
             }
 
-            <section class="mt-16 border-t border-brand-border pt-12">
-                <h2 class="mb-6">Artículos relacionados</h2>
+            <section class="mt-16 border-t border-white/10 pt-12">
+                <h2 class="mb-6 text-3xl font-bold !text-white">
+                    Artículos relacionados
+                </h2>
 
                 {
                     articulos.length > 0 ? (
-                        <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
                             {articulos.map((articulo: any) => (
                                 <RelatedCard
                                     type="Artículo"
@@ -216,7 +239,7 @@ const specs = [
                             ))}
                         </div>
                     ) : (
-                        <p class="text-brand-muted">
+                        <p class="text-slate-400">
                             Todavía no hay artículos relacionados con este
                             modelo.
                         </p>
@@ -224,12 +247,14 @@ const specs = [
                 }
             </section>
 
-            <section class="mt-16 border-t border-brand-border pt-12">
-                <h2 class="mb-6">Manuales relacionados</h2>
+            <section class="mt-16 border-t border-white/10 pt-12">
+                <h2 class="mb-6 text-3xl font-bold !text-white">
+                    Manuales relacionados
+                </h2>
 
                 {
                     manuales.length > 0 ? (
-                        <div class="grid gap-5 md:grid-cols-2">
+                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
                             {manuales.map((manual: any) => (
                                 <RelatedCard
                                     type="Manual"
@@ -242,7 +267,7 @@ const specs = [
                             ))}
                         </div>
                     ) : (
-                        <p class="text-brand-muted">
+                        <p class="text-slate-400">
                             Todavía no hay manuales relacionados con este
                             modelo.
                         </p>

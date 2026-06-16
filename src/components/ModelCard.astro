@@ -13,7 +13,7 @@ const imagenUrl = getMediaUrl(modelo.imagen_principal);
     href={`/modelos/${modelo.slug}`}
     class="group flex h-full min-h-[340px] flex-col overflow-hidden rounded border border-transparent bg-slate-900/90 shadow-sm transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-[#005EFF] hover:shadow-[0_0_8px_rgba(0,94,255,0.80),0_0_18px_rgba(0,94,255,0.30)]"
 >
-    <div class="relative h-40 overflow-hidden bg-slate-800">
+    <div class="relative h-56 overflow-hidden bg-slate-800">
         {
             imagenUrl && (
                 <>
@@ -23,11 +23,19 @@ const imagenUrl = getMediaUrl(modelo.imagen_principal);
                         class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                     />
 
-                    {modelo.marca && (
-                        <p class="absolute left-5 top-5 z-20 inline-flex rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-300 backdrop-blur">
-                            {modelo.marca.nombre}
-                        </p>
-                    )}
+                    <div class="absolute left-5 top-5 z-20 flex flex-wrap gap-2">
+                        {modelo.marca && (
+                            <p class="inline-flex rounded-full bg-slate-950/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-300 backdrop-blur">
+                                {modelo.marca.nombre}
+                            </p>
+                        )}
+
+                        {modelo.tipo_hardware && (
+                            <p class="inline-flex rounded-full bg-blue-600/90 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-white backdrop-blur">
+                                {modelo.tipo_hardware}
+                            </p>
+                        )}
+                    </div>
                 </>
             )
         }

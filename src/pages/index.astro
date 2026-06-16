@@ -9,9 +9,6 @@ import {
 	getMarcas,
 	getMarcasHome,
 } from "../lib/content";
-import ArticleCard from "../components/ArticleCard.astro";
-import ModelCard from "../components/ModelCard.astro";
-import ManualCard from "../components/ManualCard.astro";
 import HomeOperatorsSection from "../components/HomeOperatorsSection.astro";
 import HomeFeaturedSection from "../components/HomeFeaturedSection.astro";
 import HomeArticlesSection from "../components/HomeArticlesSection.astro";
@@ -20,12 +17,17 @@ import HomeManualsSection from "../components/HomeManualsSection.astro";
 import SectionDivider from "../components/SectionDivider.astro";
 
 const destacados = await getDestacados();
-const modelos = (await getModelos()).slice(0, 7);
-const manuales = (await getManuales()).slice(0, 7);
+
+const todosModelos = await getModelos();
+const todosManuales = await getManuales();
+const todosArticulos = await getArticulos();
+
+const modelos = todosModelos.slice(0, 7);
+const manuales = todosManuales.slice(0, 7);
 const marcasHome = await getMarcasHome();
 const marcasBusqueda = await getMarcas();
 
-const articulos = (await getArticulos())
+const articulos = todosArticulos
 	.sort(
 		(a: any, b: any) =>
 			new Date(b.fecha_publicacion).getTime() -
@@ -44,36 +46,40 @@ const datosBusqueda = [
 	...marcasBusqueda.map((item: any) => ({
 		tipo: "Operador",
 		titulo: item.nombre,
+		descripcion: item.descripcion_corta,
 		url: `/operadores/${item.slug}`,
 		texto: limpiarTexto(
 			`${item.nombre} ${item.descripcion_corta} ${item.descripcion_home}`,
 		),
 	})),
 
-	...modelos.map((item: any) => ({
+	...todosModelos.map((item: any) => ({
 		tipo: "Hardware",
 		titulo: item.nombre,
 		url: `/modelos/${item.slug}`,
+		descripcion: item.descripcion_corta,
 		texto: limpiarTexto(
-			`${item.nombre} ${item.descripcion_corta} ${item.marca?.nombre}`,
+			`${item.nombre} ${item.descripcion_corta} ${item.tipo_hardware} ${item.marca?.nombre}`,
 		),
 	})),
 
-	...articulos.map((item: any) => ({
+	...todosArticulos.map((item: any) => ({
 		tipo: "Artículo",
 		titulo: item.titulo,
 		url: `/articulos/${item.slug}`,
+		descripcion: item.subtitulo,
 		texto: limpiarTexto(
-			`${item.titulo} ${item.subtitulo} ${
+			`${item.titulo} ${item.subtitulo} ${item.contenido} ${
 				item.categoria_tematica?.nombre || ""
-			}`,
+			} ${item.categoria_tematica?.slug || ""}`,
 		),
 	})),
 
-	...manuales.map((item: any) => ({
+	...todosManuales.map((item: any) => ({
 		tipo: "Manual",
 		titulo: item.titulo,
 		url: `/manuales/${item.slug}`,
+		descripcion: item.descripcion,
 		texto: limpiarTexto(
 			`${item.titulo} ${item.descripcion} ${item.idioma}`,
 		),
@@ -101,6 +107,7 @@ const datosBusqueda = [
 	type SearchItem = {
 		tipo: string;
 		titulo: string;
+		descripcion?: string;
 		url: string;
 		texto: string;
 	};
@@ -132,9 +139,36 @@ const datosBusqueda = [
 
 			const palabras = query.split(/\s+/).filter(Boolean);
 
+			function calcularPuntuacion(item: SearchItem, palabras: string[]) {
+				const titulo = limpiarTexto(item.titulo);
+				const texto = limpiarTexto(item.texto);
+
+				let puntos = 0;
+
+				for (const palabra of palabras) {
+					if (titulo === palabra) puntos += 100;
+					else if (titulo.startsWith(palabra)) puntos += 80;
+					else if (titulo.includes(palabra)) puntos += 60;
+					else if (texto.includes(` ${palabra} `)) puntos += 20;
+					else return 0;
+				}
+
+				return puntos;
+			}
+
+			function coincidePalabra(texto: string, palabra: string) {
+				const palabrasTexto = texto.split(/\s+/).filter(Boolean);
+
+				return palabrasTexto.some((palabraTexto) =>
+					palabraTexto.startsWith(palabra),
+				);
+			}
+
 			const resultados = data
 				.filter((item: SearchItem) =>
-					palabras.every((palabra) => item.texto.includes(palabra)),
+					palabras.every((palabra) =>
+						coincidePalabra(item.texto, palabra),
+					),
 				)
 				.slice(0, 6);
 
@@ -154,13 +188,24 @@ const datosBusqueda = [
 									class="group flex items-center justify-between gap-4 rounded-xl px-4 py-3 transition hover:bg-slate-900"
 								>
 									<div>
-										<p class="text-sm font-bold text-white group-hover:text-[#4EA1FF]">
-											${escapeHtml(item.titulo)}
-										</p>
-										<p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-400">
-											${escapeHtml(item.tipo)}
-										</p>
-									</div>
+	<p class="text-sm font-bold text-white group-hover:text-[#4EA1FF]">
+		${escapeHtml(item.titulo)}
+	</p>
+
+	<p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-400">
+		${escapeHtml(item.tipo)}
+	</p>
+
+	${
+		item.descripcion
+			? `
+				<p class="mt-2 line-clamp-1 text-xs text-slate-400">
+					${escapeHtml(item.descripcion)}
+				</p>
+			`
+			: ""
+	}
+</div>
 
 									<span class="text-slate-500 group-hover:text-[#4EA1FF]">→</span>
 								</a>
