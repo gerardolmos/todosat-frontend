@@ -1,26 +1,154 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import { getModelos } from "../../lib/content";
+import { getModelos, getMarcas } from "../../lib/content";
 import ModelCard from "../../components/ModelCard.astro";
 import Pagination from "../../components/Pagination.astro";
 
-export async function getStaticPaths({ paginate }: any) {
-    const modelos = await getModelos();
+export async function getStaticPaths() {
+    const PAGE_SIZE = 9;
 
-    return paginate(modelos, {
-        pageSize: 9,
+    function createPage(data: any[], currentPage: number) {
+        const totalPages = Math.ceil(data.length / PAGE_SIZE) || 1;
+        const start = (currentPage - 1) * PAGE_SIZE;
+
+        return {
+            data: data.slice(start, start + PAGE_SIZE),
+            currentPage,
+            lastPage: totalPages,
+        };
+    }
+
+    function createPaginatedPaths({
+        modelosFiltrados,
+        baseSegments,
+        propsExtra,
+    }: any) {
+        const totalPages = Math.ceil(modelosFiltrados.length / PAGE_SIZE) || 1;
+        const paths = [];
+
+        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            paths.push({
+                params: {
+                    page:
+                        pageNumber === 1
+                            ? baseSegments.join("/")
+                            : [...baseSegments, String(pageNumber)].join("/"),
+                },
+                props: {
+                    page: createPage(modelosFiltrados, pageNumber),
+                    ...propsExtra,
+                },
+            });
+        }
+
+        return paths;
+    }
+
+    const modelos = await getModelos();
+    const marcas = await getMarcas();
+
+    const tiposHardware = Array.from(
+        new Set(
+            modelos.map((modelo: any) => modelo.tipo_hardware).filter(Boolean),
+        ),
+    ).sort();
+
+    const paths: any[] = [];
+
+    paths.push(
+        ...createPaginatedPaths({
+            modelosFiltrados: modelos,
+            baseSegments: [],
+            propsExtra: {
+                marcas,
+                tiposHardware,
+                tipoActual: null,
+                marcaActual: null,
+            },
+        }),
+    );
+
+    tiposHardware.forEach((tipo: any) => {
+        const modelosTipo = modelos.filter(
+            (modelo: any) => modelo.tipo_hardware === tipo,
+        );
+
+        paths.push(
+            ...createPaginatedPaths({
+                modelosFiltrados: modelosTipo,
+                baseSegments: ["tipo", tipo],
+                propsExtra: {
+                    marcas,
+                    tiposHardware,
+                    tipoActual: tipo,
+                    marcaActual: null,
+                },
+            }),
+        );
     });
+
+    marcas.forEach((marca: any) => {
+        const modelosMarca = modelos.filter(
+            (modelo: any) => modelo.marca?.slug === marca.slug,
+        );
+
+        paths.push(
+            ...createPaginatedPaths({
+                modelosFiltrados: modelosMarca,
+                baseSegments: ["operador", marca.slug],
+                propsExtra: {
+                    marcas,
+                    tiposHardware,
+                    tipoActual: null,
+                    marcaActual: marca,
+                },
+            }),
+        );
+
+        tiposHardware.forEach((tipo: any) => {
+            const modelosCombinados = modelos.filter(
+                (modelo: any) =>
+                    modelo.tipo_hardware === tipo &&
+                    modelo.marca?.slug === marca.slug,
+            );
+
+            paths.push(
+                ...createPaginatedPaths({
+                    modelosFiltrados: modelosCombinados,
+                    baseSegments: ["tipo", tipo, "operador", marca.slug],
+                    propsExtra: {
+                        marcas,
+                        tiposHardware,
+                        tipoActual: tipo,
+                        marcaActual: marca,
+                    },
+                }),
+            );
+        });
+    });
+
+    return paths;
 }
 
-const { page } = Astro.props as any;
+const { page, marcas, tiposHardware, tipoActual, marcaActual } =
+    Astro.props as any;
+
+const basePath =
+    tipoActual && marcaActual
+        ? `/modelos/tipo/${tipoActual}/operador/${marcaActual.slug}`
+        : tipoActual
+          ? `/modelos/tipo/${tipoActual}`
+          : marcaActual
+            ? `/modelos/operador/${marcaActual.slug}`
+            : "/modelos";
 ---
 
 <Layout title="Hardware | TodoSatcom">
     <main class="min-h-screen bg-slate-950 py-10">
         <Container>
             <section
-                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-20"
+                class="relative mb-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-6 py-10 shadow-2xl md:px-12 md:py-10"
             >
                 <div
                     class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.26),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.14),transparent_32%)]"
@@ -83,15 +211,113 @@ const { page } = Astro.props as any;
                 </div>
             </section>
 
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {page.data.map((modelo: any) => <ModelCard modelo={modelo} />)}
-            </div>
+            <div class="items-start gap-10 lg:grid lg:grid-cols-[260px_1fr]">
+                <aside class="lg:sticky lg:top-24 lg:self-start">
+                    <div>
+                        <p
+                            class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Tipo de hardware
+                        </p>
 
-            <Pagination
-                currentPage={page.currentPage}
-                totalPages={page.lastPage}
-                basePath="/modelos"
-            />
+                        <nav class="mb-5">
+                            <a
+                                href={marcaActual
+                                    ? `/modelos/operador/${marcaActual.slug}`
+                                    : "/modelos"}
+                                class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
+                                    !tipoActual
+                                        ? "border-blue-500 bg-blue-500/15 text-blue-300"
+                                        : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
+                                }`}
+                            >
+                                Todos
+                            </a>
+
+                            {
+                                tiposHardware.map((tipo: any) => (
+                                    <a
+                                        href={
+                                            marcaActual
+                                                ? `/modelos/tipo/${tipo}/operador/${marcaActual.slug}`
+                                                : `/modelos/tipo/${tipo}`
+                                        }
+                                        class={`block rounded border px-4 py-2 text-sm transition ${
+                                            tipoActual === tipo
+                                                ? "border-blue-500 bg-blue-500/15 text-blue-300"
+                                                : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
+                                        }`}
+                                    >
+                                        {tipo}
+                                    </a>
+                                ))
+                            }
+                        </nav>
+
+                        <p
+                            class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Operador
+                        </p>
+
+                        <nav>
+                            <a
+                                href={tipoActual
+                                    ? `/modelos/tipo/${tipoActual}`
+                                    : "/modelos"}
+                                class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
+                                    !marcaActual
+                                        ? "border-blue-500 bg-blue-500/15 text-blue-300"
+                                        : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
+                                }`}
+                            >
+                                Todos
+                            </a>
+
+                            {
+                                marcas.map((marca: any) => (
+                                    <a
+                                        href={
+                                            tipoActual
+                                                ? `/modelos/tipo/${tipoActual}/operador/${marca.slug}`
+                                                : `/modelos/operador/${marca.slug}`
+                                        }
+                                        class={`block rounded border px-4 py-2 text-sm transition ${
+                                            marcaActual?.slug === marca.slug
+                                                ? "border-blue-500 bg-blue-500/15 text-blue-300"
+                                                : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
+                                        }`}
+                                    >
+                                        {marca.nombre}
+                                    </a>
+                                ))
+                            }
+                        </nav>
+                    </div>
+                </aside>
+
+                <section>
+                    {
+                        page.data.length > 0 ? (
+                            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {page.data.map((modelo: any) => (
+                                    <ModelCard modelo={modelo} />
+                                ))}
+                            </div>
+                        ) : (
+                            <p class="rounded border border-white/10 bg-slate-900 p-6 text-slate-300">
+                                No hay hardware que coincida con estos filtros.
+                            </p>
+                        )
+                    }
+
+                    <Pagination
+                        currentPage={page.currentPage}
+                        totalPages={page.lastPage}
+                        basePath={basePath}
+                    />
+                </section>
+            </div>
         </Container>
     </main>
 </Layout>

@@ -13,28 +13,28 @@ const portadaUrl = getMediaUrl(marca.imagen_portada);
 
 <a
     href={`/operadores/${marca.slug}`}
-    class="group flex h-full min-h-[300px] flex-col overflow-hidden border border-white/10 border border-white/10 bg-slate-950/20 transition-all duration-300 hover:border-[#005EFF]/50"
+    class="group flex h-full min-h-[220px] md:min-h-[300px] flex-col overflow-hidden border border-white/10 border border-white/10 bg-slate-950/20 transition-all duration-300 hover:border-[#005EFF]/50"
 >
     <div class="flex flex-1 flex-col items-center text-center p-6">
-        <div class="flex h-40 items-center justify-center">
+        <div class="flex h-14 md:h-40 items-center justify-center">
             {
                 logoUrl && (
                     <img
                         src={logoUrl}
                         alt={`Logo de ${marca.nombre}`}
-                        class="max-h-32 max-w-[320px] object-contain"
+                        class="max-h-20 md:max-h-32 max-w-full object-contain"
                     />
                 )
             }
         </div>
 
-        <h3 class="text-2xl font-bold tracking-tight text-white">
+        <h3 class="text-lg md:text-2xl font-bold tracking-tight text-white">
             {marca.nombre}
         </h3>
 
         {
             marca.descripcion_corta && (
-                <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-300">
+                <p class="mt-2 md:mt-6 max-w-2xl text-xs text-slate-300 md:text-lg md:leading-8">
                     {marca.descripcion_corta}
                 </p>
             )

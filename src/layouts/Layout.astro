@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
-import logoTodoSatcom from "../assets/logoTodoSatcom.png";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
 interface Props {
     title?: string;
@@ -62,59 +62,6 @@ const {
             });
         </script>
         <slot />
-
-        <footer class="border-t border-white/10 bg-slate-950 text-white">
-            <div class="mx-auto max-w-7xl px-5 py-12 sm:px-6 lg:px-8">
-                <div class="grid gap-10 md:grid-cols-2">
-                    <div>
-                        <img
-                            src={logoTodoSatcom.src}
-                            alt="TodoSatcom"
-                            class="w-[220px]"
-                        />
-
-                        <p
-                            class="mt-4 max-w-md text-sm leading-6 text-slate-300"
-                        >
-                            Portal especializado en internet satelital,
-                            hardware, cobertura, instalación y actualidad del
-                            sector.
-                        </p>
-                    </div>
-
-                    <div class="md:text-right">
-                        <p class="text-sm font-semibold text-white">
-                            Información legal
-                        </p>
-
-                        <div
-                            class="mt-4 flex flex-wrap gap-4 text-sm text-slate-300 md:justify-end"
-                        >
-                            <a href="/aviso-legal" class="hover:text-white">
-                                Aviso legal
-                            </a>
-
-                            <a href="/privacidad" class="hover:text-white">
-                                Privacidad
-                            </a>
-
-                            <a href="/cookies" class="hover:text-white">
-                                Cookies
-                            </a>
-
-                            <a href="/contacto" class="hover:text-white">
-                                Contacto
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="mt-10 border-t border-white/10 pt-6 text-sm text-slate-400"
-                >
-                    © {new Date().getFullYear()} TodoSatcom.
-                </div>
-            </div>
-        </footer>
+        <Footer />
     </body>
 </html>

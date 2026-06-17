@@ -67,14 +67,14 @@ const selectedOperator = operators[0];
 
 {
 	selectedOperator && (
-		<section class="overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-10 md:py-20">
+		<section class="overflow-hidden rounded-3xl bg-slate-950 px-1 py-10 text-white shadow-2xl md:px-10 md:py-20">
 			<script
 				id="operators-data"
 				type="application/json"
 				set:html={JSON.stringify(operators)}
 			/>
 
-			<div class="grid h-[820px] gap-10 xl:grid-cols-2 xl:items-stretch">
+			<div class="grid gap-10 xl:h-[820px] xl:grid-cols-2 xl:items-stretch">
 				<div class="flex h-full min-h-0 flex-col">
 					<p class="inline-flex w-fit rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
 						Operadores
@@ -102,11 +102,11 @@ const selectedOperator = operators[0];
 					<div class="mt-8 min-h-0 flex-1 overflow-y-auto pr-2">
     <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
 						{operators.map((operator: any, index: number) => (
-							<button
-								type="button"
-								data-operator-button
-								data-index={index}
-								class={`group flex h-52 flex-col rounded border p-4 text-left transition-all duration-300 ${
+							<a
+	href={`/operadores/${operator.slug}`}
+	data-operator-button
+	data-index={index}
+	class={`group flex h-52 flex-col rounded border p-4 text-left transition-all duration-300 ${
 									index === 0
 										? "border-[#00ccff] bg-slate-900/80 shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
 										: "border-transparent bg-slate-900/70 hover:border-[#00ccff] hover:bg-slate-900 hover:shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
@@ -137,13 +137,13 @@ const selectedOperator = operators[0];
 								<p class="mt-2 line-clamp-2 text-xs leading-5 text-slate-300">
 									{operator.descripcion_corta}
 								</p>
-							</button>
+							</a>
 						))}
 						</div>
 					</div>
 				</div>
 
-				<div class="relative mt-10 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl xl:sticky xl:top-24 xl:mt-0">
+				<div class="relative mt-10 hidden overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl xl:sticky xl:top-24 xl:mt-0 xl:block">
 					<img
 						data-selected-image
 						src={selectedOperator.imagen || ""}
@@ -156,10 +156,10 @@ const selectedOperator = operators[0];
 					<div class="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/55 to-slate-950" />
 					<div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-slate-950/10" />
 
-					<div class="relative flex h-full min-h-0 flex-col overflow-hidden p-8 md:p-10">
+					<div class="relative flex h-full min-h-0 flex-col overflow-hidden p-8">
 					 
 
-						<div class="min-h-0 overflow-y-auto pr-2">
+						<div class="xl:h-[550px] xl:overflow-y-auto xl:pr-2">
 							<img
 	data-selected-logo
 	src={selectedOperator.logo || ""}
@@ -190,7 +190,7 @@ const selectedOperator = operators[0];
 							</p>
 						</div>
 
-						<div class="mt-10 border-t border-white/10 pt-8">
+						<div class="mt-6 border-t border-white/10 pt-6">
 	<div class="grid gap-6 md:grid-cols-3 xl:grid-cols-3">
 		{selectedOperator.features.map((feature: any, index: number) => (
 			<div>

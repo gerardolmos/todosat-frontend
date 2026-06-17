@@ -275,19 +275,21 @@ const datosBusqueda = [
 						class="relative z-50 mt-8 flex max-w-2xl items-center gap-2 rounded-full border border-white/15 bg-slate-950/55 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-md"
 					>
 						<div
-							class="flex min-h-12 flex-1 items-center gap-3 rounded-full px-4"
+							class="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-full px-3 md:px-4"
 						>
-							<span class="text-6xl leading-none text-slate-400"
-								>⌕</span
+							<span
+								class="text-4xl leading-none text-slate-400 md:text-6xl"
 							>
+								⌕
+							</span>
 
 							<input
 								type="search"
 								name="q"
 								autocomplete="off"
 								spellcheck="false"
-								placeholder="Buscar operadores, modelos, artículos o manuales..."
-								class="w-full appearance-none bg-transparent text-base text-white outline-none placeholder:text-slate-400"
+								placeholder="Buscar..."
+								class="min-w-0 w-full appearance-none bg-transparent text-base text-white outline-none placeholder:text-slate-400"
 							/>
 						</div>
 

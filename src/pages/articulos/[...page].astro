@@ -85,13 +85,17 @@ const title = categoriaActual
 const basePath = categoriaActual
     ? `/articulos/${categoriaActual.slug}`
     : "/articulos";
+
+const heroIconUrl = categoriaActual
+    ? getMediaUrl(categoriaActual.icono)
+    : todasIcon.src;
 ---
 
 <Layout title={title}>
-    <main class="min-h-screen bg-slate-950 py-16 text-white">
+    <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
             <section
-                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-20"
+                class="relative mb-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-6 py-10 shadow-2xl md:px-12 md:py-10"
             >
                 <div
                     class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
@@ -101,18 +105,22 @@ const basePath = categoriaActual
                     class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
                 >
                 </div>
-                <div
-                    class="absolute -right-32 top-10 h-72 w-72 rounded-full border border-blue-400/20"
-                >
-                </div>
-                <div
-                    class="absolute -right-20 top-24 h-96 w-96 rounded-full border border-cyan-400/10"
-                >
-                </div>
 
-                <div class="relative max-w-4xl">
+                {
+                    heroIconUrl && (
+                        <img
+                            src={heroIconUrl}
+                            alt=""
+                            class="pointer-events-none absolute right-12 top-1/2 hidden h-72 w-72 -translate-y-1/2 object-contain opacity-80 md:block rounded-full"
+                        />
+                    )
+                }
+
+                <div
+                    class="relative z-10 flex max-w-4xl flex-col justify-center"
+                >
                     <p
-                        class="inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        class="inline-flex w-fit rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
                     >
                         Actualidad satelital
                     </p>
@@ -127,7 +135,7 @@ const basePath = categoriaActual
                         }
                     </h1>
 
-                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+                    <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
                         {
                             categoriaActual?.descripcion ||
                                 "Noticias, análisis, guías y contenidos para entender mejor los operadores, equipos, servicios y tendencias del ecosistema satelital."
