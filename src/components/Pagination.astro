@@ -15,39 +15,45 @@ const getPageUrl = (page: number) => {
 
 {
     totalPages > 1 && (
-        <nav class="mt-14 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <nav class="mt-14 flex items-center justify-center gap-2 text-sm">
             {currentPage > 1 && (
                 <a
                     href={getPageUrl(currentPage - 1)}
-                    class="rounded-full border border-white/10 bg-slate-900/60 px-5 py-2.5 font-semibold text-slate-300 transition-all duration-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)]"
+                    class="rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-xs font-semibold text-slate-300 transition-all duration-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)] md:px-5 md:py-2.5 md:text-sm"
                 >
-                    ← Anterior
+                    ←<span class="hidden md:inline"> Anterior</span>
                 </a>
             )}
 
-            {Array.from({ length: totalPages }, (_, index) => {
-                const page = index + 1;
+            <div class="rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-xs font-semibold text-slate-300 md:hidden">
+                {currentPage} / {totalPages}
+            </div>
 
-                return (
-                    <a
-                        href={getPageUrl(page)}
-                        class={`flex h-10 w-10 items-center justify-center rounded-full border font-semibold transition-all duration-300 ${
-                            page === currentPage
-                                ? "border-[#005EFF] bg-[#005EFF] text-white shadow-[0_0_18px_rgba(0,94,255,0.45)]"
-                                : "border-white/10 bg-slate-900/60 text-slate-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)]"
-                        }`}
-                    >
-                        {page}
-                    </a>
-                );
-            })}
+            <div class="hidden items-center gap-2 md:flex">
+                {Array.from({ length: totalPages }, (_, index) => {
+                    const page = index + 1;
+
+                    return (
+                        <a
+                            href={getPageUrl(page)}
+                            class={`flex h-10 w-10 items-center justify-center rounded-full border font-semibold transition-all duration-300 ${
+                                page === currentPage
+                                    ? "border-[#005EFF] bg-[#005EFF] text-white shadow-[0_0_18px_rgba(0,94,255,0.45)]"
+                                    : "border-white/10 bg-slate-900/60 text-slate-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)]"
+                            }`}
+                        >
+                            {page}
+                        </a>
+                    );
+                })}
+            </div>
 
             {currentPage < totalPages && (
                 <a
                     href={getPageUrl(currentPage + 1)}
-                    class="rounded-full border border-white/10 bg-slate-900/60 px-5 py-2.5 font-semibold text-slate-300 transition-all duration-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)]"
+                    class="rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-xs font-semibold text-slate-300 transition-all duration-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)] md:px-5 md:py-2.5 md:text-sm"
                 >
-                    Siguiente →
+                    <span class="hidden md:inline">Siguiente </span>→
                 </a>
             )}
         </nav>

@@ -124,18 +124,22 @@ const specs = [
                         }
 
                         <h1
-                            class="mt-6 max-w-4xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                            class="mt-6 max-w-4xl text-3xl font-bold leading-tight tracking-tight !text-white md:text-5xl"
                         >
                             {modelo.nombre}
                         </h1>
 
                         {
                             modelo.descripcion_corta && (
-                                <p class="mt-6 max-w-2xl text-xl leading-8 text-slate-300">
+                                <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300 md:text-lg md:leading-8">
                                     {modelo.descripcion_corta}
                                 </p>
                             )
                         }
+                        <div
+                            class="mt-8 h-px w-32 bg-gradient-to-r from-[#00ccff] to-transparent"
+                        >
+                        </div>
                     </div>
 
                     {
@@ -144,7 +148,7 @@ const specs = [
                                 <img
                                     src={imagenUrl}
                                     alt={modelo.nombre}
-                                    class="h-full max-h-[500px] w-full object-cover"
+                                    class="h-[320px] w-full object-contain md:h-[500px]"
                                 />
                             </div>
                         )

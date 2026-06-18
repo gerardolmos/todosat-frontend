@@ -161,7 +161,7 @@ const detallesTecnicos = [
 
                         {
                             marca.descripcion_corta && (
-                                <p class="mt-5 max-w-xl text-2xl font-semibold leading-tight text-white">
+                                <p class="mt-5 max-w-xl text-xl font-semibold leading-tight text-white">
                                     {marca.descripcion_corta}
                                 </p>
                             )
@@ -199,7 +199,7 @@ const detallesTecnicos = [
                                     href={marca.web_oficial}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="mt-10 inline-flex rounded-xl bg-[#005EFF] px-10 py-4 text-lg font-bold text-white transition hover:brightness-110"
+                                    class="mt-8 inline-flex rounded-full border border-[#005EFF] bg-[#005EFF]/10 px-6 py-3 text-sm font-bold text-blue-300 transition hover:bg-[#005EFF] hover:text-white"
                                 >
                                     Web oficial →
                                 </a>
@@ -213,7 +213,7 @@ const detallesTecnicos = [
                                 <img
                                     src={imagenPortadaUrl}
                                     alt={marca.nombre}
-                                    class="w-full object-cover"
+                                    class="h-full w-full object-contain"
                                 />
                             </div>
                         )
@@ -227,7 +227,7 @@ const detallesTecnicos = [
                         <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
                             Información técnica
                         </h2>
-
+                        <div class="mb-8 h-px w-full bg-white/10" />
                         <div class="grid gap-5 lg:grid-cols-2">
                             {detallesTecnicos.map((item) => (
                                 <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-6">
@@ -264,7 +264,7 @@ const detallesTecnicos = [
                         <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
                             Acerca de {marca.nombre}
                         </h2>
-
+                        <div class="mb-8 h-px w-full bg-white/10" />
                         <div
                             class="prose prose-invert prose-lg max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
                             set:html={descripcionHTML}
@@ -305,7 +305,7 @@ const detallesTecnicos = [
                 <h2 class="mb-6 text-3xl font-bold text-white">
                     Artículos relacionados
                 </h2>
-
+                <div class="mb-8 h-px w-full bg-white/10"></div>
                 {
                     articulos.length > 0 ? (
                         <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
@@ -333,7 +333,7 @@ const detallesTecnicos = [
                 <h2 class="mb-6 text-3xl font-bold text-white">
                     Manuales relacionados
                 </h2>
-
+                <div class="mb-8 h-px w-full bg-white/10"></div>
                 {
                     manuales.length > 0 ? (
                         <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">

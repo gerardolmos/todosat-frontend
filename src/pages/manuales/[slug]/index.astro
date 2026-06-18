@@ -49,8 +49,11 @@ const meta = [
 ].filter(Boolean);
 ---
 
-<Layout title={`${manual.titulo} | Todo-Sat`} description={manual.descripcion}>
-    <main class="min-h-screen py-10">
+<Layout
+    title={`${manual.titulo} | TodoSatcom`}
+    description={manual.descripcion}
+>
+    <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
             <Breadcrumbs
                 items={[
@@ -68,28 +71,32 @@ const meta = [
                 class="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center"
             >
                 <div>
-                    <a
-                        href="/manuales"
-                        class="text-sm font-semibold text-info-primary hover:text-info-primary-dark"
+                    <div class="flex flex-wrap items-center gap-3">
+                        <a
+                            href="/manuales"
+                            class="text-sm font-semibold text-blue-400 transition hover:text-white"
+                        >
+                            ← Volver a manuales
+                        </a>
+
+                        {
+                            manual.idioma && (
+                                <p class="inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
+                                    {formatLabel(manual.idioma)}
+                                </p>
+                            )
+                        }
+                    </div>
+
+                    <h1
+                        class="mt-8 max-w-4xl text-4xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
                     >
-                        ← Volver a manuales
-                    </a>
-
-                    {
-                        manual.idioma && (
-                            <p class="mt-8 inline-flex rounded-full bg-info-primary-soft px-4 py-2 text-sm font-semibold text-info-primary-dark">
-                                {formatLabel(manual.idioma)}
-                            </p>
-                        )
-                    }
-
-                    <h1 class="mt-6 max-w-4xl">
                         {manual.titulo}
                     </h1>
 
                     {
                         manual.descripcion && (
-                            <p class="mt-6 max-w-2xl text-xl leading-8 text-brand-muted">
+                            <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
                                 {manual.descripcion}
                             </p>
                         )
@@ -101,7 +108,7 @@ const meta = [
                                 href={archivoPdfUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="mt-8 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-info-primary-dark"
+                                class="mt-8 inline-flex rounded-full border border-[#00ccff] bg-[#00ccff] px-5 py-3 text-sm font-bold text-slate-950 shadow-[0_0_18px_rgba(0,204,255,0.35)] transition hover:bg-white"
                             >
                                 Abrir PDF →
                             </a>
@@ -111,11 +118,11 @@ const meta = [
 
                 {
                     imagenUrl && (
-                        <div class="overflow-hidden rounded-3xl border border-brand-border bg-white shadow-sm">
+                        <div class="overflow-hidden">
                             <img
                                 src={imagenUrl}
                                 alt={manual.titulo}
-                                class="h-full max-h-[460px] w-full object-cover"
+                                class="h-[320px] w-full object-contain lg:h-[420px]"
                             />
                         </div>
                     )
@@ -124,17 +131,19 @@ const meta = [
 
             {
                 meta.length > 0 && (
-                    <section class="mt-16 rounded-3xl border border-brand-border bg-white p-6 shadow-sm md:p-8">
-                        <h2 class="mb-6 text-3xl">Datos del manual</h2>
+                    <section class="mt-16 rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-2xl shadow-slate-950/30 md:p-8">
+                        <h2 class="mb-6 text-3xl font-bold text-white">
+                            Datos del manual
+                        </h2>
 
                         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             {meta.map((item: any) => (
-                                <div class="rounded-2xl bg-brand-soft p-4">
-                                    <p class="text-xs font-semibold uppercase tracking-wider text-brand-muted">
+                                <div class="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                         {item.label}
                                     </p>
 
-                                    <p class="mt-2 text-lg font-semibold text-brand-base">
+                                    <p class="mt-2 text-lg font-semibold text-white">
                                         {item.value}
                                     </p>
                                 </div>
@@ -146,8 +155,10 @@ const meta = [
 
             {
                 marcas.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Operadores relacionados</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-2xl font-bold text-white">
+                            Operadores relacionados
+                        </h2>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             {marcas.map((marca: any) => (
@@ -166,8 +177,10 @@ const meta = [
 
             {
                 modelos.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Modelos relacionados</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-2xl font-bold text-white">
+                            Modelos relacionados
+                        </h2>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             {modelos.map((modelo: any) => (
@@ -186,8 +199,10 @@ const meta = [
 
             {
                 articulos.length > 0 && (
-                    <section class="mt-16 border-t border-brand-border pt-12">
-                        <h2 class="mb-6">Artículos relacionados</h2>
+                    <section class="mt-16 border-t border-white/10 pt-12">
+                        <h2 class="mb-6 text-2xl font-bold text-white">
+                            Artículos relacionados
+                        </h2>
 
                         <div class="grid gap-5 md:grid-cols-2">
                             {articulos.map((articulo: any) => (

@@ -95,7 +95,7 @@ const heroIconUrl = categoriaActual
     <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
             <section
-                class="relative mb-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-6 py-10 shadow-2xl md:px-12 md:py-10"
+                class="relative mb-10 flex min-h-[320px] overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-6 py-10 shadow-2xl md:min-h-[430px] md:px-12 md:py-10"
             >
                 <div
                     class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
@@ -126,12 +126,12 @@ const heroIconUrl = categoriaActual
                     </p>
 
                     <h1
-                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                        class="mt-6 max-w-3xl text-3xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
                     >
                         {
                             categoriaActual
                                 ? categoriaActual.nombre
-                                : "Actualidad y guías"
+                                : "Noticias y actualidad"
                         }
                     </h1>
 
@@ -168,7 +168,61 @@ const heroIconUrl = categoriaActual
             </section>
 
             <div class="grid gap-10 lg:grid-cols-[260px_1fr]">
-                <aside class="lg:sticky lg:top-24 lg:self-start">
+                <div class="mb-8 lg:hidden">
+                    <label class="block">
+                        <span
+                            class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Categoría
+                        </span>
+
+                        <div class="relative">
+                            <select
+                                class="w-full appearance-none rounded border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-slate-200 outline-none"
+                                onchange="window.location.href = this.value"
+                            >
+                                <option
+                                    value="/articulos"
+                                    selected={!categoriaActual}
+                                >
+                                    Todas
+                                </option>
+
+                                {
+                                    categorias.map((categoria: any) => (
+                                        <option
+                                            value={`/articulos/${categoria.slug}`}
+                                            selected={
+                                                categoriaActual?.slug ===
+                                                categoria.slug
+                                            }
+                                        >
+                                            {categoria.nombre}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+
+                            <svg
+                                class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </label>
+                </div>
+
+                <aside
+                    class="hidden lg:sticky lg:top-24 lg:block lg:self-start"
+                >
                     <div>
                         <p
                             class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"

@@ -6,7 +6,7 @@ export function renderBlocks(blocks: any[]) {
     return blocks
         .map((block) => {
             if (block.type === 'paragraph') {
-                return `<p class="mb-4 text-lg leading-relaxed">${renderChildren(block.children)}</p>`;
+                return `<p class="mb-4 text-[1.05rem] font-normal leading-8">${renderChildren(block.children)}</p>`;
             }
 
             if (block.type === 'heading') {
@@ -56,7 +56,7 @@ function renderChildren(children: any[]) {
             let text = child.text || '';
 
             if (child.bold) {
-                text = `<strong class="font-bold">${text}</strong>`;
+                text = `<strong class="font-semibold">${text}</strong>`;
             }
 
             if (child.italic) {

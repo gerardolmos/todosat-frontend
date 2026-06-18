@@ -175,7 +175,7 @@ const basePath =
                     </p>
 
                     <h1
-                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                        class="mt-6 max-w-3xl text-3xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
                     >
                         Hardware satelital
                     </h1>
@@ -212,7 +212,117 @@ const basePath =
             </section>
 
             <div class="items-start gap-10 lg:grid lg:grid-cols-[260px_1fr]">
-                <aside class="lg:sticky lg:top-24 lg:self-start">
+                <div class="mb-8 grid gap-4 lg:hidden">
+                    <label class="block">
+                        <span
+                            class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Tipo de hardware
+                        </span>
+
+                        <div class="relative">
+                            <select
+                                class="appearance-none w-full rounded border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-slate-200 outline-none"
+                                onchange="window.location.href = this.value"
+                            >
+                                <option
+                                    value={marcaActual
+                                        ? `/modelos/operador/${marcaActual.slug}`
+                                        : "/modelos"}
+                                    selected={!tipoActual}
+                                >
+                                    Todos
+                                </option>
+
+                                {
+                                    tiposHardware.map((tipo: any) => (
+                                        <option
+                                            value={
+                                                marcaActual
+                                                    ? `/modelos/tipo/${tipo}/operador/${marcaActual.slug}`
+                                                    : `/modelos/tipo/${tipo}`
+                                            }
+                                            selected={tipoActual === tipo}
+                                        >
+                                            {tipo}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                            <svg
+                                class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </label>
+
+                    <label class="block">
+                        <span
+                            class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Operador
+                        </span>
+
+                        <div class="relative">
+                            <select
+                                class="w-full rounded border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-slate-200 outline-none"
+                                onchange="window.location.href = this.value"
+                            >
+                                <option
+                                    value={tipoActual
+                                        ? `/modelos/tipo/${tipoActual}`
+                                        : "/modelos"}
+                                    selected={!marcaActual}
+                                >
+                                    Todos
+                                </option>
+
+                                {
+                                    marcas.map((marca: any) => (
+                                        <option
+                                            value={
+                                                tipoActual
+                                                    ? `/modelos/tipo/${tipoActual}/operador/${marca.slug}`
+                                                    : `/modelos/operador/${marca.slug}`
+                                            }
+                                            selected={
+                                                marcaActual?.slug === marca.slug
+                                            }
+                                        >
+                                            {marca.nombre}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                            <svg
+                                class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </label>
+                </div>
+
+                <aside
+                    class="hidden lg:sticky lg:top-24 lg:block lg:self-start"
+                >
                     <div>
                         <p
                             class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"

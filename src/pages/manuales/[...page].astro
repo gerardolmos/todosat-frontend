@@ -1,19 +1,98 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import { getManuales } from "../../lib/content";
+import { getManuales, getMarcas } from "../../lib/content";
 import ManualCard from "../../components/ManualCard.astro";
 import Pagination from "../../components/Pagination.astro";
 
-export async function getStaticPaths({ paginate }: any) {
-    const manuales = await getManuales();
+export async function getStaticPaths() {
+    const PAGE_SIZE = 9;
 
-    return paginate(manuales, {
-        pageSize: 9,
+    function createPage(data: any[], currentPage: number) {
+        const totalPages = Math.ceil(data.length / PAGE_SIZE) || 1;
+        const start = (currentPage - 1) * PAGE_SIZE;
+
+        return {
+            data: data.slice(start, start + PAGE_SIZE),
+            currentPage,
+            lastPage: totalPages,
+        };
+    }
+
+    function createPaginatedPaths({
+        manualesFiltrados,
+        baseSegments,
+        propsExtra,
+    }: any) {
+        const totalPages = Math.ceil(manualesFiltrados.length / PAGE_SIZE) || 1;
+        const paths = [];
+
+        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            paths.push({
+                params: {
+                    page:
+                        pageNumber === 1
+                            ? baseSegments.join("/")
+                            : [...baseSegments, String(pageNumber)].join("/"),
+                },
+                props: {
+                    page: createPage(manualesFiltrados, pageNumber),
+                    ...propsExtra,
+                },
+            });
+        }
+
+        return paths;
+    }
+
+    const manuales = await getManuales();
+    const marcas = await getMarcas();
+
+    const paths: any[] = [];
+
+    paths.push(
+        ...createPaginatedPaths({
+            manualesFiltrados: manuales,
+            baseSegments: [],
+            propsExtra: {
+                marcas,
+                marcaActual: null,
+            },
+        }),
+    );
+
+    marcas.forEach((marca: any) => {
+        const manualesMarca = manuales.filter((manual: any) => {
+            const marcasManual = manual.marcas || manual.marca || [];
+            const listaMarcas = Array.isArray(marcasManual)
+                ? marcasManual
+                : [marcasManual];
+
+            return listaMarcas.some(
+                (marcaManual: any) => marcaManual?.slug === marca.slug,
+            );
+        });
+
+        paths.push(
+            ...createPaginatedPaths({
+                manualesFiltrados: manualesMarca,
+                baseSegments: ["operador", marca.slug],
+                propsExtra: {
+                    marcas,
+                    marcaActual: marca,
+                },
+            }),
+        );
     });
+
+    return paths;
 }
 
-const { page } = Astro.props as any;
+const { page, marcas, marcaActual } = Astro.props as any;
+
+const basePath = marcaActual
+    ? `/manuales/operador/${marcaActual.slug}`
+    : "/manuales";
 ---
 
 <Layout title="Manuales | TodoSatcom">
@@ -47,7 +126,7 @@ const { page } = Astro.props as any;
                     </p>
 
                     <h1
-                        class="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                        class="mt-6 max-w-3xl text-3xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
                     >
                         Manuales y documentación
                     </h1>
@@ -60,22 +139,22 @@ const { page } = Astro.props as any;
 
                     <div class="mt-8 flex flex-wrap gap-3">
                         <span
-                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                            class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 md:px-4 md:py-2 md:text-sm"
                         >
                             Instalación
                         </span>
                         <span
-                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                            class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 md:px-4 md:py-2 md:text-sm"
                         >
                             Firmware
                         </span>
                         <span
-                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                            class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 md:px-4 md:py-2 md:text-sm"
                         >
                             Fichas técnicas
                         </span>
                         <span
-                            class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200"
+                            class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 md:px-4 md:py-2 md:text-sm"
                         >
                             Guías oficiales
                         </span>
@@ -83,15 +162,120 @@ const { page } = Astro.props as any;
                 </div>
             </section>
 
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {page.data.map((manual: any) => <ManualCard manual={manual} />)}
-            </div>
+            <div class="items-start gap-10 lg:grid lg:grid-cols-[260px_1fr]">
+                <div class="mb-8 lg:hidden">
+                    <label class="block">
+                        <span
+                            class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Operador
+                        </span>
 
-            <Pagination
-                currentPage={page.currentPage}
-                totalPages={page.lastPage}
-                basePath="/manuales"
-            />
+                        <div class="relative">
+                            <select
+                                class="w-full appearance-none rounded border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-slate-200 outline-none"
+                                onchange="window.location.href = this.value"
+                            >
+                                <option
+                                    value="/manuales"
+                                    selected={!marcaActual}
+                                >
+                                    Todos
+                                </option>
+
+                                {
+                                    marcas.map((marca: any) => (
+                                        <option
+                                            value={`/manuales/operador/${marca.slug}`}
+                                            selected={
+                                                marcaActual?.slug === marca.slug
+                                            }
+                                        >
+                                            {marca.nombre}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+
+                            <svg
+                                class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </label>
+                </div>
+
+                <aside
+                    class="hidden lg:sticky lg:top-24 lg:block lg:self-start"
+                >
+                    <div>
+                        <p
+                            class="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Operador
+                        </p>
+
+                        <nav>
+                            <a
+                                href="/manuales"
+                                class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
+                                    !marcaActual
+                                        ? "border-blue-500 bg-blue-500/15 text-blue-300"
+                                        : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
+                                }`}
+                            >
+                                Todos
+                            </a>
+
+                            {
+                                marcas.map((marca: any) => (
+                                    <a
+                                        href={`/manuales/operador/${marca.slug}`}
+                                        class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
+                                            marcaActual?.slug === marca.slug
+                                                ? "border-blue-500 bg-blue-500/15 text-blue-300"
+                                                : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
+                                        }`}
+                                    >
+                                        {marca.nombre}
+                                    </a>
+                                ))
+                            }
+                        </nav>
+                    </div>
+                </aside>
+
+                <section>
+                    {
+                        page.data.length > 0 ? (
+                            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {page.data.map((manual: any) => (
+                                    <ManualCard manual={manual} />
+                                ))}
+                            </div>
+                        ) : (
+                            <p class="rounded border border-white/10 bg-slate-900 p-6 text-slate-300">
+                                No hay manuales que coincidan con este operador.
+                            </p>
+                        )
+                    }
+
+                    <Pagination
+                        currentPage={page.currentPage}
+                        totalPages={page.lastPage}
+                        basePath={basePath}
+                    />
+                </section>
+            </div>
         </Container>
     </main>
 </Layout>
