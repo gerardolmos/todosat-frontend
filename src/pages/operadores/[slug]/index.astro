@@ -130,94 +130,112 @@ const detallesTecnicos = [
             />
 
             <section
-                class="mt-8 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8"
+                class="relative mt-8 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/45 p-5 shadow-2xl md:p-8"
             >
-                <a
-                    href="/operadores"
-                    class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
+                <div
+                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(0,204,255,0.12),transparent_30%)]"
                 >
-                    ← Volver a operadores
-                </a>
+                </div>
 
                 <div
-                    class="mt-8 grid gap-10 lg:grid-cols-[40%_60%] lg:items-center"
+                    class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
                 >
-                    <div>
-                        {
-                            logoUrl && (
-                                <img
-                                    src={logoUrl}
-                                    alt={`Logo de ${marca.nombre}`}
-                                    class="max-h-20 w-auto"
-                                />
-                            )
-                        }
+                </div>
 
-                        <h1
-                            class="mt-5 text-4xl font-bold tracking-tight text-white md:text-5xl"
-                        >
-                            {marca.nombre}
-                        </h1>
+                <div class="relative">
+                    <a
+                        href="/operadores"
+                        class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
+                    >
+                        ← Volver a operadores
+                    </a>
 
-                        {
-                            marca.descripcion_corta && (
-                                <p class="mt-5 max-w-xl text-xl font-semibold leading-tight text-white">
-                                    {marca.descripcion_corta}
-                                </p>
-                            )
-                        }
-
-                        {
-                            marca.descripcion_home && (
-                                <p class="mt-4 max-w-xl text-[1.05rem] leading-8 text-slate-400">
-                                    {marca.descripcion_home}
-                                </p>
-                            )
-                        }
-
-                        <div class="mt-7 flex flex-wrap gap-3">
+                    <div
+                        class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-12"
+                    >
+                        <div>
                             {
-                                marca.tipo_orbita && (
-                                    <span class="rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
-                                        {marca.tipo_orbita}
-                                    </span>
+                                logoUrl && (
+                                    <div>
+                                        <img
+                                            src={logoUrl}
+                                            alt={`Logo de ${marca.nombre}`}
+                                            class="max-h-16 w-auto max-w-[220px] object-contain md:max-h-40 md:max-w-[400px]"
+                                        />
+
+                                        <div class="h-px w-1/2 bg-gradient-to-r from-blue-400/70 to-transparent" />
+                                    </div>
+                                )
+                            }
+
+                            <h1
+                                class="mt-5 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-white md:text-5xl"
+                            >
+                                {marca.nombre}
+                            </h1>
+
+                            {
+                                marca.descripcion_corta && (
+                                    <p class="mt-2 max-w-2xl text-lg font-semibold leading-7 text-slate-100 md:text-xl md:leading-8">
+                                        {marca.descripcion_corta}
+                                    </p>
                                 )
                             }
 
                             {
-                                marca.pais_origen && (
-                                    <span class="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-slate-300">
-                                        {marca.pais_origen}
-                                    </span>
+                                marca.descripcion_home && (
+                                    <p class="mt-4 max-w-2xl text-base text-slate-400">
+                                        {marca.descripcion_home}
+                                    </p>
                                 )
                             }
                         </div>
 
-                        {
-                            marca.web_oficial && (
-                                <a
-                                    href={marca.web_oficial}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="mt-8 inline-flex rounded-full border border-[#005EFF] bg-[#005EFF]/10 px-6 py-3 text-sm font-bold text-blue-300 transition hover:bg-[#005EFF] hover:text-white"
-                                >
-                                    Web oficial →
-                                </a>
-                            )
-                        }
-                    </div>
+                        <div>
+                            {
+                                imagenPortadaUrl && (
+                                    <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 p-3 shadow-2xl">
+                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(78,161,255,0.18),transparent_55%)]" />
 
-                    {
-                        imagenPortadaUrl && (
-                            <div class="overflow-hidden rounded-3xl border border-white/10">
-                                <img
-                                    src={imagenPortadaUrl}
-                                    alt={marca.nombre}
-                                    class="h-full w-full object-contain"
-                                />
-                            </div>
-                        )
-                    }
+                                        <img
+                                            src={imagenPortadaUrl}
+                                            alt={marca.nombre}
+                                            class="relative aspect-[16/11] w-full rounded-2xl object-contain"
+                                        />
+
+                                        <div class="absolute bottom-6 left-6 z-10 flex flex-wrap gap-3">
+                                            {marca.tipo_orbita && (
+                                                <span class="rounded-full border border-blue-500/60 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-blue-300 backdrop-blur">
+                                                    {marca.tipo_orbita}
+                                                </span>
+                                            )}
+
+                                            {marca.pais_origen && (
+                                                <span class="rounded-full border border-white/15 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-slate-200 backdrop-blur">
+                                                    {marca.pais_origen}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                            {
+                                marca.web_oficial && (
+                                    <div class="mt-5 flex justify-end">
+                                        <a
+                                            href={marca.web_oficial}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex rounded-full border border-blue-500/60 bg-blue-500/10 px-6 py-3 text-sm font-bold text-blue-300 transition hover:bg-blue-500 hover:text-white"
+                                        >
+                                            Web oficial →
+                                        </a>
+                                    </div>
+                                )
+                            }
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -266,7 +284,7 @@ const detallesTecnicos = [
                         </h2>
                         <div class="mb-8 h-px w-full bg-white/10" />
                         <div
-                            class="prose prose-invert prose-lg max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
+                            class="prose prose-invert max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white md:[&_p]:text-[1.18rem] md:[&_p]:leading-9 md:[&_li]:text-[1.18rem] md:[&_li]:leading-9"
                             set:html={descripcionHTML}
                         />
                     </section>
