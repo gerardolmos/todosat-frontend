@@ -1,24 +1,39 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Container from "../components/Container.astro";
 ---
 
-<Layout title="Página no encontrada | TODOSat">
-    <main class="min-h-screen py-20">
-        <Container>
-            <h1 class="text-5xl font-bold">Página no encontrada</h1>
-
-            <p class="mt-6 max-w-2xl text-xl text-gray-600">
-                La página que buscas no existe, ha cambiado de dirección o ya no
-                está disponible.
-            </p>
+<Layout title="404 | Señal perdida">
+    <main class="bg-[#00020B] md:min-h-screen">
+        <div
+            class="mx-auto flex max-w-5xl flex-col items-center px-6 py-6 md:min-h-screen md:justify-center md:py-12"
+        >
+            <img
+                src="/images/404-senal-perdida.png"
+                alt="Señal perdida"
+                class="w-full max-w-[380px] object-contain md:max-w-5xl"
+            />
 
             <a
                 href="/"
-                class="mt-8 inline-block rounded border px-5 py-3 font-medium hover:bg-gray-50"
+                class="mt-4 inline-flex items-center gap-2 rounded-xl border border-[#00ccff] bg-slate-900 px-5 py-2.5 text-base font-semibold text-white shadow-[0_0_24px_rgba(0,204,255,0.25)] transition hover:bg-[#00ccff] hover:text-slate-950 md:mt-8 md:gap-3 md:rounded-2xl md:px-8 md:py-4 md:text-lg"
             >
-                Volver al inicio
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    class="h-5 w-5 md:h-6 md:w-6"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 12 11.204 3.045a1.125 1.125 0 0 1 1.592 0L21.75 12M4.5 9.75v10.125A1.125 1.125 0 0 0 5.625 21h12.75A1.125 1.125 0 0 0 19.5 19.875V9.75"
+                    ></path>
+                </svg>
+
+                <span>Volver al inicio</span>
             </a>
-        </Container>
+        </div>
     </main>
 </Layout>

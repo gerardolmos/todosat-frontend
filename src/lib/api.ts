@@ -1,4 +1,6 @@
-const STRAPI_URL = 'http://localhost:1337';
+// const STRAPI_URL = 'http://localhost:1337';
+
+const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL || "http://localhost:1337";
 
 export async function fetchAPI(path: string) {
     const res = await fetch(`${STRAPI_URL}${path}`);

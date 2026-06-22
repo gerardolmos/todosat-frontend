@@ -3,21 +3,23 @@
 import coberturaIcon from "../assets/images/pictostecnicos/cobertura.png";
 import velocidadIcon from "../assets/images/pictostecnicos/velocidad.png";
 import latenciaIcon from "../assets/images/pictostecnicos/latencia.png";
-
+import { getMediaUrl } from "../lib/media";
 
 const { marcas = [] } = Astro.props;
 
-const STRAPI_URL =
-	import.meta.env.PUBLIC_STRAPI_URL ||
-	import.meta.env.STRAPI_URL ||
-	"http://localhost:1337";
+// const STRAPI_URL =
+// 	import.meta.env.PUBLIC_STRAPI_URL ||
+// 	import.meta.env.STRAPI_URL ||
+// 	"http://localhost:1337";
 
-function getMediaUrl(media: any) {
-	if (!media?.url) return null;
-	return media.url.startsWith("http")
-		? media.url
-		: `${STRAPI_URL}${media.url}`;
-}
+// function getMediaUrl(media: any) {
+// 	if (!media?.url) return null;
+// 	return media.url.startsWith("http")
+// 		? media.url
+// 		: `${STRAPI_URL}${media.url}`;
+// }
+
+
 
 function getExternalUrl(url: string | null | undefined) {
 	if (!url) return null;
@@ -102,10 +104,11 @@ const selectedOperator = operators[0];
 					<div class="mt-8 min-h-0 flex-1 overflow-y-auto pr-2">
     <div class="grid grid-cols-2 gap-3 md:grid-cols-3">
 						{operators.map((operator: any, index: number) => (
-							<a
-	href={`/operadores/${operator.slug}`}
-	data-operator-button
-	data-index={index}
+							<button
+    type="button"
+    data-operator-button
+    data-index={index}
+    data-slug={operator.slug}
 	class={`group flex h-52 flex-col rounded border p-4 text-left transition-all duration-300 ${
 									index === 0
 										? "border-[#00ccff] bg-slate-900/80 shadow-[0_0_8px_rgba(0,204,255,0.70),0_0_14px_rgba(0,204,255,0.25)]"
@@ -137,7 +140,7 @@ const selectedOperator = operators[0];
 								<p class="mt-2 line-clamp-2 text-xs leading-5 text-slate-300">
 									{operator.descripcion_corta}
 								</p>
-							</a>
+							</button>
 						))}
 						</div>
 					</div>
@@ -330,11 +333,19 @@ const selectedOperator = operators[0];
 				}
 
 				buttons.forEach((button) => {
-					button.addEventListener("click", () => {
-						const index = Number(button.dataset.index);
-						updateOperator(index);
-					});
-				});
+    button.addEventListener("click", () => {
+        const isDesktop = window.innerWidth >= 1280;
+
+        if (!isDesktop) {
+            window.location.href =
+                `/operadores/${button.dataset.slug}`;
+            return;
+        }
+
+        const index = Number(button.dataset.index);
+        updateOperator(index);
+    });
+});
 			</script>
 		</section>
 	)
