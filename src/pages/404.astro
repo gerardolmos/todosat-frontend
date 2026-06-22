@@ -1,5 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { Picture } from "astro:assets";
+import senalPerdida404 from "../assets/images/404-senal-perdida.png";
 ---
 
 <Layout title="404 | Señal perdida">
@@ -7,9 +9,16 @@ import Layout from "../layouts/Layout.astro";
         <div
             class="mx-auto flex max-w-5xl flex-col items-center px-6 py-6 md:min-h-screen md:justify-center md:py-12"
         >
-            <img
-                src="/images/404-senal-perdida.png"
+            <Picture
+                src={senalPerdida404}
+                formats={["avif", "webp"]}
+                fallbackFormat="png"
+                widths={[380, 760, 1024]}
+                sizes="(max-width: 767px) 380px, 1024px"
                 alt="Señal perdida"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
                 class="w-full max-w-[380px] object-contain md:max-w-5xl"
             />
 
