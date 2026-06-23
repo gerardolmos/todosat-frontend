@@ -154,66 +154,80 @@ const meta = [
             }
 
             {
-                marcas.length > 0 && (
+                (marcas.length > 0 ||
+                    modelos.length > 0 ||
+                    articulos.length > 0) && (
                     <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-2xl font-bold text-white">
-                            Operadores relacionados
+                        <h2 class="mb-8 text-3xl font-bold text-white">
+                            Contenido relacionado
                         </h2>
 
-                        <div class="grid gap-5 md:grid-cols-2">
-                            {marcas.map((marca: any) => (
-                                <RelatedCard
-                                    type="Operador"
-                                    title={marca.nombre}
-                                    description={marca.descripcion_corta}
-                                    url={`/operadores/${marca.slug}`}
-                                    image={marca.imagen_portada}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
+                        <div class="grid gap-8 lg:grid-cols-3">
+                            {marcas.length > 0 && (
+                                <div>
+                                    <h3 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                        Operadores relacionados
+                                    </h3>
 
-            {
-                modelos.length > 0 && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-2xl font-bold text-white">
-                            Modelos relacionados
-                        </h2>
+                                    <div class="grid gap-5 [&>a]:min-h-[190px] [&>a]:h-full">
+                                        {marcas.map((marca: any) => (
+                                            <RelatedCard
+                                                type="Operador"
+                                                title={marca.nombre}
+                                                description={
+                                                    marca.descripcion_corta
+                                                }
+                                                url={`/operadores/${marca.slug}`}
+                                                image={marca.imagen_portada}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
-                        <div class="grid gap-5 md:grid-cols-2">
-                            {modelos.map((modelo: any) => (
-                                <RelatedCard
-                                    type="Modelo"
-                                    title={modelo.nombre}
-                                    description={modelo.descripcion_corta}
-                                    url={`/modelos/${modelo.slug}`}
-                                    image={modelo.imagen_principal}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
+                            {modelos.length > 0 && (
+                                <div>
+                                    <h3 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                        Hardware relacionado
+                                    </h3>
 
-            {
-                articulos.length > 0 && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-2xl font-bold text-white">
-                            Artículos relacionados
-                        </h2>
+                                    <div class="grid gap-5 [&>a]:min-h-[190px] [&>a]:h-full">
+                                        {modelos.map((modelo: any) => (
+                                            <RelatedCard
+                                                type="Modelo"
+                                                title={modelo.nombre}
+                                                description={
+                                                    modelo.descripcion_corta
+                                                }
+                                                url={`/modelos/${modelo.slug}`}
+                                                image={modelo.imagen_principal}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
-                        <div class="grid gap-5 md:grid-cols-2">
-                            {articulos.map((articulo: any) => (
-                                <RelatedCard
-                                    type="Artículo"
-                                    title={articulo.titulo}
-                                    description={articulo.subtitulo}
-                                    url={`/articulos/${articulo.slug}`}
-                                    image={articulo.imagen_principal}
-                                />
-                            ))}
+                            {articulos.length > 0 && (
+                                <div>
+                                    <h3 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                        Artículos relacionados
+                                    </h3>
+
+                                    <div class="grid gap-5 [&>a]:min-h-[190px] [&>a]:h-full">
+                                        {articulos.map((articulo: any) => (
+                                            <RelatedCard
+                                                type="Artículo"
+                                                title={articulo.titulo}
+                                                description={articulo.subtitulo}
+                                                url={`/articulos/${articulo.slug}`}
+                                                image={
+                                                    articulo.imagen_principal
+                                                }
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </section>
                 )

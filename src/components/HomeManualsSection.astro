@@ -1,7 +1,7 @@
 ---
 import { Picture } from "astro:assets";
 import ManualCard from "./ManualCard.astro";
-import noticias from "../assets/images/guiasbg.png";
+import guiasBg from "../assets/images/guiasbg.png";
 
 interface Props {
     manuales: any[];
@@ -14,12 +14,12 @@ const { manuales } = Astro.props;
     class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12"
 >
     <Picture
-        src={noticias}
+        src={guiasBg}
         formats={["avif", "webp"]}
         fallbackFormat="png"
         widths={[192, 288]}
         sizes="288px"
-        alt="Guias Image"
+        alt=""
         quality={100}
         loading="lazy"
         decoding="async"

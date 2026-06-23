@@ -39,169 +39,227 @@ const fecha = articulo.fecha_publicacion
     : null;
 
 const readingTime = getReadingTime(articulo.contenido);
+
+const hasRelated =
+    marcas.length > 0 || modelos.length > 0 || manuales.length > 0;
 ---
 
 <Layout
     title={`${articulo.titulo} | TodoSatcom`}
     description={articulo.subtitulo}
 >
-    <main class="min-h-screen bg-slate-950 py-10 text-white md:py-16">
-        <Container>
-            <Breadcrumbs
-                items={[
-                    {
-                        label: "Artículos",
-                        href: "/articulos",
-                    },
-                    {
-                        label: articulo.titulo,
-                    },
-                ]}
-            />
-
-            <article class="mt-8">
-                <a
-                    href="/articulos"
-                    class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
-                >
-                    ← Volver a artículos
-                </a>
-
-                <header
-                    class="mt-6 max-w-5xl border-b border-white/10 pb-10 md:mt-8 md:pb-12"
-                >
-                    <div class="flex flex-wrap gap-3">
+    <main class="min-h-screen bg-slate-950 text-white">
+        <section class="bg-slate-950 py-8 md:py-12">
+            <Container>
+                <Breadcrumbs
+                    items={[
                         {
-                            categoria && (
-                                <a
-                                    href={`/articulos/${categoria.slug}`}
-                                    class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1.5 text-xs md:px-4 md:py-2 md:text-sm font-semibold text-blue-300 transition hover:border-[#005EFF] hover:text-white"
-                                >
-                                    {categoria.nombre}
-                                </a>
-                            )
-                        }
-
+                            label: "Artículos",
+                            href: "/articulos",
+                        },
                         {
-                            fecha && (
-                                <span class="rounded-full border border-white/10 bg-slate-900 px-3 py-1.5 text-xs md:px-4 md:py-2 md:text-sm font-semibold text-slate-300">
-                                    {fecha}
-                                </span>
-                            )
-                        }
-                        {
-                            readingTime && (
-                                <span class="rounded-full border border-white/10 bg-slate-900 px-3 py-1.5 text-xs md:px-4 md:py-2 md:text-sm font-semibold text-slate-300">
-                                    {readingTime} min lectura
-                                </span>
-                            )
-                        }
-                    </div>
+                            label: articulo.titulo,
+                        },
+                    ]}
+                />
 
-                    <h1
-                        class="mt-6 max-w-5xl text-3xl font-bold leading-tight tracking-tight !text-white md:mt-8 md:text-5xl"
+                <article class="mt-8">
+                    <a
+                        href="/articulos"
+                        class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
                     >
-                        {articulo.titulo}
-                    </h1>
+                        ← Volver a artículos
+                    </a>
+
+                    <header class="mt-8 max-w-5xl pb-10 md:pb-14">
+                        <div class="flex flex-wrap gap-3">
+                            {
+                                categoria && (
+                                    <a
+                                        href={`/articulos/${categoria.slug}`}
+                                        class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-300 transition hover:border-[#005EFF] hover:text-white md:px-4 md:py-2 md:text-sm"
+                                    >
+                                        {categoria.nombre}
+                                    </a>
+                                )
+                            }
+
+                            {
+                                fecha && (
+                                    <span class="rounded-full border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 md:px-4 md:py-2 md:text-sm">
+                                        {fecha}
+                                    </span>
+                                )
+                            }
+
+                            {
+                                readingTime && (
+                                    <span class="rounded-full border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 md:px-4 md:py-2 md:text-sm">
+                                        {readingTime} min lectura
+                                    </span>
+                                )
+                            }
+                        </div>
+
+                        <h1
+                            class="mt-6 max-w-5xl text-4xl font-bold leading-tight tracking-tight !text-white md:mt-8 md:text-6xl"
+                        >
+                            {articulo.titulo}
+                        </h1>
+
+                        {
+                            articulo.subtitulo && (
+                                <p class="mt-6 max-w-3xl border-l-2 border-[#00ccff]/60 pl-5 text-lg leading-8 text-slate-300 md:text-2xl md:leading-9">
+                                    {articulo.subtitulo}
+                                </p>
+                            )
+                        }
+                    </header>
+                </article>
+            </Container>
+        </section>
+
+        <section class="bg-slate-100 py-10 text-slate-950 md:py-14">
+            <Container>
+                <div
+                    class={`grid gap-10 ${
+                        hasRelated
+                            ? "lg:grid-cols-[minmax(0,1fr)_340px]"
+                            : "lg:grid-cols-[minmax(0,1fr)]"
+                    }`}
+                >
+                    <article
+                        class="overflow-hidden rounded-3xl bg-white shadow-xl shadow-slate-950/10"
+                    >
+                        {
+                            imagenUrl && (
+                                <div class="border-b border-slate-200 bg-slate-950">
+                                    <img
+                                        src={imagenUrl}
+                                        alt={articulo.titulo}
+                                        class="h-[280px] w-full object-contain md:h-[520px]"
+                                    />
+                                </div>
+                            )
+                        }
+
+                        {
+                            contenidoHTML && (
+                                <section class="px-6 py-8 md:px-10 md:py-12">
+                                    <div
+                                        class="prose prose-slate max-w-none prose-headings:text-slate-950 prose-p:text-slate-700 prose-a:text-blue-600 prose-strong:text-slate-950 prose-li:text-slate-700 md:[&_p]:text-[1.08rem] md:[&_p]:leading-8 md:[&_li]:text-[1.08rem] md:[&_li]:leading-8"
+                                        set:html={contenidoHTML}
+                                    />
+                                </section>
+                            )
+                        }
+                    </article>
 
                     {
-                        articulo.subtitulo && (
-                            <p class="mt-6 max-w-3xl border-l-2 border-[#00ccff]/60 pl-5 text-base leading-7 text-slate-300 md:text-xl md:leading-8">
-                                {articulo.subtitulo}
-                            </p>
+                        hasRelated && (
+                            <aside class="lg:sticky lg:top-28 lg:self-start">
+                                <div class="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 text-white shadow-2xl">
+                                    <div class="border-b border-white/10 p-6">
+                                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">
+                                            Relacionado
+                                        </p>
+
+                                        <h2 class="mt-3 text-2xl font-bold text-white">
+                                            En este artículo
+                                        </h2>
+                                    </div>
+
+                                    <div class="space-y-8 p-6">
+                                        {marcas.length > 0 && (
+                                            <section>
+                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                                    Operadores
+                                                </h3>
+
+                                                <div class="grid gap-4">
+                                                    {marcas.map(
+                                                        (marca: any) => (
+                                                            <RelatedCard
+                                                                type="Operador"
+                                                                title={
+                                                                    marca.nombre
+                                                                }
+                                                                description={
+                                                                    marca.descripcion_corta
+                                                                }
+                                                                url={`/operadores/${marca.slug}`}
+                                                                image={
+                                                                    marca.imagen_portada
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </section>
+                                        )}
+
+                                        {modelos.length > 0 && (
+                                            <section>
+                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                                    Hardware
+                                                </h3>
+
+                                                <div class="grid gap-4">
+                                                    {modelos.map(
+                                                        (modelo: any) => (
+                                                            <RelatedCard
+                                                                type="Modelo"
+                                                                title={
+                                                                    modelo.nombre
+                                                                }
+                                                                description={
+                                                                    modelo.descripcion_corta
+                                                                }
+                                                                url={`/modelos/${modelo.slug}`}
+                                                                image={
+                                                                    modelo.imagen_principal
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </section>
+                                        )}
+
+                                        {manuales.length > 0 && (
+                                            <section>
+                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                                    Manuales
+                                                </h3>
+
+                                                <div class="grid gap-4">
+                                                    {manuales.map(
+                                                        (manual: any) => (
+                                                            <RelatedCard
+                                                                type="Manual"
+                                                                title={
+                                                                    manual.titulo
+                                                                }
+                                                                description={
+                                                                    manual.descripcion
+                                                                }
+                                                                url={`/manuales/${manual.slug}`}
+                                                                image={
+                                                                    manual.imagen_portada
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </section>
+                                        )}
+                                    </div>
+                                </div>
+                            </aside>
                         )
                     }
-                </header>
-
-                {
-                    imagenUrl && (
-                        <div class="mt-10 border-b border-white/10 pb-10 md:mt-12 md:pb-12">
-                            <img
-                                src={imagenUrl}
-                                alt={articulo.titulo}
-                                class="h-[320px] w-full object-contain object-left md:h-[560px]"
-                            />
-                        </div>
-                    )
-                }
-
-                {
-                    contenidoHTML && (
-                        <section class="mt-12">
-                            <div
-                                class="prose prose-invert prose-base max-w-4xl prose-p:font-normal prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white"
-                                set:html={contenidoHTML}
-                            />
-                        </section>
-                    )
-                }
-            </article>
-
-            {
-                marcas.length > 0 && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-3xl font-bold !text-white">
-                            Operadores relacionados
-                        </h2>
-
-                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
-                            {marcas.map((marca: any) => (
-                                <RelatedCard
-                                    type="Operador"
-                                    title={marca.nombre}
-                                    description={marca.descripcion_corta}
-                                    url={`/operadores/${marca.slug}`}
-                                    image={marca.imagen_portada}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
-
-            {
-                modelos.length > 0 && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-3xl font-bold !text-white">
-                            Modelos relacionados
-                        </h2>
-
-                        <div class="grid gap-5 md:grid-cols-2">
-                            {modelos.map((modelo: any) => (
-                                <RelatedCard
-                                    type="Modelo"
-                                    title={modelo.nombre}
-                                    description={modelo.descripcion_corta}
-                                    url={`/modelos/${modelo.slug}`}
-                                    image={modelo.imagen_principal}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
-
-            {
-                manuales.length > 0 && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-3xl font-bold !text-white">
-                            Manuales relacionados
-                        </h2>
-
-                        <div class="grid gap-5 md:grid-cols-2">
-                            {manuales.map((manual: any) => (
-                                <RelatedCard
-                                    type="Manual"
-                                    title={manual.titulo}
-                                    description={manual.descripcion}
-                                    url={`/manuales/${manual.slug}`}
-                                    image={manual.imagen_portada}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
-        </Container>
+                </div>
+            </Container>
+        </section>
     </main>
 </Layout>

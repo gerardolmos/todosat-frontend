@@ -115,34 +115,22 @@ const detallesTecnicos = [
     title={`${marca.nombre} | TodoSatcom`}
     description={marca.descripcion_corta}
 >
-    <main class="min-h-screen bg-slate-950 py-10 text-white">
-        <Container>
-            <Breadcrumbs
-                items={[
-                    {
-                        label: "Operadores",
-                        href: "/operadores",
-                    },
-                    {
-                        label: marca.nombre,
-                    },
-                ]}
-            />
+    <main class="min-h-screen bg-slate-950 text-white">
+        <section class="bg-slate-950 py-8 md:py-12">
+            <Container>
+                <Breadcrumbs
+                    items={[
+                        {
+                            label: "Operadores",
+                            href: "/operadores",
+                        },
+                        {
+                            label: marca.nombre,
+                        },
+                    ]}
+                />
 
-            <section
-                class="relative mt-8 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/45 p-5 shadow-2xl md:p-8"
-            >
-                <div
-                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(0,204,255,0.12),transparent_30%)]"
-                >
-                </div>
-
-                <div
-                    class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
-                >
-                </div>
-
-                <div class="relative">
+                <article class="mt-8">
                     <a
                         href="/operadores"
                         class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
@@ -150,230 +138,285 @@ const detallesTecnicos = [
                         ← Volver a operadores
                     </a>
 
-                    <div
-                        class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-12"
+                    <section
+                        class="relative mt-8 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/45 p-5 shadow-2xl md:p-8"
                     >
+                        <div
+                            class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(0,204,255,0.12),transparent_30%)]"
+                        >
+                        </div>
+
+                        <div
+                            class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:48px_48px] opacity-20"
+                        >
+                        </div>
+
+                        <div
+                            class="relative grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-12"
+                        >
+                            <div>
+                                {
+                                    logoUrl && (
+                                        <div>
+                                            <img
+                                                src={logoUrl}
+                                                alt={`Logo de ${marca.nombre}`}
+                                                class="max-h-16 w-auto max-w-[220px] object-contain md:max-h-40 md:max-w-[400px]"
+                                            />
+
+                                            <div class="mt-5 h-px w-1/2 bg-gradient-to-r from-blue-400/70 to-transparent" />
+                                        </div>
+                                    )
+                                }
+
+                                <h1
+                                    class="mt-5 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-white md:text-5xl"
+                                >
+                                    {marca.nombre}
+                                </h1>
+
+                                {
+                                    marca.descripcion_corta && (
+                                        <p class="mt-4 max-w-2xl text-lg font-semibold leading-7 text-slate-100 md:text-xl md:leading-8">
+                                            {marca.descripcion_corta}
+                                        </p>
+                                    )
+                                }
+
+                                {
+                                    marca.descripcion_home && (
+                                        <p class="mt-4 max-w-2xl text-base leading-7 text-slate-400">
+                                            {marca.descripcion_home}
+                                        </p>
+                                    )
+                                }
+                            </div>
+
+                            <div>
+                                {
+                                    imagenPortadaUrl && (
+                                        <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 p-3 shadow-2xl">
+                                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(78,161,255,0.18),transparent_55%)]" />
+
+                                            <img
+                                                src={imagenPortadaUrl}
+                                                alt={marca.nombre}
+                                                class="relative aspect-[16/11] w-full rounded-2xl object-contain"
+                                            />
+
+                                            <div class="absolute bottom-6 left-6 z-10 flex flex-wrap gap-3">
+                                                {marca.tipo_orbita && (
+                                                    <span class="rounded-full border border-blue-500/60 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-blue-300 backdrop-blur">
+                                                        {marca.tipo_orbita}
+                                                    </span>
+                                                )}
+
+                                                {marca.pais_origen && (
+                                                    <span class="rounded-full border border-white/15 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-slate-200 backdrop-blur">
+                                                        {marca.pais_origen}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )
+                                }
+
+                                {
+                                    marca.web_oficial && (
+                                        <div class="mt-5 flex justify-end">
+                                            <a
+                                                href={marca.web_oficial}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="inline-flex rounded-full border border-blue-500/60 bg-blue-500/10 px-6 py-3 text-sm font-bold text-blue-300 transition hover:bg-blue-500 hover:text-white"
+                                            >
+                                                Web oficial →
+                                            </a>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </Container>
+        </section>
+
+        <section class="bg-slate-100 py-10 text-slate-950 md:py-14">
+            <Container>
+                <article
+                    class="overflow-hidden rounded-3xl bg-white shadow-xl shadow-slate-950/10"
+                >
+                    {
+                        detallesTecnicos.length > 0 && (
+                            <section class="border-b border-slate-200 px-6 py-8 md:px-10 md:py-12">
+                                <h2 class="text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+                                    Información técnica
+                                </h2>
+
+                                <div class="mt-8 grid gap-5 lg:grid-cols-2">
+                                    {detallesTecnicos.map((item) => (
+                                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                                            <div class="mb-4 flex items-center gap-3">
+                                                <img
+                                                    src={item.icon.src}
+                                                    alt={item.title}
+                                                    class="h-12 w-12 object-contain"
+                                                />
+
+                                                <h3 class="text-xl font-bold text-slate-950">
+                                                    {item.title}:
+                                                    {item.value && (
+                                                        <span class="ml-1 text-blue-600">
+                                                            {item.value}
+                                                        </span>
+                                                    )}
+                                                </h3>
+                                            </div>
+
+                                            {item.text && (
+                                                <p class="leading-7 text-slate-700">
+                                                    {item.text}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )
+                    }
+
+                    {
+                        descripcionHTML && (
+                            <section class="px-6 py-8 md:px-10 md:py-12">
+                                <h2 class="mb-8 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+                                    Acerca de {marca.nombre}
+                                </h2>
+
+                                <div
+                                    class="prose prose-slate max-w-none prose-headings:text-slate-950 prose-p:text-slate-700 prose-a:text-blue-600 prose-strong:text-slate-950 prose-li:text-slate-700 md:[&_p]:text-[1.08rem] md:[&_p]:leading-8 md:[&_li]:text-[1.08rem] md:[&_li]:leading-8"
+                                    set:html={descripcionHTML}
+                                />
+                            </section>
+                        )
+                    }
+                </article>
+
+                <section
+                    class="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 text-white shadow-2xl"
+                >
+                    <div class="border-b border-white/10 p-6 md:p-8">
+                        <p
+                            class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400"
+                        >
+                            Relacionado
+                        </p>
+
+                        <h2 class="mt-3 text-3xl font-bold text-white">
+                            Contenido vinculado a {marca.nombre}
+                        </h2>
+                    </div>
+
+                    <div class="grid gap-8 p-6 md:p-8 lg:grid-cols-3">
                         <div>
-                            {
-                                logoUrl && (
-                                    <div>
-                                        <img
-                                            src={logoUrl}
-                                            alt={`Logo de ${marca.nombre}`}
-                                            class="max-h-16 w-auto max-w-[220px] object-contain md:max-h-40 md:max-w-[400px]"
-                                        />
-
-                                        <div class="h-px w-1/2 bg-gradient-to-r from-blue-400/70 to-transparent" />
-                                    </div>
-                                )
-                            }
-
-                            <h1
-                                class="mt-5 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-white md:text-5xl"
+                            <h3
+                                class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300"
                             >
-                                {marca.nombre}
-                            </h1>
+                                Hardware relacionado
+                            </h3>
 
                             {
-                                marca.descripcion_corta && (
-                                    <p class="mt-2 max-w-2xl text-lg font-semibold leading-7 text-slate-100 md:text-xl md:leading-8">
-                                        {marca.descripcion_corta}
-                                    </p>
-                                )
-                            }
-
-                            {
-                                marca.descripcion_home && (
-                                    <p class="mt-4 max-w-2xl text-base text-slate-400">
-                                        {marca.descripcion_home}
+                                modelos.length > 0 ? (
+                                    <div class="grid gap-5 [&>a]:h-full [&>a]:min-h-[190px]">
+                                        {modelos.map((modelo: any) => (
+                                            <RelatedCard
+                                                type="Hardware"
+                                                title={modelo.nombre}
+                                                description={
+                                                    modelo.descripcion_corta
+                                                }
+                                                meta={modelo.marca?.nombre}
+                                                url={`/modelos/${modelo.slug}`}
+                                                image={modelo.imagen_principal}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 text-sm leading-6 text-slate-400">
+                                        Todavía no hay hardware publicado para
+                                        este operador.
                                     </p>
                                 )
                             }
                         </div>
 
                         <div>
+                            <h3
+                                class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300"
+                            >
+                                Artículos relacionados
+                            </h3>
+
                             {
-                                imagenPortadaUrl && (
-                                    <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 p-3 shadow-2xl">
-                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(78,161,255,0.18),transparent_55%)]" />
-
-                                        <img
-                                            src={imagenPortadaUrl}
-                                            alt={marca.nombre}
-                                            class="relative aspect-[16/11] w-full rounded-2xl object-contain"
-                                        />
-
-                                        <div class="absolute bottom-6 left-6 z-10 flex flex-wrap gap-3">
-                                            {marca.tipo_orbita && (
-                                                <span class="rounded-full border border-blue-500/60 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-blue-300 backdrop-blur">
-                                                    {marca.tipo_orbita}
-                                                </span>
-                                            )}
-
-                                            {marca.pais_origen && (
-                                                <span class="rounded-full border border-white/15 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-slate-200 backdrop-blur">
-                                                    {marca.pais_origen}
-                                                </span>
-                                            )}
-                                        </div>
+                                articulos.length > 0 ? (
+                                    <div class="grid gap-5 [&>a]:h-full [&>a]:min-h-[190px]">
+                                        {articulos.map((articulo: any) => (
+                                            <RelatedCard
+                                                type="Artículo"
+                                                title={articulo.titulo}
+                                                description={articulo.subtitulo}
+                                                meta={
+                                                    articulo.categoria_tematica
+                                                        ?.nombre
+                                                }
+                                                url={`/articulos/${articulo.slug}`}
+                                                image={
+                                                    articulo.imagen_principal
+                                                }
+                                            />
+                                        ))}
                                     </div>
+                                ) : (
+                                    <p class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 text-sm leading-6 text-slate-400">
+                                        Todavía no hay artículos relacionados
+                                        con este operador.
+                                    </p>
                                 )
                             }
+                        </div>
+
+                        <div>
+                            <h3
+                                class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300"
+                            >
+                                Manuales relacionados
+                            </h3>
 
                             {
-                                marca.web_oficial && (
-                                    <div class="mt-5 flex justify-end">
-                                        <a
-                                            href={marca.web_oficial}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="inline-flex rounded-full border border-blue-500/60 bg-blue-500/10 px-6 py-3 text-sm font-bold text-blue-300 transition hover:bg-blue-500 hover:text-white"
-                                        >
-                                            Web oficial →
-                                        </a>
+                                manuales.length > 0 ? (
+                                    <div class="grid gap-5 [&>a]:h-full [&>a]:min-h-[190px]">
+                                        {manuales.map((manual: any) => (
+                                            <RelatedCard
+                                                type="Manual"
+                                                title={manual.titulo}
+                                                description={manual.descripcion}
+                                                meta={`${manual.ano_publicacion ?? ""}${manual.idioma ? ` · ${formatLabel(manual.idioma)}` : ""}`}
+                                                url={`/manuales/${manual.slug}`}
+                                                image={manual.imagen_portada}
+                                            />
+                                        ))}
                                     </div>
+                                ) : (
+                                    <p class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 text-sm leading-6 text-slate-400">
+                                        Todavía no hay manuales relacionados con
+                                        este operador.
+                                    </p>
                                 )
                             }
                         </div>
                     </div>
-                </div>
-            </section>
-
-            {
-                detallesTecnicos.length > 0 && (
-                    <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
-                        <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
-                            Información técnica
-                        </h2>
-                        <div class="mb-8 h-px w-full bg-white/10" />
-                        <div class="grid gap-5 lg:grid-cols-2">
-                            {detallesTecnicos.map((item) => (
-                                <div class="rounded-2xl border border-white/10 bg-slate-950/40 p-6">
-                                    <div class="mb-4 flex items-center gap-3">
-                                        <img
-                                            src={item.icon.src}
-                                            alt={item.title}
-                                            class="h-12 w-12 object-contain"
-                                        />
-
-                                        <h3 class="text-xl font-bold text-white">
-                                            {item.title}:
-                                            {item.value && (
-                                                <span class="text-blue-400">
-                                                    {item.value}
-                                                </span>
-                                            )}
-                                        </h3>
-                                    </div>
-
-                                    <p class="leading-7 text-slate-300">
-                                        {item.text}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
-
-            {
-                descripcionHTML && (
-                    <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900/30 p-6 md:p-8">
-                        <h2 class="mb-8 text-2xl font-bold uppercase tracking-wide text-blue-400">
-                            Acerca de {marca.nombre}
-                        </h2>
-                        <div class="mb-8 h-px w-full bg-white/10" />
-                        <div
-                            class="prose prose-invert max-w-5xl prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400 prose-strong:text-white md:[&_p]:text-[1.18rem] md:[&_p]:leading-9 md:[&_li]:text-[1.18rem] md:[&_li]:leading-9"
-                            set:html={descripcionHTML}
-                        />
-                    </section>
-                )
-            }
-
-            <section class="mt-12 border-t border-white/10 pt-10">
-                <h2 class="mb-6 text-3xl font-bold text-white">
-                    Modelos de {marca.nombre}
-                </h2>
-
-                {
-                    modelos.length > 0 ? (
-                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
-                            {modelos.map((modelo: any) => (
-                                <RelatedCard
-                                    type="Modelo"
-                                    title={modelo.nombre}
-                                    description={modelo.descripcion_corta}
-                                    meta={modelo.marca?.nombre}
-                                    url={`/modelos/${modelo.slug}`}
-                                    image={modelo.imagen_principal}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <p class="text-slate-300">
-                            Todavía no hay modelos publicados para este
-                            operador.
-                        </p>
-                    )
-                }
-            </section>
-
-            <section class="mt-12 border-t border-white/10 pt-10">
-                <h2 class="mb-6 text-3xl font-bold text-white">
-                    Artículos relacionados
-                </h2>
-                <div class="mb-8 h-px w-full bg-white/10"></div>
-                {
-                    articulos.length > 0 ? (
-                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
-                            {articulos.map((articulo: any) => (
-                                <RelatedCard
-                                    type="Artículo"
-                                    title={articulo.titulo}
-                                    description={articulo.subtitulo}
-                                    meta={articulo.categoria_tematica?.nombre}
-                                    url={`/articulos/${articulo.slug}`}
-                                    image={articulo.imagen_principal}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <p class="text-slate-300">
-                            Todavía no hay artículos relacionados con este
-                            operador.
-                        </p>
-                    )
-                }
-            </section>
-
-            <section class="mt-12 border-t border-white/10 pt-10">
-                <h2 class="mb-6 text-3xl font-bold text-white">
-                    Manuales relacionados
-                </h2>
-                <div class="mb-8 h-px w-full bg-white/10"></div>
-                {
-                    manuales.length > 0 ? (
-                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
-                            {manuales.map((manual: any) => (
-                                <RelatedCard
-                                    type="Manual"
-                                    title={manual.titulo}
-                                    description={manual.descripcion}
-                                    meta={`${manual.ano_publicacion ?? ""}${manual.idioma ? ` · ${formatLabel(manual.idioma)}` : ""}`}
-                                    url={`/manuales/${manual.slug}`}
-                                    image={manual.imagen_portada}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <p class="text-slate-300">
-                            Todavía no hay manuales relacionados con este
-                            operador.
-                        </p>
-                    )
-                }
-            </section>
-        </Container>
+                </section>
+            </Container>
+        </section>
     </main>
 </Layout>

@@ -7,19 +7,6 @@ import { getMediaUrl } from "../lib/media";
 
 const { marcas = [] } = Astro.props;
 
-// const STRAPI_URL =
-// 	import.meta.env.PUBLIC_STRAPI_URL ||
-// 	import.meta.env.STRAPI_URL ||
-// 	"http://localhost:1337";
-
-// function getMediaUrl(media: any) {
-// 	if (!media?.url) return null;
-// 	return media.url.startsWith("http")
-// 		? media.url
-// 		: `${STRAPI_URL}${media.url}`;
-// }
-
-
 
 function getExternalUrl(url: string | null | undefined) {
 	if (!url) return null;

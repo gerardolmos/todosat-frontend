@@ -1,7 +1,7 @@
 ---
 import { Picture } from "astro:assets";
 import ModelCard from "./ModelCard.astro";
-import modelo from "../assets/images/equiposbg.png";
+import equiposBg from "../assets/images/equiposbg.png";
 
 interface Props {
     modelos: any[];
@@ -14,12 +14,12 @@ const { modelos } = Astro.props;
     class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-14 text-white shadow-2xl md:px-10 md:py-20"
 >
     <Picture
-        src={modelo}
+        src={equiposBg}
         formats={["avif", "webp"]}
         fallbackFormat="png"
         widths={[192, 288]}
         sizes="288px"
-        alt="Guias Image"
+        alt=""
         quality={100}
         loading="lazy"
         decoding="async"

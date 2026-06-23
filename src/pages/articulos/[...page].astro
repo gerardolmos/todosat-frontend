@@ -4,11 +4,35 @@ import Container from "../../components/Container.astro";
 import { getArticulos, getCategorias } from "../../lib/content";
 import ArticleCard from "../../components/ArticleCard.astro";
 import Pagination from "../../components/Pagination.astro";
+import { Image, Picture } from "astro:assets";
 import { getMediaUrl } from "../../lib/media";
 import todasIcon from "../../assets/images/categoryPictos/todas.png";
 
 export async function getStaticPaths() {
     const PAGE_SIZE = 9;
+
+    type OrdenArticulos = "recientes" | "antiguos";
+
+    function getFechaPublicacionTime(articulo: any) {
+        if (!articulo.fecha_publicacion) return null;
+
+        const time = new Date(articulo.fecha_publicacion).getTime();
+
+        return Number.isNaN(time) ? null : time;
+    }
+
+    function ordenarArticulos(data: any[], orden: OrdenArticulos) {
+        return [...data].sort((a: any, b: any) => {
+            const timeA = getFechaPublicacionTime(a);
+            const timeB = getFechaPublicacionTime(b);
+
+            if (timeA === null && timeB === null) return 0;
+            if (timeA === null) return 1;
+            if (timeB === null) return -1;
+
+            return orden === "antiguos" ? timeA - timeB : timeB - timeA;
+        });
+    }
 
     function createPage(data: any[], currentPage: number) {
         const totalPages = Math.ceil(data.length / PAGE_SIZE) || 1;
@@ -21,25 +45,64 @@ export async function getStaticPaths() {
         };
     }
 
+    function createPaginatedPaths({
+        articulosBase,
+        baseSegments,
+        categorias,
+        categoriaActual,
+        ordenActual,
+    }: any) {
+        const articulosOrdenados = ordenarArticulos(articulosBase, ordenActual);
+
+        const totalPages =
+            Math.ceil(articulosOrdenados.length / PAGE_SIZE) || 1;
+
+        const paths = [];
+
+        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            paths.push({
+                params: {
+                    page:
+                        pageNumber === 1
+                            ? baseSegments.join("/") || undefined
+                            : [...baseSegments, String(pageNumber)].join("/"),
+                },
+                props: {
+                    page: createPage(articulosOrdenados, pageNumber),
+                    categorias,
+                    categoriaActual,
+                    ordenActual,
+                },
+            });
+        }
+
+        return paths;
+    }
+
     const articulos = await getArticulos();
     const categorias = await getCategorias();
 
     const paths: any[] = [];
 
-    const totalPages = Math.ceil(articulos.length / PAGE_SIZE) || 1;
+    paths.push(
+        ...createPaginatedPaths({
+            articulosBase: articulos,
+            baseSegments: [],
+            categorias,
+            categoriaActual: null,
+            ordenActual: "recientes",
+        }),
+    );
 
-    for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
-        paths.push({
-            params: {
-                page: pageNumber === 1 ? undefined : String(pageNumber),
-            },
-            props: {
-                page: createPage(articulos, pageNumber),
-                categorias,
-                categoriaActual: null,
-            },
-        });
-    }
+    paths.push(
+        ...createPaginatedPaths({
+            articulosBase: articulos,
+            baseSegments: ["orden", "antiguos"],
+            categorias,
+            categoriaActual: null,
+            ordenActual: "antiguos",
+        }),
+    );
 
     categorias.forEach((categoria: any) => {
         const categoriaSlug = String(categoria.slug);
@@ -49,46 +112,59 @@ export async function getStaticPaths() {
                 articulo.categoria_tematica?.slug === categoriaSlug,
         );
 
-        const totalCategoryPages =
-            Math.ceil(articulosCategoria.length / PAGE_SIZE) || 1;
+        paths.push(
+            ...createPaginatedPaths({
+                articulosBase: articulosCategoria,
+                baseSegments: [categoriaSlug],
+                categorias,
+                categoriaActual: categoria,
+                ordenActual: "recientes",
+            }),
+        );
 
-        for (
-            let pageNumber = 1;
-            pageNumber <= totalCategoryPages;
-            pageNumber++
-        ) {
-            paths.push({
-                params: {
-                    page:
-                        pageNumber === 1
-                            ? categoriaSlug
-                            : `${categoriaSlug}/${pageNumber}`,
-                },
-                props: {
-                    page: createPage(articulosCategoria, pageNumber),
-                    categorias,
-                    categoriaActual: categoria,
-                },
-            });
-        }
+        paths.push(
+            ...createPaginatedPaths({
+                articulosBase: articulosCategoria,
+                baseSegments: [categoriaSlug, "orden", "antiguos"],
+                categorias,
+                categoriaActual: categoria,
+                ordenActual: "antiguos",
+            }),
+        );
     });
 
     return paths;
 }
 
-const { page, categorias, categoriaActual } = Astro.props as any;
+const {
+    page,
+    categorias,
+    categoriaActual,
+    ordenActual = "recientes",
+} = Astro.props as any;
 
 const title = categoriaActual
     ? `${categoriaActual.nombre} | Artículos | TodoSatcom`
     : "Artículos | TodoSatcom";
 
-const basePath = categoriaActual
+const basePath =
+    ordenActual === "antiguos"
+        ? categoriaActual
+            ? `/articulos/${categoriaActual.slug}/orden/antiguos`
+            : "/articulos/orden/antiguos"
+        : categoriaActual
+          ? `/articulos/${categoriaActual.slug}`
+          : "/articulos";
+
+const ordenRecientesUrl = categoriaActual
     ? `/articulos/${categoriaActual.slug}`
     : "/articulos";
 
-const heroIconUrl = categoriaActual
-    ? getMediaUrl(categoriaActual.icono)
-    : todasIcon.src;
+const ordenAntiguosUrl = categoriaActual
+    ? `/articulos/${categoriaActual.slug}/orden/antiguos`
+    : "/articulos/orden/antiguos";
+
+const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
 ---
 
 <Layout title={title}>
@@ -107,11 +183,26 @@ const heroIconUrl = categoriaActual
                 </div>
 
                 {
-                    heroIconUrl && (
-                        <img
-                            src={heroIconUrl}
+                    categoriaActual ? (
+                        heroIconUrl && (
+                            <img
+                                src={heroIconUrl}
+                                alt=""
+                                class="pointer-events-none absolute right-12 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full object-contain opacity-80 md:block"
+                            />
+                        )
+                    ) : (
+                        <Picture
+                            src={todasIcon}
+                            formats={["avif", "webp"]}
+                            fallbackFormat="png"
+                            widths={[288]}
+                            sizes="288px"
                             alt=""
-                            class="pointer-events-none absolute right-12 top-1/2 hidden h-72 w-72 -translate-y-1/2 object-contain opacity-80 md:block rounded-full"
+                            loading="lazy"
+                            decoding="async"
+                            aria-hidden="true"
+                            class="pointer-events-none absolute right-12 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full object-contain opacity-80 md:block"
                         />
                     )
                 }
@@ -239,9 +330,14 @@ const heroIconUrl = categoriaActual
                                         : "text-white"
                                 }`}
                             >
-                                <img
-                                    src={todasIcon.src}
+                                <Image
+                                    src={todasIcon}
                                     alt="Todas las categorías"
+                                    width={72}
+                                    height={72}
+                                    loading="lazy"
+                                    quality={100}
+                                    decoding="async"
                                     class="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110"
                                 />
 
@@ -284,6 +380,53 @@ const heroIconUrl = categoriaActual
                 </aside>
 
                 <section>
+                    <div
+                        class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                        <p class="text-sm text-slate-400">
+                            {page.data.length} artículos en esta página
+                        </p>
+
+                        <label class="block w-full sm:w-64">
+                            <span class="sr-only">Ordenar artículos</span>
+
+                            <div class="relative">
+                                <select
+                                    class="w-full appearance-none rounded border border-white/10 bg-slate-950 px-4 py-3 text-sm font-semibold text-slate-200 outline-none transition hover:border-blue-500/50"
+                                    onchange="window.location.href = this.value"
+                                >
+                                    <option
+                                        value={ordenRecientesUrl}
+                                        selected={ordenActual === "recientes"}
+                                    >
+                                        Más recientes primero
+                                    </option>
+
+                                    <option
+                                        value={ordenAntiguosUrl}
+                                        selected={ordenActual === "antiguos"}
+                                    >
+                                        Más antiguos primero
+                                    </option>
+                                </select>
+
+                                <svg
+                                    class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </label>
+                    </div>
+
                     {
                         page.data.length > 0 ? (
                             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

@@ -78,206 +78,280 @@ const specs = [
             value: modelo.portatil ? "Sí" : "No",
         },
 ].filter(Boolean);
+
+const hasAside =
+    Boolean(modelo.marca) || articulos.length > 0 || manuales.length > 0;
 ---
 
 <Layout
-    title={`${modelo.nombre} | Todo-Sat`}
+    title={`${modelo.nombre} | TodoSatcom`}
     description={modelo.descripcion_corta}
 >
-    <main class="min-h-screen bg-slate-950 py-10 text-white">
-        <Container>
-            <Breadcrumbs
-                items={[
-                    { label: "Hardware", href: "/modelos" },
-                    { label: modelo.nombre },
-                ]}
-            />
+    <main class="min-h-screen bg-slate-950 text-white">
+        <section class="bg-slate-950 py-8 md:py-12">
+            <Container>
+                <Breadcrumbs
+                    items={[
+                        { label: "Hardware", href: "/modelos" },
+                        { label: modelo.nombre },
+                    ]}
+                />
 
-            <section
-                class="relative mt-8 overflow-hidden rounded-3xl bg-slate-950 p-8 shadow-2xl md:p-10"
-            >
-                <div
-                    class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
-                >
-                </div>
+                <article class="mt-8">
+                    <a
+                        href="/modelos"
+                        class="inline-flex text-sm font-semibold text-blue-400 transition hover:text-white"
+                    >
+                        ← Volver a hardware
+                    </a>
 
-                <div
-                    class="relative grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center"
-                >
-                    <div>
-                        <a
-                            href="/modelos"
-                            class="text-sm font-semibold text-blue-400 hover:text-white mr-4"
-                        >
-                            ← Volver a hardware
-                        </a>
+                    <header class="mt-8 max-w-5xl pb-10 md:pb-14">
+                        <div class="flex flex-wrap gap-3">
+                            {
+                                modelo.marca && (
+                                    <a
+                                        href={`/operadores/${modelo.marca.slug}`}
+                                        class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-300 transition hover:border-[#005EFF] hover:text-white md:px-4 md:py-2 md:text-sm"
+                                    >
+                                        {modelo.marca.nombre}
+                                    </a>
+                                )
+                            }
 
-                        {
-                            modelo.marca && (
-                                <a
-                                    href={`/operadores/${modelo.marca.slug}`}
-                                    class="mt-8 inline-flex rounded-full border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-300 hover:border-blue-400"
-                                >
-                                    {modelo.marca.nombre}
-                                </a>
-                            )
-                        }
+                            {
+                                modelo.tipo_hardware && (
+                                    <span class="rounded-full border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 md:px-4 md:py-2 md:text-sm">
+                                        {modelo.tipo_hardware}
+                                    </span>
+                                )
+                            }
+
+                            {
+                                modelo.uso_recomendado && (
+                                    <span class="rounded-full border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-slate-300 md:px-4 md:py-2 md:text-sm">
+                                        {modelo.uso_recomendado}
+                                    </span>
+                                )
+                            }
+                        </div>
 
                         <h1
-                            class="mt-6 max-w-4xl text-3xl font-bold leading-tight tracking-tight !text-white md:text-5xl"
+                            class="mt-6 max-w-5xl text-4xl font-bold leading-tight tracking-tight !text-white md:mt-8 md:text-6xl"
                         >
                             {modelo.nombre}
                         </h1>
 
                         {
                             modelo.descripcion_corta && (
-                                <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300 md:text-lg md:leading-8">
+                                <p class="mt-6 max-w-3xl border-l-2 border-[#00ccff]/60 pl-5 text-lg leading-8 text-slate-300 md:text-2xl md:leading-9">
                                     {modelo.descripcion_corta}
                                 </p>
                             )
                         }
-                        <div
-                            class="mt-8 h-px w-32 bg-gradient-to-r from-[#00ccff] to-transparent"
-                        >
-                        </div>
-                    </div>
+                    </header>
+                </article>
+            </Container>
+        </section>
+
+        <section class="bg-slate-100 py-10 text-slate-950 md:py-14">
+            <Container>
+                <div
+                    class={`grid gap-10 ${
+                        hasAside
+                            ? "lg:grid-cols-[minmax(0,1fr)_340px]"
+                            : "lg:grid-cols-[minmax(0,1fr)]"
+                    }`}
+                >
+                    <article
+                        class="overflow-hidden rounded-3xl bg-white shadow-xl shadow-slate-950/10"
+                    >
+                        {
+                            imagenUrl && (
+                                <div class="border-b border-slate-200 bg-slate-950">
+                                    <img
+                                        src={imagenUrl}
+                                        alt={modelo.nombre}
+                                        class="h-[280px] w-full object-contain md:h-[520px]"
+                                    />
+                                </div>
+                            )
+                        }
+
+                        {
+                            specs.length > 0 && (
+                                <section class="border-b border-slate-200 px-6 py-8 md:px-10 md:py-10">
+                                    <h2 class="text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+                                        Ficha técnica
+                                    </h2>
+
+                                    <div class="mt-8 grid gap-x-10 gap-y-0 md:grid-cols-2 xl:grid-cols-3">
+                                        {specs.map(
+                                            (spec: any, index: number) => (
+                                                <div
+                                                    class={`py-5 ${
+                                                        index < specs.length - 3
+                                                            ? "border-b border-slate-200"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
+                                                        {spec.label}
+                                                    </p>
+
+                                                    <p class="mt-2 text-lg font-semibold leading-snug text-slate-950">
+                                                        {spec.value}
+                                                    </p>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                </section>
+                            )
+                        }
+
+                        {
+                            contenidoHTML && (
+                                <section class="px-6 py-8 md:px-10 md:py-12">
+                                    <div
+                                        class="prose prose-slate max-w-none prose-headings:text-slate-950 prose-p:text-slate-700 prose-a:text-blue-600 prose-strong:text-slate-950 prose-li:text-slate-700 md:[&_p]:text-[1.08rem] md:[&_p]:leading-8 md:[&_li]:text-[1.08rem] md:[&_li]:leading-8"
+                                        set:html={contenidoHTML}
+                                    />
+                                </section>
+                            )
+                        }
+
+                        {
+                            galeria.length > 0 && (
+                                <section class="border-t border-slate-200 px-6 py-8 md:px-10 md:py-12">
+                                    <h2 class="text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+                                        Galería
+                                    </h2>
+
+                                    <div class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                                        {galeria.map((imagen: any) => {
+                                            const url = getMediaUrl(imagen);
+
+                                            return url ? (
+                                                <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+                                                    <img
+                                                        src={url}
+                                                        alt={modelo.nombre}
+                                                        class="h-64 w-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : null;
+                                        })}
+                                    </div>
+                                </section>
+                            )
+                        }
+                    </article>
 
                     {
-                        imagenUrl && (
-                            <div class="overflow-hidden rounded-3xl bg-slate-900 shadow-2xl">
-                                <img
-                                    src={imagenUrl}
-                                    alt={modelo.nombre}
-                                    class="h-[320px] w-full object-contain md:h-[500px]"
-                                />
-                            </div>
+                        hasAside && (
+                            <aside class="lg:sticky lg:top-28 lg:self-start">
+                                <div class="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 text-white shadow-2xl">
+                                    <div class="border-b border-white/10 p-6">
+                                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">
+                                            Relacionado
+                                        </p>
+
+                                        <h2 class="mt-3 text-2xl font-bold text-white">
+                                            Sobre este hardware
+                                        </h2>
+                                    </div>
+
+                                    <div class="space-y-8 p-6">
+                                        {modelo.marca && (
+                                            <section>
+                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                                    Operador
+                                                </h3>
+
+                                                <RelatedCard
+                                                    type="Operador"
+                                                    title={modelo.marca.nombre}
+                                                    description={
+                                                        modelo.marca
+                                                            .descripcion_corta
+                                                    }
+                                                    url={`/operadores/${modelo.marca.slug}`}
+                                                    image={
+                                                        modelo.marca
+                                                            .imagen_portada
+                                                    }
+                                                />
+                                            </section>
+                                        )}
+
+                                        {articulos.length > 0 && (
+                                            <section>
+                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                                    Artículos
+                                                </h3>
+
+                                                <div class="grid gap-4">
+                                                    {articulos.map(
+                                                        (articulo: any) => (
+                                                            <RelatedCard
+                                                                type="Artículo"
+                                                                title={
+                                                                    articulo.titulo
+                                                                }
+                                                                description={
+                                                                    articulo.subtitulo
+                                                                }
+                                                                meta={
+                                                                    articulo
+                                                                        .categoria_tematica
+                                                                        ?.nombre
+                                                                }
+                                                                url={`/articulos/${articulo.slug}`}
+                                                                image={
+                                                                    articulo.imagen_principal
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </section>
+                                        )}
+
+                                        {manuales.length > 0 && (
+                                            <section>
+                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                                    Manuales
+                                                </h3>
+
+                                                <div class="grid gap-4">
+                                                    {manuales.map(
+                                                        (manual: any) => (
+                                                            <RelatedCard
+                                                                type="Manual"
+                                                                title={
+                                                                    manual.titulo
+                                                                }
+                                                                description={
+                                                                    manual.descripcion
+                                                                }
+                                                                meta={`${manual.ano_publicacion ?? ""}${manual.idioma ? ` · ${formatLabel(manual.idioma)}` : ""}`}
+                                                                url={`/manuales/${manual.slug}`}
+                                                                image={
+                                                                    manual.imagen_portada
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </section>
+                                        )}
+                                    </div>
+                                </div>
+                            </aside>
                         )
                     }
                 </div>
-            </section>
-
-            {
-                specs.length > 0 && (
-                    <section class="mt-12 md:p-2">
-                        <h2 class="mb-6 text-3xl font-bold !text-white">
-                            Ficha técnica
-                        </h2>
-
-                        <div class="grid gap-x-12 gap-y-0 md:grid-cols-2 xl:grid-cols-3">
-                            {specs.map((spec: any, index: number) => (
-                                <div
-                                    class={`py-5 ${
-                                        index < specs.length - 3
-                                            ? "border-b border-white/10"
-                                            : ""
-                                    }`}
-                                >
-                                    <p class="text-xs font-semibold uppercase tracking-wider text-blue-300">
-                                        {spec.label}
-                                    </p>
-
-                                    <p class="mt-2 text-lg font-semibold leading-snug text-white">
-                                        {spec.value}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                )
-            }
-
-            {
-                contenidoHTML && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <div
-                            class="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-p:text-slate-300 prose-a:text-blue-400"
-                            set:html={contenidoHTML}
-                        />
-                    </section>
-                )
-            }
-
-            {
-                galeria.length > 0 && (
-                    <section class="mt-16 border-t border-white/10 pt-12">
-                        <h2 class="mb-6 text-3xl font-bold !text-white">
-                            Galería
-                        </h2>
-
-                        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                            {galeria.map((imagen: any) => {
-                                const url = getMediaUrl(imagen);
-
-                                return url ? (
-                                    <div class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-sm">
-                                        <img
-                                            src={url}
-                                            alt={modelo.nombre}
-                                            class="h-64 w-full object-cover"
-                                        />
-                                    </div>
-                                ) : null;
-                            })}
-                        </div>
-                    </section>
-                )
-            }
-
-            <section class="mt-16 border-t border-white/10 pt-12">
-                <h2 class="mb-6 text-3xl font-bold !text-white">
-                    Artículos relacionados
-                </h2>
-
-                {
-                    articulos.length > 0 ? (
-                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
-                            {articulos.map((articulo: any) => (
-                                <RelatedCard
-                                    type="Artículo"
-                                    title={articulo.titulo}
-                                    description={articulo.subtitulo}
-                                    meta={articulo.categoria_tematica?.nombre}
-                                    url={`/articulos/${articulo.slug}`}
-                                    image={articulo.imagen_principal}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <p class="text-slate-400">
-                            Todavía no hay artículos relacionados con este
-                            modelo.
-                        </p>
-                    )
-                }
-            </section>
-
-            <section class="mt-16 border-t border-white/10 pt-12">
-                <h2 class="mb-6 text-3xl font-bold !text-white">
-                    Manuales relacionados
-                </h2>
-
-                {
-                    manuales.length > 0 ? (
-                        <div class="grid gap-x-10 gap-y-2 md:grid-cols-2">
-                            {manuales.map((manual: any) => (
-                                <RelatedCard
-                                    type="Manual"
-                                    title={manual.titulo}
-                                    description={manual.descripcion}
-                                    meta={`${manual.ano_publicacion ?? ""}${manual.idioma ? ` · ${formatLabel(manual.idioma)}` : ""}`}
-                                    url={`/manuales/${manual.slug}`}
-                                    image={manual.imagen_portada}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <p class="text-slate-400">
-                            Todavía no hay manuales relacionados con este
-                            modelo.
-                        </p>
-                    )
-                }
-            </section>
-        </Container>
+            </Container>
+        </section>
     </main>
 </Layout>
