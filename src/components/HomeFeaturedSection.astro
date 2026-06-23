@@ -1,4 +1,5 @@
 ---
+import { Picture } from "astro:assets";
 import FeaturedCard from "./FeaturedCard.astro";
 import seleccionBg from "../assets/images/seleccionbg.png";
 
@@ -11,16 +12,23 @@ const { destacados } = Astro.props;
 
 {
     destacados.length > 0 && (
-        <section class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-14 text-white shadow-2xl md:px-10 md:py-20">
-            <img
-                src={seleccionBg.src}
-                alt=""
-                class="pointer-events-none absolute right-10 top-18 z-0 hidden h-48 w-48 object-contain lg:block md:h-56 md:w-72"
+        <section class="relative isolate mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-14 text-white shadow-2xl md:px-10 md:py-20">
+            <Picture
+                src={seleccionBg}
+                formats={["avif", "webp"]}
+                fallbackFormat="png"
+                widths={[192, 272]}
+                sizes="272px"
+                alt="Featured Image"
+                loading="lazy"
+                decoding="async"
+                quality={100}
+                aria-hidden="true"
+                class="pointer-events-none absolute right-10 top-24 z-0 hidden h-48 w-48 object-contain md:h-52 md:w-68 lg:block"
             />
+            <div class="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-slate-950/5 via-slate-950/50 to-slate-950" />
 
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/5 via-slate-950/50 to-slate-950" />
-
-            <div class="relative z-10">
+            <div class="relative z-20">
                 <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                         <p class="inline-flex rounded-full border border-blue-500/50 bg-blue-500/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-400">
@@ -39,8 +47,8 @@ const { destacados } = Astro.props;
                     </div>
                 </div>
 
-                <div class="mt-8">
-                    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <div class="relative z-30 mt-8">
+                    <div class="relative z-30 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                         {destacados.map((destacado: any) => (
                             <FeaturedCard destacado={destacado} />
                         ))}

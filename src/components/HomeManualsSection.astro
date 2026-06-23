@@ -1,6 +1,7 @@
 ---
+import { Picture } from "astro:assets";
 import ManualCard from "./ManualCard.astro";
-import guiasbg from "../assets/images/guiasbg.png";
+import noticias from "../assets/images/guiasbg.png";
 
 interface Props {
     manuales: any[];
@@ -12,10 +13,18 @@ const { manuales } = Astro.props;
 <section
     class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12"
 >
-    <img
-        src={guiasbg.src}
-        alt=""
-        class="pointer-events-none absolute right-10 top-10 z-0 hidden h-48 w-48 object-contain lg:block md:h-56 md:w-72"
+    <Picture
+        src={noticias}
+        formats={["avif", "webp"]}
+        fallbackFormat="png"
+        widths={[192, 288]}
+        sizes="288px"
+        alt="Guias Image"
+        quality={100}
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+        class="pointer-events-none absolute right-10 top-12 z-10 hidden h-48 w-48 object-contain md:h-56 md:w-72 lg:block"
     />
 
     <div

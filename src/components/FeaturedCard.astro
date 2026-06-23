@@ -31,9 +31,11 @@ const relaciones = [
     },
 ].filter(Boolean);
 
-const href = relaciones.length === 1 ? relaciones[0].href : "#";
-const tipo = relaciones.length === 1 ? relaciones[0].tipo : "Destacado";
-const tieneRelacionValida = relaciones.length === 1;
+const relacionPrincipal = relaciones[0];
+
+const href = relacionPrincipal ? relacionPrincipal.href : "#";
+const tipo = relacionPrincipal ? relacionPrincipal.tipo : "Destacado";
+const tieneRelacionValida = Boolean(relacionPrincipal);
 ---
 
 <a

@@ -1,6 +1,7 @@
 ---
+import { Picture } from "astro:assets";
 import ModelCard from "./ModelCard.astro";
-import equiposbg from "../assets/images/equiposbg.png";
+import modelo from "../assets/images/equiposbg.png";
 
 interface Props {
     modelos: any[];
@@ -12,10 +13,18 @@ const { modelos } = Astro.props;
 <section
     class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-14 text-white shadow-2xl md:px-10 md:py-20"
 >
-    <img
-        src={equiposbg.src}
-        alt=""
-        class="pointer-events-none absolute right-10 top-18 z-0 hidden h-48 w-48 object-contain lg:block md:h-56 md:w-72"
+    <Picture
+        src={modelo}
+        formats={["avif", "webp"]}
+        fallbackFormat="png"
+        widths={[192, 288]}
+        sizes="288px"
+        alt="Guias Image"
+        quality={100}
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+        class="pointer-events-none absolute right-10 top-18 z-10 hidden h-48 w-48 object-contain md:h-56 md:w-72 lg:block"
     />
 
     <div

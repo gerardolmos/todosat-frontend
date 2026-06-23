@@ -1,4 +1,5 @@
 ---
+import { Picture } from "astro:assets";
 import ArticleCard from "./ArticleCard.astro";
 import noticias from "../assets/images/noticias.png";
 
@@ -12,12 +13,19 @@ const { articulos } = Astro.props;
 <section
     class="relative mt-16 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white shadow-2xl md:px-8 md:py-12"
 >
-    <img
-        src={noticias.src}
-        alt=""
-        class="pointer-events-none absolute right-10 top-18 z-0 hidden h-48 w-48 object-contain lg:block md:h-56 md:w-72"
+    <Picture
+        src={noticias}
+        formats={["avif", "webp"]}
+        fallbackFormat="png"
+        widths={[192, 288]}
+        sizes="288px"
+        alt="Articles Image"
+        quality={100}
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+        class="pointer-events-none absolute right-10 top-18 z-10 hidden h-48 w-48 object-contain md:h-56 md:w-72 lg:block"
     />
-
     <div
         class="absolute left-0 top-0 h-[430px] w-full bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950"
     >
