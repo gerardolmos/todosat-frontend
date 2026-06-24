@@ -150,19 +150,19 @@ const title = categoriaActual
 const basePath =
     ordenActual === "antiguos"
         ? categoriaActual
-            ? `/articulos/${categoriaActual.slug}/orden/antiguos`
-            : "/articulos/orden/antiguos"
+            ? `/noticias/${categoriaActual.slug}/orden/antiguos`
+            : "/noticias/orden/antiguos"
         : categoriaActual
-          ? `/articulos/${categoriaActual.slug}`
-          : "/articulos";
+          ? `/noticias/${categoriaActual.slug}`
+          : "/noticias";
 
 const ordenRecientesUrl = categoriaActual
-    ? `/articulos/${categoriaActual.slug}`
-    : "/articulos";
+    ? `/noticias/${categoriaActual.slug}`
+    : "/noticias";
 
 const ordenAntiguosUrl = categoriaActual
-    ? `/articulos/${categoriaActual.slug}/orden/antiguos`
-    : "/articulos/orden/antiguos";
+    ? `/noticias/${categoriaActual.slug}/orden/antiguos`
+    : "/noticias/orden/antiguos";
 
 const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
 ---
@@ -273,7 +273,7 @@ const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
                                 onchange="window.location.href = this.value"
                             >
                                 <option
-                                    value="/articulos"
+                                    value="/noticias"
                                     selected={!categoriaActual}
                                 >
                                     Todas
@@ -282,7 +282,7 @@ const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
                                 {
                                     categorias.map((categoria: any) => (
                                         <option
-                                            value={`/articulos/${categoria.slug}`}
+                                            value={`/noticias/${categoria.slug}`}
                                             selected={
                                                 categoriaActual?.slug ===
                                                 categoria.slug
@@ -323,7 +323,7 @@ const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
 
                         <nav>
                             <a
-                                href="/articulos"
+                                href="/noticias"
                                 class={`group flex items-center gap-4 border-b border-white/10 px-1 py-2.5 transition-all duration-200 hover:bg-slate-900/30 ${
                                     !categoriaActual
                                         ? "text-blue-400"
@@ -352,7 +352,7 @@ const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
 
                                     return (
                                         <a
-                                            href={`/articulos/${categoria.slug}`}
+                                            href={`/noticias/${categoria.slug}`}
                                             class={`group flex items-center gap-4 border-b border-white/10 px-1 py-2.5 transition-all duration-200 hover:bg-slate-900/30 ${
                                                 categoriaActual?.slug ===
                                                 categoria.slug
