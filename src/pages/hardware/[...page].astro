@@ -136,12 +136,12 @@ const { page, marcas, tiposHardware, tipoActual, marcaActual } =
 
 const basePath =
     tipoActual && marcaActual
-        ? `/modelos/tipo/${tipoActual}/operador/${marcaActual.slug}`
+        ? `/hardware/tipo/${tipoActual}/operador/${marcaActual.slug}`
         : tipoActual
-          ? `/modelos/tipo/${tipoActual}`
+          ? `/hardware/tipo/${tipoActual}`
           : marcaActual
-            ? `/modelos/operador/${marcaActual.slug}`
-            : "/modelos";
+            ? `/hardware/operador/${marcaActual.slug}`
+            : "/hardware";
 ---
 
 <Layout title="Hardware | TodoSatcom">
@@ -227,8 +227,8 @@ const basePath =
                             >
                                 <option
                                     value={marcaActual
-                                        ? `/modelos/operador/${marcaActual.slug}`
-                                        : "/modelos"}
+                                        ? `/hardware/operador/${marcaActual.slug}`
+                                        : "/hardware"}
                                     selected={!tipoActual}
                                 >
                                     Todos
@@ -239,8 +239,8 @@ const basePath =
                                         <option
                                             value={
                                                 marcaActual
-                                                    ? `/modelos/tipo/${tipo}/operador/${marcaActual.slug}`
-                                                    : `/modelos/tipo/${tipo}`
+                                                    ? `/hardware/tipo/${tipo}/operador/${marcaActual.slug}`
+                                                    : `/hardware/tipo/${tipo}`
                                             }
                                             selected={tipoActual === tipo}
                                         >
@@ -279,8 +279,8 @@ const basePath =
                             >
                                 <option
                                     value={tipoActual
-                                        ? `/modelos/tipo/${tipoActual}`
-                                        : "/modelos"}
+                                        ? `/hardware/tipo/${tipoActual}`
+                                        : "/hardware"}
                                     selected={!marcaActual}
                                 >
                                     Todos
@@ -291,8 +291,8 @@ const basePath =
                                         <option
                                             value={
                                                 tipoActual
-                                                    ? `/modelos/tipo/${tipoActual}/operador/${marca.slug}`
-                                                    : `/modelos/operador/${marca.slug}`
+                                                    ? `/hardware/tipo/${tipoActual}/operador/${marca.slug}`
+                                                    : `/hardware/operador/${marca.slug}`
                                             }
                                             selected={
                                                 marcaActual?.slug === marca.slug
@@ -333,8 +333,8 @@ const basePath =
                         <nav class="mb-5">
                             <a
                                 href={marcaActual
-                                    ? `/modelos/operador/${marcaActual.slug}`
-                                    : "/modelos"}
+                                    ? `/hardware/operador/${marcaActual.slug}`
+                                    : "/hardware"}
                                 class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
                                     !tipoActual
                                         ? "border-blue-500 bg-blue-500/15 text-blue-300"
@@ -349,8 +349,8 @@ const basePath =
                                     <a
                                         href={
                                             marcaActual
-                                                ? `/modelos/tipo/${tipo}/operador/${marcaActual.slug}`
-                                                : `/modelos/tipo/${tipo}`
+                                                ? `/hardware/tipo/${tipo}/operador/${marcaActual.slug}`
+                                                : `/hardware/tipo/${tipo}`
                                         }
                                         class={`block rounded border px-4 py-2 text-sm transition ${
                                             tipoActual === tipo
@@ -373,8 +373,8 @@ const basePath =
                         <nav class="grid grid-cols-2 gap-2">
                             <a
                                 href={tipoActual
-                                    ? `/modelos/tipo/${tipoActual}`
-                                    : "/modelos"}
+                                    ? `/hardware/tipo/${tipoActual}`
+                                    : "/hardware"}
                                 class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
                                     !marcaActual
                                         ? "border-blue-500 bg-blue-500/15 text-blue-300"
@@ -389,8 +389,8 @@ const basePath =
                                     <a
                                         href={
                                             tipoActual
-                                                ? `/modelos/tipo/${tipoActual}/operador/${marca.slug}`
-                                                : `/modelos/operador/${marca.slug}`
+                                                ? `/hardware/tipo/${tipoActual}/operador/${marca.slug}`
+                                                : `/hardware/operador/${marca.slug}`
                                         }
                                         class={`block rounded border px-4 py-2 text-sm transition ${
                                             marcaActual?.slug === marca.slug
