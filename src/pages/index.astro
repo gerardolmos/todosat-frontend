@@ -15,6 +15,7 @@ import HomeArticlesSection from "../components/HomeArticlesSection.astro";
 import HomeModelsSection from "../components/HomeModelsSection.astro";
 import HomeManualsSection from "../components/HomeManualsSection.astro";
 import SectionDivider from "../components/SectionDivider.astro";
+import searchIcon from "../assets/images/icons/search.svg";
 
 const destacados = await getDestacados();
 
@@ -286,11 +287,12 @@ const datosBusqueda = [
 						<div
 							class="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-full px-3 md:px-4"
 						>
-							<span
-								class="text-4xl leading-none text-slate-400 md:text-6xl"
-							>
-								⌕
-							</span>
+							<img
+								src={searchIcon.src}
+								alt=""
+								aria-hidden="true"
+								class="h-8 w-8 shrink-0 object-contain"
+							/>
 
 							<input
 								type="search"

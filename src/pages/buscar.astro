@@ -9,6 +9,7 @@ import {
 } from "../lib/content";
 
 import { getMediaUrl } from "../lib/media";
+import searchIcon from "../assets/images/icons/search.svg";
 
 const marcas = await getMarcas();
 const modelos = await getModelos();
@@ -129,9 +130,12 @@ ${item.marca?.nombre}
                         <div
                             class="flex min-h-12 flex-1 items-center gap-3 rounded-full px-4"
                         >
-                            <span class="text-3xl leading-none text-slate-400">
-                                ⌕
-                            </span>
+                            <img
+                                src={searchIcon.src}
+                                alt=""
+                                aria-hidden="true"
+                                class="h-6 w-6 shrink-0 object-contain"
+                            />
 
                             <input
                                 id="search-input"
