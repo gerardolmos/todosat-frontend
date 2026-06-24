@@ -30,6 +30,50 @@ const marcas = articulo.marcas || [];
 const modelos = articulo.modelos || [];
 const manuales = articulo.manuals || [];
 
+const todosLosArticulos = await getArticulos();
+
+const marcasSlugs = new Set(
+    marcas.map((marca: any) => marca.slug).filter(Boolean),
+);
+
+const articulosRelacionados = todosLosArticulos
+    .filter(
+        (articuloRelacionado: any) =>
+            articuloRelacionado.slug !== articulo.slug,
+    )
+    .map((articuloRelacionado: any) => {
+        const comparteCategoria =
+            categoria?.slug &&
+            articuloRelacionado.categoria_tematica?.slug === categoria.slug;
+
+        const comparteMarca = articuloRelacionado.marcas?.some(
+            (marcaRelacionada: any) => marcasSlugs.has(marcaRelacionada.slug),
+        );
+
+        const score = (comparteMarca ? 2 : 0) + (comparteCategoria ? 1 : 0);
+
+        return {
+            articulo: articuloRelacionado,
+            score,
+        };
+    })
+    .filter((item: any) => item.score > 0)
+    .sort((a: any, b: any) => {
+        if (b.score !== a.score) return b.score - a.score;
+
+        const fechaA = a.articulo.fecha_publicacion
+            ? new Date(a.articulo.fecha_publicacion).getTime()
+            : 0;
+
+        const fechaB = b.articulo.fecha_publicacion
+            ? new Date(b.articulo.fecha_publicacion).getTime()
+            : 0;
+
+        return fechaB - fechaA;
+    })
+    .slice(0, 4)
+    .map((item: any) => item.articulo);
+
 const fecha = articulo.fecha_publicacion
     ? new Date(articulo.fecha_publicacion).toLocaleDateString("es-ES", {
           day: "2-digit",
@@ -40,8 +84,7 @@ const fecha = articulo.fecha_publicacion
 
 const readingTime = getReadingTime(articulo.contenido);
 
-const hasRelated =
-    marcas.length > 0 || modelos.length > 0 || manuales.length > 0;
+const hasRelated = marcas.length > 0 || articulosRelacionados.length > 0;
 ---
 
 <Layout
@@ -198,54 +241,33 @@ const hasRelated =
                                             </section>
                                         )}
 
-                                        {modelos.length > 0 && (
+                                        {articulosRelacionados.length > 0 && (
                                             <section>
                                                 <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
-                                                    Hardware
+                                                    Más artículos
                                                 </h3>
 
                                                 <div class="grid gap-4">
-                                                    {modelos.map(
-                                                        (modelo: any) => (
+                                                    {articulosRelacionados.map(
+                                                        (
+                                                            articuloRelacionado: any,
+                                                        ) => (
                                                             <RelatedCard
-                                                                type="Modelo"
+                                                                type="Artículo"
                                                                 title={
-                                                                    modelo.nombre
+                                                                    articuloRelacionado.titulo
                                                                 }
                                                                 description={
-                                                                    modelo.descripcion_corta
+                                                                    articuloRelacionado.subtitulo
                                                                 }
-                                                                url={`/modelos/${modelo.slug}`}
+                                                                meta={
+                                                                    articuloRelacionado
+                                                                        .categoria_tematica
+                                                                        ?.nombre
+                                                                }
+                                                                url={`/articulos/${articuloRelacionado.slug}`}
                                                                 image={
-                                                                    modelo.imagen_principal
-                                                                }
-                                                            />
-                                                        ),
-                                                    )}
-                                                </div>
-                                            </section>
-                                        )}
-
-                                        {manuales.length > 0 && (
-                                            <section>
-                                                <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
-                                                    Manuales
-                                                </h3>
-
-                                                <div class="grid gap-4">
-                                                    {manuales.map(
-                                                        (manual: any) => (
-                                                            <RelatedCard
-                                                                type="Manual"
-                                                                title={
-                                                                    manual.titulo
-                                                                }
-                                                                description={
-                                                                    manual.descripcion
-                                                                }
-                                                                url={`/manuales/${manual.slug}`}
-                                                                image={
-                                                                    manual.imagen_portada
+                                                                    articuloRelacionado.imagen_principal
                                                                 }
                                                             />
                                                         ),
@@ -259,6 +281,68 @@ const hasRelated =
                         )
                     }
                 </div>
+
+                {
+                    (modelos.length > 0 || manuales.length > 0) && (
+                        <section class="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 text-white shadow-2xl">
+                            <div class="border-b border-white/10 p-6 md:p-8">
+                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">
+                                    Recursos relacionados
+                                </p>
+                            </div>
+
+                            <div class="grid gap-8 p-6 md:p-8 lg:grid-cols-2">
+                                {modelos.length > 0 && (
+                                    <div>
+                                        <h3 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                            Hardware relacionado
+                                        </h3>
+
+                                        <div class="grid gap-5 [&>a]:h-full [&>a]:min-h-[190px]">
+                                            {modelos.map((modelo: any) => (
+                                                <RelatedCard
+                                                    type="Hardware"
+                                                    title={modelo.nombre}
+                                                    description={
+                                                        modelo.descripcion_corta
+                                                    }
+                                                    url={`/modelos/${modelo.slug}`}
+                                                    image={
+                                                        modelo.imagen_principal
+                                                    }
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {manuales.length > 0 && (
+                                    <div>
+                                        <h3 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
+                                            Guías relacionadas
+                                        </h3>
+
+                                        <div class="grid gap-5 [&>a]:h-full [&>a]:min-h-[190px]">
+                                            {manuales.map((manual: any) => (
+                                                <RelatedCard
+                                                    type="Guía"
+                                                    title={manual.titulo}
+                                                    description={
+                                                        manual.descripcion
+                                                    }
+                                                    url={`/manuales/${manual.slug}`}
+                                                    image={
+                                                        manual.imagen_portada
+                                                    }
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    )
+                }
             </Container>
         </section>
     </main>
