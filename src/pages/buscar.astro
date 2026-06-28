@@ -58,7 +58,7 @@ ${item.marca?.nombre}
 		`),
     })),
     ...articulos.map((item: any) => ({
-        tipo: "Artículo",
+        tipo: "Noticia",
         titulo: item.titulo,
         descripcion: item.subtitulo,
         url: `/noticias/${item.slug}`,
@@ -118,7 +118,7 @@ ${item.marca?.nombre}
                     </h1>
 
                     <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-                        Encuentra operadores, hardware, artículos y manuales
+                        Encuentra operadores, hardware, noticias y manuales
                         desde una única búsqueda.
                     </p>
 
@@ -143,7 +143,7 @@ ${item.marca?.nombre}
                                 name="q"
                                 autocomplete="off"
                                 spellcheck="false"
-                                placeholder="Buscar operadores, hardware, artículos o manuales..."
+                                placeholder="Buscar operadores, hardware, noticias o manuales..."
                                 class="w-full appearance-none bg-transparent text-base text-white outline-none placeholder:text-slate-400"
                             />
                         </div>
@@ -178,6 +178,14 @@ ${item.marca?.nombre}
             imageUrl?: string;
         };
 
+        type RankedSearchItem = {
+            item: SearchItem;
+            score: number;
+        };
+
+        const RESULTS_PER_PAGE = 12;
+        const MIN_QUERY_LENGTH = 3;
+
         function limpiarTexto(valor: string) {
             return String(valor || "")
                 .toLowerCase()
@@ -194,9 +202,161 @@ ${item.marca?.nombre}
                 .replace(/'/g, "&#039;");
         }
 
+        function getWords(valor: string) {
+            return limpiarTexto(valor).match(/[a-z0-9]+/g) || [];
+        }
+
+        function hasExactWord(words: string[], term: string) {
+            return words.includes(term);
+        }
+
+        function hasWordStartingWith(words: string[], term: string) {
+            return words.some((word) => word.startsWith(term));
+        }
+
+        function hasLongPartialMatch(words: string[], term: string) {
+            if (term.length < 4) return false;
+
+            return words.some((word) => word.includes(term));
+        }
+
+        function calcularPuntuacion(
+            item: SearchItem,
+            terms: string[],
+            fullQuery: string,
+        ) {
+            const titulo = limpiarTexto(item.titulo);
+            const descripcion = limpiarTexto(item.descripcion || "");
+            const tipo = limpiarTexto(item.tipo);
+            const texto = limpiarTexto(item.texto);
+
+            const titleWords = getWords(item.titulo);
+            const descriptionWords = getWords(item.descripcion || "");
+            const typeWords = getWords(item.tipo);
+            const textWords = getWords(item.texto);
+
+            let score = 0;
+
+            for (const term of terms) {
+                let termScore = 0;
+
+                if (titulo === term) termScore = Math.max(termScore, 140);
+                if (titulo.startsWith(term))
+                    termScore = Math.max(termScore, 120);
+                if (hasExactWord(titleWords, term))
+                    termScore = Math.max(termScore, 100);
+                if (hasWordStartingWith(titleWords, term))
+                    termScore = Math.max(termScore, 80);
+                if (hasLongPartialMatch(titleWords, term))
+                    termScore = Math.max(termScore, 50);
+
+                if (hasExactWord(typeWords, term))
+                    termScore = Math.max(termScore, 45);
+                if (hasWordStartingWith(typeWords, term))
+                    termScore = Math.max(termScore, 35);
+
+                if (hasExactWord(descriptionWords, term))
+                    termScore = Math.max(termScore, 35);
+                if (hasWordStartingWith(descriptionWords, term))
+                    termScore = Math.max(termScore, 25);
+                if (hasLongPartialMatch(descriptionWords, term))
+                    termScore = Math.max(termScore, 15);
+
+                if (hasWordStartingWith(textWords, term))
+                    termScore = Math.max(termScore, 12);
+                if (hasLongPartialMatch(textWords, term))
+                    termScore = Math.max(termScore, 6);
+
+                if (termScore === 0) return 0;
+
+                score += termScore;
+            }
+
+            if (titulo === fullQuery) score += 200;
+            else if (titulo.startsWith(fullQuery)) score += 150;
+            else if (fullQuery.length >= 4 && titulo.includes(fullQuery))
+                score += 80;
+
+            if (descripcion.includes(fullQuery) && fullQuery.length >= 4)
+                score += 20;
+            if (tipo === fullQuery) score += 20;
+            if (texto.includes(fullQuery) && fullQuery.length >= 4) score += 5;
+
+            return score;
+        }
+
+        function crearUrlPagina(queryOriginal: string, page: number) {
+            const params = new URLSearchParams();
+
+            params.set("q", queryOriginal);
+
+            if (page > 1) {
+                params.set("page", String(page));
+            }
+
+            return `/buscar?${params.toString()}`;
+        }
+
+        function renderPagination(
+            queryOriginal: string,
+            currentPage: number,
+            totalPages: number,
+        ) {
+            if (totalPages <= 1) return "";
+
+            const previous =
+                currentPage > 1
+                    ? `
+                    <a
+                        href="${crearUrlPagina(queryOriginal, currentPage - 1)}"
+                        class="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 transition hover:border-blue-500 hover:text-white"
+                    >
+                        ← Anterior
+                    </a>
+                `
+                    : `
+                    <span class="rounded-full border border-white/5 px-4 py-2 text-sm font-bold text-slate-600">
+                        ← Anterior
+                    </span>
+                `;
+
+            const next =
+                currentPage < totalPages
+                    ? `
+                    <a
+                        href="${crearUrlPagina(queryOriginal, currentPage + 1)}"
+                        class="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 transition hover:border-blue-500 hover:text-white"
+                    >
+                        Siguiente →
+                    </a>
+                `
+                    : `
+                    <span class="rounded-full border border-white/5 px-4 py-2 text-sm font-bold text-slate-600">
+                        Siguiente →
+                    </span>
+                `;
+
+            return `
+            <nav class="mt-12 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+                ${previous}
+
+                <p class="text-sm font-semibold text-slate-400">
+                    Página <span class="text-white">${currentPage}</span> de <span class="text-white">${totalPages}</span>
+                </p>
+
+                ${next}
+            </nav>
+        `;
+        }
+
         const params = new URLSearchParams(window.location.search);
         const queryOriginal = params.get("q")?.trim() || "";
         const query = limpiarTexto(queryOriginal);
+        const pageParam = Number(params.get("page") || "1");
+        const requestedPage =
+            Number.isFinite(pageParam) && pageParam > 0
+                ? Math.floor(pageParam)
+                : 1;
 
         const input = document.getElementById("search-input");
         const resultsContainer = document.getElementById("search-results");
@@ -215,121 +375,117 @@ ${item.marca?.nombre}
 
             if (!query) {
                 resultsContainer.innerHTML = `
-					<p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
-						Escribe una búsqueda para encontrar contenido en TodoSatcom.
-					</p>
-				`;
+                <p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
+                    Escribe una búsqueda para encontrar contenido en TodoSatcom.
+                </p>
+            `;
             } else {
-                const palabras = query.split(/\s+/).filter(Boolean);
+                const terms = query
+                    .split(/\s+/)
+                    .map((term) => term.trim())
+                    .filter((term) => term.length >= MIN_QUERY_LENGTH);
 
-                const resultados = data.filter((item: SearchItem) =>
-                    palabras.every((palabra) => item.texto.includes(palabra)),
-                );
-
-                const grupos = [
-                    {
-                        titulo: "Operadores",
-                        items: resultados.filter(
-                            (item: SearchItem) => item.tipo === "Operador",
-                        ),
-                    },
-                    {
-                        titulo: "Hardware",
-                        items: resultados.filter(
-                            (item: SearchItem) => item.tipo === "Hardware",
-                        ),
-                    },
-                    {
-                        titulo: "Artículos",
-                        items: resultados.filter(
-                            (item: SearchItem) => item.tipo === "Artículo",
-                        ),
-                    },
-                    {
-                        titulo: "Manuales",
-                        items: resultados.filter(
-                            (item: SearchItem) => item.tipo === "Manual",
-                        ),
-                    },
-                ];
-
-                if (resultados.length === 0) {
+                if (terms.length === 0) {
                     resultsContainer.innerHTML = `
-						<p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
-							No se han encontrado resultados para <strong class="text-white">${escapeHtml(queryOriginal)}</strong>.
-						</p>
-					`;
+                    <p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
+                        Introduce al menos <strong class="text-white">${MIN_QUERY_LENGTH} caracteres</strong> para buscar.
+                    </p>
+                `;
                 } else {
-                    resultsContainer.innerHTML = `
-						<p class="mb-8 text-slate-300">
-							<span class="font-bold text-white">${resultados.length}</span>
-							resultado${resultados.length === 1 ? "" : "s"} para
-							<strong class="text-white">${escapeHtml(queryOriginal)}</strong>
-						</p>
+                    const resultados = data
+                        .map((item: SearchItem) => ({
+                            item,
+                            score: calcularPuntuacion(item, terms, query),
+                        }))
+                        .filter((result: RankedSearchItem) => result.score > 0)
+                        .sort((a: RankedSearchItem, b: RankedSearchItem) => {
+                            if (b.score !== a.score) return b.score - a.score;
 
-						${grupos
-                            .map((grupo) =>
-                                grupo.items.length > 0
-                                    ? `
-										<section class="mt-10">
-											<h2 class="mb-4 text-2xl font-bold !text-white">${grupo.titulo}</h2>
+                            return a.item.titulo.localeCompare(
+                                b.item.titulo,
+                                "es",
+                            );
+                        });
 
-											<ul class="grid gap-4 md:grid-cols-2">
-												${grupo.items
-                                                    .map(
-                                                        (item: SearchItem) => `
-															<li>
-	<a href="${item.url}" class="group flex h-full">
-		<div class="flex min-h-[150px] w-full gap-5 border-b border-white/10 py-6 transition-colors duration-200 group-hover:border-[#005EFF]">
-			${
-                item.imageUrl
-                    ? `
-						<div class="h-24 w-24 shrink-0 overflow-hidden rounded">
-							<img
-								src="${item.imageUrl}"
-								alt="${escapeHtml(item.titulo)}"
-								class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-								loading="lazy"
-							/>
-						</div>
-					`
-                    : ""
-            }
+                    if (resultados.length === 0) {
+                        resultsContainer.innerHTML = `
+                        <p class="rounded-2xl border border-white/10 bg-slate-900/40 p-6 text-slate-300">
+                            No se han encontrado resultados para <strong class="text-white">${escapeHtml(queryOriginal)}</strong>.
+                        </p>
+                    `;
+                    } else {
+                        const totalPages = Math.ceil(
+                            resultados.length / RESULTS_PER_PAGE,
+                        );
+                        const currentPage = Math.min(requestedPage, totalPages);
+                        const start = (currentPage - 1) * RESULTS_PER_PAGE;
+                        const end = start + RESULTS_PER_PAGE;
+                        const resultadosPagina = resultados.slice(start, end);
 
-			<div class="flex min-w-0 flex-1 flex-col">
-				<div class="mb-3 flex flex-wrap gap-2">
-					<span class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-300">
-						${escapeHtml(item.tipo)}
-					</span>
-				</div>
+                        resultsContainer.innerHTML = `
+                        <p class="mb-8 text-slate-300">
+                            Mostrando
+                            <span class="font-bold text-white">${start + 1}</span>–<span class="font-bold text-white">${Math.min(end, resultados.length)}</span>
+                            de
+                            <span class="font-bold text-white">${resultados.length}</span>
+                            resultado${resultados.length === 1 ? "" : "s"} para
+                            <strong class="text-white">${escapeHtml(queryOriginal)}</strong>
+                        </p>
 
-				<h3 class="line-clamp-2 text-lg font-bold leading-snug tracking-tight !text-white">
-					${escapeHtml(item.titulo)}
-				</h3>
+                        <ul class="grid gap-4 md:grid-cols-2">
+                            ${resultadosPagina
+                                .map(
+                                    ({ item }: RankedSearchItem) => `
+                                        <li>
+                                            <a href="${item.url}" class="group flex h-full">
+                                                <div class="flex min-h-[150px] w-full gap-5 border-b border-white/10 py-6 transition-colors duration-200 group-hover:border-[#005EFF]">
+                                                    ${
+                                                        item.imageUrl
+                                                            ? `
+                                                                <div class="h-24 w-24 shrink-0 overflow-hidden rounded">
+                                                                    <img
+                                                                        src="${item.imageUrl}"
+                                                                        alt="${escapeHtml(item.titulo)}"
+                                                                        class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                                                                        loading="lazy"
+                                                                    />
+                                                                </div>
+                                                            `
+                                                            : ""
+                                                    }
 
-				${
-                    item.descripcion
-                        ? `
-							<p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-300">
-								${escapeHtml(item.descripcion)}
-							</p>
-						`
-                        : ""
-                }
-			</div>
-		</div>
-	</a>
-</li>
-														`,
-                                                    )
-                                                    .join("")}
-											</ul>
-										</section>
-									`
-                                    : "",
-                            )
-                            .join("")}
-					`;
+                                                    <div class="flex min-w-0 flex-1 flex-col">
+                                                        <div class="mb-3 flex flex-wrap gap-2">
+                                                            <span class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-300">
+                                                                ${escapeHtml(item.tipo)}
+                                                            </span>
+                                                        </div>
+
+                                                        <h3 class="line-clamp-2 text-lg font-bold leading-snug tracking-tight !text-white">
+                                                            ${escapeHtml(item.titulo)}
+                                                        </h3>
+
+                                                        ${
+                                                            item.descripcion
+                                                                ? `
+                                                                    <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-300">
+                                                                        ${escapeHtml(item.descripcion)}
+                                                                    </p>
+                                                                `
+                                                                : ""
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    `,
+                                )
+                                .join("")}
+                        </ul>
+
+                        ${renderPagination(queryOriginal, currentPage, totalPages)}
+                    `;
+                    }
                 }
             }
         }
