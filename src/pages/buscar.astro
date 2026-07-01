@@ -93,7 +93,7 @@ ${item.marca?.nombre}
     <main class="min-h-screen bg-slate-950 py-16 text-white">
         <Container>
             <section
-                class="relative mb-12 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-16"
+                class="relative z-20 mb-12 overflow-visible rounded-3xl border border-white/10 bg-slate-950 px-8 py-14 shadow-2xl md:px-12 md:py-16"
             >
                 <div
                     class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,94,255,0.24),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(78,161,255,0.13),transparent_32%)]"
@@ -125,7 +125,7 @@ ${item.marca?.nombre}
                     <form
                         action="/buscar"
                         method="get"
-                        class="mt-8 flex max-w-3xl items-center gap-2 rounded-full border border-white/15 bg-slate-950/55 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-md"
+                        class="relative z-50 mt-8 flex max-w-3xl items-center gap-2 rounded-full border border-white/15 bg-slate-950/55 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-md"
                     >
                         <div
                             class="flex min-h-12 flex-1 items-center gap-3 rounded-full px-4"
@@ -154,6 +154,11 @@ ${item.marca?.nombre}
                         >
                             Buscar
                         </button>
+                        <div
+                            id="search-page-suggestions"
+                            class="absolute left-0 top-full z-50 mt-3 hidden w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl shadow-slate-950/60 backdrop-blur-md"
+                        >
+                        </div>
                     </form>
                 </div>
             </section>
@@ -227,12 +232,10 @@ ${item.marca?.nombre}
         ) {
             const titulo = limpiarTexto(item.titulo);
             const descripcion = limpiarTexto(item.descripcion || "");
-            const tipo = limpiarTexto(item.tipo);
             const texto = limpiarTexto(item.texto);
 
             const titleWords = getWords(item.titulo);
             const descriptionWords = getWords(item.descripcion || "");
-            const typeWords = getWords(item.tipo);
             const textWords = getWords(item.texto);
 
             let score = 0;
@@ -249,11 +252,6 @@ ${item.marca?.nombre}
                     termScore = Math.max(termScore, 80);
                 if (hasLongPartialMatch(titleWords, term))
                     termScore = Math.max(termScore, 50);
-
-                if (hasExactWord(typeWords, term))
-                    termScore = Math.max(termScore, 45);
-                if (hasWordStartingWith(typeWords, term))
-                    termScore = Math.max(termScore, 35);
 
                 if (hasExactWord(descriptionWords, term))
                     termScore = Math.max(termScore, 35);
@@ -279,7 +277,7 @@ ${item.marca?.nombre}
 
             if (descripcion.includes(fullQuery) && fullQuery.length >= 4)
                 score += 20;
-            if (tipo === fullQuery) score += 20;
+
             if (texto.includes(fullQuery) && fullQuery.length >= 4) score += 5;
 
             return score;
@@ -359,6 +357,7 @@ ${item.marca?.nombre}
                 : 1;
 
         const input = document.getElementById("search-input");
+        const suggestions = document.getElementById("search-page-suggestions");
         const resultsContainer = document.getElementById("search-results");
         const dataElement = document.getElementById("search-data");
 
@@ -372,6 +371,107 @@ ${item.marca?.nombre}
             const data = JSON.parse(
                 dataElement.textContent || "[]",
             ) as SearchItem[];
+
+            if (suggestions instanceof HTMLElement) {
+                input.addEventListener("input", () => {
+                    const liveQueryOriginal = input.value.trim();
+                    const liveQuery = limpiarTexto(liveQueryOriginal);
+
+                    if (liveQuery.length < MIN_QUERY_LENGTH) {
+                        suggestions.classList.add("hidden");
+                        suggestions.innerHTML = "";
+                        return;
+                    }
+
+                    const terms = liveQuery
+                        .split(/\s+/)
+                        .map((term) => term.trim())
+                        .filter((term) => term.length >= MIN_QUERY_LENGTH);
+
+                    if (terms.length === 0) {
+                        suggestions.classList.add("hidden");
+                        suggestions.innerHTML = "";
+                        return;
+                    }
+
+                    const resultadosPredictivos = data
+                        .map((item: SearchItem) => ({
+                            item,
+                            score: calcularPuntuacion(item, terms, liveQuery),
+                        }))
+                        .filter((result: RankedSearchItem) => result.score > 0)
+                        .sort((a: RankedSearchItem, b: RankedSearchItem) => {
+                            if (b.score !== a.score) return b.score - a.score;
+
+                            return a.item.titulo.localeCompare(
+                                b.item.titulo,
+                                "es",
+                            );
+                        })
+                        .slice(0, 6);
+
+                    if (resultadosPredictivos.length === 0) {
+                        suggestions.classList.add("hidden");
+                        suggestions.innerHTML = "";
+                        return;
+                    }
+
+                    suggestions.innerHTML = `
+            <div class="p-2">
+                ${resultadosPredictivos
+                    .map(
+                        ({ item }: RankedSearchItem) => `
+                            <a
+                                href="${item.url}"
+                                class="group flex items-center justify-between gap-4 rounded-xl px-4 py-3 transition hover:bg-slate-900"
+                            >
+                                <div>
+                                    <p class="text-sm font-bold text-white group-hover:text-[#4EA1FF]">
+                                        ${escapeHtml(item.titulo)}
+                                    </p>
+
+                                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-400">
+                                        ${escapeHtml(item.tipo)}
+                                    </p>
+
+                                    ${
+                                        item.descripcion
+                                            ? `
+                                                <p class="mt-2 line-clamp-1 text-xs text-slate-400">
+                                                    ${escapeHtml(item.descripcion)}
+                                                </p>
+                                            `
+                                            : ""
+                                    }
+                                </div>
+
+                                <span class="text-slate-500 group-hover:text-[#4EA1FF]">→</span>
+                            </a>
+                        `,
+                    )
+                    .join("")}
+            </div>
+
+            <a
+                href="/buscar?q=${encodeURIComponent(liveQueryOriginal)}"
+                class="block border-t border-white/10 px-6 py-4 text-sm font-bold text-[#4EA1FF] hover:bg-slate-900"
+            >
+                Ver todos los resultados →
+            </a>
+        `;
+
+                    suggestions.classList.remove("hidden");
+                });
+
+                document.addEventListener("click", (event) => {
+                    if (
+                        !suggestions.contains(event.target as Node) &&
+                        event.target !== input
+                    ) {
+                        suggestions.classList.add("hidden");
+                    }
+                });
+            }
 
             if (!query) {
                 resultsContainer.innerHTML = `

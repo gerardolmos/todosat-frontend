@@ -1,4 +1,4 @@
-import { fetchAPI } from './api';
+import { fetchAllAPI } from './api';
 
 function sortByName(a: any, b: any) {
     return (a.nombre || "").localeCompare(b.nombre || "", "es");
@@ -30,7 +30,7 @@ function sortByYearDescThenTitle(a: any, b: any) {
 }
 
 export async function getMarcas() {
-    const data = await fetchAPI('/api/marcas?populate=*');
+    const data = await fetchAllAPI('/api/marcas?populate=*');
 
     return data.data
         .filter((marca: any) => marca.activa)
@@ -38,7 +38,7 @@ export async function getMarcas() {
 }
 
 export async function getMarcasHome() {
-    const data = await fetchAPI("/api/marcas?populate=*");
+    const data = await fetchAllAPI("/api/marcas?populate=*");
 
     return data.data
         .filter((marca: any) => marca.activa)
@@ -48,7 +48,7 @@ export async function getMarcasHome() {
 }
 
 export async function getArticulos() {
-    const data = await fetchAPI(
+    const data = await fetchAllAPI(
         "/api/articulos?populate[imagen_principal]=true&populate[categoria_tematica]=true&populate[marcas][populate][imagen_portada]=true&populate[marcas][populate][logo]=true&populate[modelos][populate][imagen_principal]=true&populate[manuals][populate][imagen_portada]=true"
     );
 
@@ -58,7 +58,7 @@ export async function getArticulos() {
 }
 
 export async function getCategorias() {
-    const data = await fetchAPI('/api/categoria-tematicas?populate=*');
+    const data = await fetchAllAPI('/api/categoria-tematicas?populate=*');
 
     return data.data
         .filter((categoria: any) => categoria.activa)
@@ -66,7 +66,7 @@ export async function getCategorias() {
 }
 
 export async function getModelos() {
-    const data = await fetchAPI('/api/modelos?populate=*');
+    const data = await fetchAllAPI('/api/modelos?populate=*');
 
     return data.data
         .filter((modelo: any) => modelo.activo)
@@ -74,7 +74,7 @@ export async function getModelos() {
 }
 
 export async function getManuales() {
-    const data = await fetchAPI(
+    const data = await fetchAllAPI(
         "/api/manuals?populate[imagen_portada]=true&populate[archivo_pdf]=true&populate[marcas][populate][imagen_portada]=true&populate[marcas][populate][logo]=true&populate[modelos][populate][imagen_principal]=true&populate[articulos][populate][imagen_principal]=true"
     );
 
@@ -84,15 +84,9 @@ export async function getManuales() {
 }
 
 export async function getDestacados() {
-    const data = await fetchAPI('/api/destacados?populate=*');
+    const data = await fetchAllAPI('/api/destacados?populate=*');
 
     return data.data
         .filter((destacado: any) => destacado.activa)
         .sort((a: any, b: any) => a.orden - b.orden);
-}
-
-export async function getMarcasDestacadas() {
-    const marcas = await getMarcas();
-
-    return marcas.filter((marca: any) => marca.destacada);
 }
