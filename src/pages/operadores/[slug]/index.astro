@@ -2,9 +2,9 @@
 import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import {
-    getMarcas,
-    getModelos,
-    getArticulos,
+    getOperadores,
+    getHardwares,
+    getNoticias,
     getManuales,
 } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
@@ -20,7 +20,7 @@ import latenciaIcon from "../../../assets/images/pictostecnicosLight/latencia.sv
 import orbitaIcon from "../../../assets/images/pictostecnicosLight/orbita.svg";
 
 export async function getStaticPaths() {
-    const marcas = await getMarcas();
+    const marcas = await getOperadores();
 
     return marcas.map((marca: any) => ({
         params: {
@@ -38,18 +38,18 @@ const descripcionHTML = renderBlocks(marca.descripcion_completa);
 const logoUrl = getMediaUrl(marca.logo);
 const imagenPortadaUrl = getMediaUrl(marca.imagen_portada);
 
-const modelos = (await getModelos()).filter(
-    (modelo: any) => modelo.marca?.slug === marca.slug,
+const modelos = (await getHardwares()).filter(
+    (modelo: any) => modelo.operador?.slug === marca.slug,
 );
 
-const articulos = (await getArticulos()).filter((articulo: any) =>
-    articulo.marcas?.some(
+const articulos = (await getNoticias()).filter((articulo: any) =>
+    articulo.operadores?.some(
         (marcaRelacionada: any) => marcaRelacionada.slug === marca.slug,
     ),
 );
 
 const manuales = (await getManuales()).filter((manual: any) =>
-    manual.marcas?.some(
+    manual.operadores?.some(
         (marcaRelacionada: any) => marcaRelacionada.slug === marca.slug,
     ),
 );
@@ -335,7 +335,7 @@ const detallesTecnicos = [
                                                 description={
                                                     modelo.descripcion_corta
                                                 }
-                                                meta={modelo.marca?.nombre}
+                                                meta={modelo.operador?.nombre}
                                                 url={`/hardware/${modelo.slug}`}
                                                 image={modelo.imagen_principal}
                                             />
@@ -366,7 +366,7 @@ const detallesTecnicos = [
                                                 title={articulo.titulo}
                                                 description={articulo.subtitulo}
                                                 meta={
-                                                    articulo.categoria_tematica
+                                                    articulo.categoria_noticia
                                                         ?.nombre
                                                 }
                                                 url={`/noticias/${articulo.slug}`}

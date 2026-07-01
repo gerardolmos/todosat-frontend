@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import { getManuales, getMarcas } from "../../lib/content";
+import { getManuales, getOperadores } from "../../lib/content";
 import ManualCard from "../../components/ManualCard.astro";
 import Pagination from "../../components/Pagination.astro";
 
@@ -46,7 +46,7 @@ export async function getStaticPaths() {
     }
 
     const manuales = await getManuales();
-    const marcas = await getMarcas();
+    const marcas = await getOperadores();
 
     const paths: any[] = [];
 
@@ -63,7 +63,7 @@ export async function getStaticPaths() {
 
     marcas.forEach((marca: any) => {
         const manualesMarca = manuales.filter((manual: any) => {
-            const marcasManual = manual.marcas || manual.marca || [];
+            const marcasManual = manual.operadores || manual.operador || [];
             const listaMarcas = Array.isArray(marcasManual)
                 ? marcasManual
                 : [marcasManual];

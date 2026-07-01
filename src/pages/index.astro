@@ -2,12 +2,12 @@
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
 import {
-	getArticulos,
+	getNoticias,
 	getDestacados,
-	getModelos,
+	getHardwares,
 	getManuales,
-	getMarcas,
-	getMarcasHome,
+	getOperadores,
+	getOperadoresHome,
 } from "../lib/content";
 import HomeOperatorsSection from "../components/HomeOperatorsSection.astro";
 import HomeFeaturedSection from "../components/HomeFeaturedSection.astro";
@@ -19,16 +19,17 @@ import searchIcon from "../assets/images/icons/search.svg";
 
 const destacados = await getDestacados();
 
-const todosModelos = await getModelos();
+const todosHardwares = await getHardwares();
 const todosManuales = await getManuales();
-const todosArticulos = await getArticulos();
+const todosNoticias = await getNoticias();
 
-const modelos = todosModelos.slice(0, 7);
+const hardwares = todosHardwares.slice(0, 7);
 const manuales = todosManuales.slice(0, 7);
-const marcasHome = await getMarcasHome();
-const marcasBusqueda = await getMarcas();
+const operadoresHome = await getOperadoresHome();
+const operadoresBusqueda = await getOperadores();
 
-const articulos = todosArticulos
+const noticias = todosNoticias
+
 	.sort(
 		(a: any, b: any) =>
 			new Date(b.fecha_publicacion).getTime() -
@@ -44,7 +45,7 @@ function limpiarTexto(valor: any) {
 }
 
 const datosBusqueda = [
-	...marcasBusqueda.map((item: any) => ({
+	...operadoresBusqueda.map((item: any) => ({
 		tipo: "Operador",
 		titulo: item.nombre,
 		descripcion: item.descripcion_corta,
@@ -54,25 +55,25 @@ const datosBusqueda = [
 		),
 	})),
 
-	...todosModelos.map((item: any) => ({
+	...todosHardwares.map((item: any) => ({
 		tipo: "Hardware",
 		titulo: item.nombre,
 		url: `/hardware/${item.slug}`,
 		descripcion: item.descripcion_corta,
 		texto: limpiarTexto(
-			`${item.nombre} ${item.descripcion_corta} ${item.tipo_hardware} ${item.marca?.nombre}`,
+			`${item.nombre} ${item.descripcion_corta} ${item.tipo_hardware} ${item.operador?.nombre}`,
 		),
 	})),
 
-	...todosArticulos.map((item: any) => ({
+	...todosNoticias.map((item: any) => ({
 		tipo: "Notícia",
 		titulo: item.titulo,
 		url: `/noticias/${item.slug}`,
 		descripcion: item.subtitulo,
 		texto: limpiarTexto(
 			`${item.titulo} ${item.subtitulo} ${item.contenido} ${
-				item.categoria_tematica?.nombre || ""
-			} ${item.categoria_tematica?.slug || ""}`,
+				item.categoria_noticia?.nombre || ""
+			} ${item.categoria_noticia?.slug || ""}`,
 		),
 	})),
 
@@ -327,13 +328,13 @@ const datosBusqueda = [
 
 		<section class="bg-slate-950">
 			<Container>
-				<HomeOperatorsSection marcas={marcasHome} />
+				<HomeOperatorsSection marcas={operadoresHome} />
 				<SectionDivider />
 				<HomeFeaturedSection destacados={destacados} />
 				<SectionDivider />
-				<HomeArticlesSection articulos={articulos} />
+				<HomeArticlesSection articulos={noticias} />
 				<SectionDivider />
-				<HomeModelsSection modelos={modelos} />
+				<HomeModelsSection modelos={hardwares} />
 				<SectionDivider />
 				<HomeManualsSection manuales={manuales} />
 			</Container>

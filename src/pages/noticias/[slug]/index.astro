@@ -1,6 +1,6 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import { getArticulos } from "../../../lib/content";
+import { getNoticias } from "../../../lib/content";
 import { renderBlocks, getReadingTime } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import Container from "../../../components/Container.astro";
@@ -8,7 +8,7 @@ import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
-    const articulos = await getArticulos();
+    const articulos = await getNoticias();
 
     return articulos.map((articulo: any) => ({
         params: {
@@ -25,12 +25,12 @@ const { articulo } = Astro.props as any;
 const contenidoHTML = renderBlocks(articulo.contenido);
 const imagenUrl = getMediaUrl(articulo.imagen_principal);
 
-const categoria = articulo.categoria_tematica;
-const marcas = articulo.marcas || [];
-const modelos = articulo.modelos || [];
-const manuales = articulo.manuals || [];
+const categoria = articulo.categoria_noticia;
+const marcas = articulo.operadores || [];
+const modelos = articulo.hardwares || [];
+const manuales = articulo.manuales || [];
 
-const todosLosArticulos = await getArticulos();
+const todosLosArticulos = await getNoticias();
 
 const marcasSlugs = new Set(
     marcas.map((marca: any) => marca.slug).filter(Boolean),
@@ -44,9 +44,9 @@ const articulosRelacionados = todosLosArticulos
     .map((articuloRelacionado: any) => {
         const comparteCategoria =
             categoria?.slug &&
-            articuloRelacionado.categoria_tematica?.slug === categoria.slug;
+            articuloRelacionado.categoria_noticia?.slug === categoria.slug;
 
-        const comparteMarca = articuloRelacionado.marcas?.some(
+        const comparteMarca = articuloRelacionado.operadores?.some(
             (marcaRelacionada: any) => marcasSlugs.has(marcaRelacionada.slug),
         );
 
@@ -61,18 +61,18 @@ const articulosRelacionados = todosLosArticulos
     .sort((a: any, b: any) => {
         if (b.score !== a.score) return b.score - a.score;
 
-        const fechaA = a.articulo.fecha_publicacion
-            ? new Date(a.articulo.fecha_publicacion).getTime()
+        const fechaA = a.noticia.fecha_publicacion
+            ? new Date(a.noticia.fecha_publicacion).getTime()
             : 0;
 
-        const fechaB = b.articulo.fecha_publicacion
-            ? new Date(b.articulo.fecha_publicacion).getTime()
+        const fechaB = b.noticia.fecha_publicacion
+            ? new Date(b.noticia.fecha_publicacion).getTime()
             : 0;
 
         return fechaB - fechaA;
     })
     .slice(0, 4)
-    .map((item: any) => item.articulo);
+    .map((item: any) => item.noticia);
 
 const fecha = articulo.fecha_publicacion
     ? new Date(articulo.fecha_publicacion).toLocaleDateString("es-ES", {
@@ -262,7 +262,7 @@ const hasRelated = marcas.length > 0 || articulosRelacionados.length > 0;
                                                                 }
                                                                 meta={
                                                                     articuloRelacionado
-                                                                        .categoria_tematica
+                                                                        .categoria_noticia
                                                                         ?.nombre
                                                                 }
                                                                 url={`/noticias/${articuloRelacionado.slug}`}

@@ -1,7 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
-import { getModelos, getArticulos, getManuales } from "../../../lib/content";
+import { getHardwares, getNoticias, getManuales } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
@@ -9,7 +9,7 @@ import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import { formatLabel } from "../../../lib/format";
 
 export async function getStaticPaths() {
-    const modelos = await getModelos();
+    const modelos = await getHardwares();
 
     return modelos.map((modelo: any) => ({
         params: {
@@ -27,14 +27,14 @@ const contenidoHTML = renderBlocks(modelo.descripcion_completa);
 const imagenUrl = getMediaUrl(modelo.imagen_principal);
 const galeria = modelo.galeria || [];
 
-const articulos = (await getArticulos()).filter((articulo: any) =>
-    articulo.modelos?.some(
+const articulos = (await getNoticias()).filter((articulo: any) =>
+    articulo.hardwares?.some(
         (modeloRelacionado: any) => modeloRelacionado.slug === modelo.slug,
     ),
 );
 
 const manuales = (await getManuales()).filter((manual: any) =>
-    manual.modelos?.some(
+    manual.hardwares?.some(
         (modeloRelacionado: any) => modeloRelacionado.slug === modelo.slug,
     ),
 );
@@ -80,7 +80,7 @@ const specs = [
 ].filter(Boolean);
 
 const hasAside =
-    Boolean(modelo.marca) || articulos.length > 0 || manuales.length > 0;
+    Boolean(modelo.operador) || articulos.length > 0 || manuales.length > 0;
 ---
 
 <Layout
@@ -108,12 +108,12 @@ const hasAside =
                     <header class="mt-8 max-w-5xl pb-10 md:pb-14">
                         <div class="flex flex-wrap gap-3">
                             {
-                                modelo.marca && (
+                                modelo.operador && (
                                     <a
-                                        href={`/operadores/${modelo.marca.slug}`}
+                                        href={`/operadores/${modelo.operador.slug}`}
                                         class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-300 transition hover:border-[#005EFF] hover:text-white md:px-4 md:py-2 md:text-sm"
                                     >
-                                        {modelo.marca.nombre}
+                                        {modelo.operador.nombre}
                                     </a>
                                 )
                             }
@@ -262,7 +262,7 @@ const hasAside =
                                     </div>
 
                                     <div class="space-y-8 p-6">
-                                        {modelo.marca && (
+                                        {modelo.operador && (
                                             <section>
                                                 <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
                                                     Operador
@@ -270,14 +270,14 @@ const hasAside =
 
                                                 <RelatedCard
                                                     type="Operador"
-                                                    title={modelo.marca.nombre}
+                                                    title={modelo.operador.nombre}
                                                     description={
-                                                        modelo.marca
+                                                        modelo.operador
                                                             .descripcion_corta
                                                     }
-                                                    url={`/operadores/${modelo.marca.slug}`}
+                                                    url={`/operadores/${modelo.operador.slug}`}
                                                     image={
-                                                        modelo.marca
+                                                        modelo.operador
                                                             .imagen_portada
                                                     }
                                                 />
@@ -303,7 +303,7 @@ const hasAside =
                                                                 }
                                                                 meta={
                                                                     articulo
-                                                                        .categoria_tematica
+                                                                        .categoria_noticia
                                                                         ?.nombre
                                                                 }
                                                                 url={`/noticias/${articulo.slug}`}

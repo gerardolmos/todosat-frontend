@@ -2,18 +2,18 @@
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
 import {
-    getMarcas,
-    getModelos,
-    getArticulos,
+    getOperadores,
+    getHardwares,
+    getNoticias,
     getManuales,
 } from "../lib/content";
 
 import { getMediaUrl } from "../lib/media";
 import searchIcon from "../assets/images/icons/search.svg";
 
-const marcas = await getMarcas();
-const modelos = await getModelos();
-const articulos = await getArticulos();
+const operadores = await getOperadores();
+const hardwares = await getHardwares();
+const noticias = await getNoticias();
 const manuales = await getManuales();
 
 function limpiarTexto(valor: any) {
@@ -24,7 +24,7 @@ function limpiarTexto(valor: any) {
 }
 
 const datosBusqueda = [
-    ...marcas.map((item: any) => ({
+    ...operadores.map((item: any) => ({
         tipo: "Operador",
         titulo: item.nombre,
         descripcion: item.descripcion_corta,
@@ -42,7 +42,7 @@ const datosBusqueda = [
 			${item.latencia}
 		`),
     })),
-    ...modelos.map((item: any) => ({
+    ...hardwares.map((item: any) => ({
         tipo: "Hardware",
         titulo: item.nombre,
         descripcion: item.descripcion_corta,
@@ -54,10 +54,10 @@ const datosBusqueda = [
 			${item.descripcion_completa}
 			${item.uso_recomendado}
 ${item.tipo_hardware}
-${item.marca?.nombre}
+${item.operador?.nombre}
 		`),
     })),
-    ...articulos.map((item: any) => ({
+    ...noticias.map((item: any) => ({
         tipo: "Noticia",
         titulo: item.titulo,
         descripcion: item.subtitulo,
@@ -67,7 +67,7 @@ ${item.marca?.nombre}
 			${item.titulo}
 			${item.subtitulo}
 			${item.contenido}
-			${item.categoria_tematica?.nombre || ""}
+			${item.categoria_noticia?.nombre || ""}
 		`),
     })),
     ...manuales.map((item: any) => ({
@@ -82,8 +82,8 @@ ${item.marca?.nombre}
 			${item.idioma}
 			${item.version}
 			${item.ano_publicacion}
-			${item.marcas?.map((marca: any) => marca.nombre).join(" ")}
-			${item.modelos?.map((modelo: any) => modelo.nombre).join(" ")}
+			${item.operadores?.map((marca: any) => marca.nombre).join(" ")}
+			${item.hardwares?.map((modelo: any) => modelo.nombre).join(" ")}
 		`),
     })),
 ];

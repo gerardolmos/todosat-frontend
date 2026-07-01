@@ -24,9 +24,9 @@ const { manual } = Astro.props as any;
 
 const archivoPdfUrl = getMediaUrl(manual.archivo_pdf);
 const imagenUrl = getMediaUrl(manual.imagen_portada);
-const marcas = manual.marcas || [];
-const modelos = manual.modelos || [];
-const articulos = manual.articulos || [];
+const marcas = manual.operadores || [];
+const modelos = manual.hardwares || [];
+const articulos = manual.noticias || [];
 
 const meta = [
     manual.version && {

@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import { getModelos, getMarcas } from "../../lib/content";
+import { getHardwares, getOperadores } from "../../lib/content";
 import ModelCard from "../../components/ModelCard.astro";
 import Pagination from "../../components/Pagination.astro";
 
@@ -45,8 +45,8 @@ export async function getStaticPaths() {
         return paths;
     }
 
-    const modelos = await getModelos();
-    const marcas = await getMarcas();
+    const modelos = await getHardwares();
+    const marcas = await getOperadores();
 
     const tiposHardware = Array.from(
         new Set(
@@ -90,7 +90,7 @@ export async function getStaticPaths() {
 
     marcas.forEach((marca: any) => {
         const modelosMarca = modelos.filter(
-            (modelo: any) => modelo.marca?.slug === marca.slug,
+            (modelo: any) => modelo.operador?.slug === marca.slug,
         );
 
         paths.push(
@@ -110,7 +110,7 @@ export async function getStaticPaths() {
             const modelosCombinados = modelos.filter(
                 (modelo: any) =>
                     modelo.tipo_hardware === tipo &&
-                    modelo.marca?.slug === marca.slug,
+                    modelo.operador?.slug === marca.slug,
             );
 
             paths.push(

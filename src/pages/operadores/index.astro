@@ -1,10 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import { getMarcas } from "../../lib/content";
+import { getOperadores } from "../../lib/content";
 import BrandCard from "../../components/BrandCard.astro";
 
-const marcas = await getMarcas();
+const marcas = await getOperadores();
 ---
 
 <Layout title="Operadores | TodoSatcom">

@@ -9,7 +9,7 @@ interface Props {
 const { articulo } = Astro.props;
 const imagenUrl = getMediaUrl(articulo.imagen_principal);
 
-const categoria = articulo.categoria_tematica;
+const categoria = articulo.categoria_noticia;
 const fecha = articulo.fecha_publicacion
     ? new Date(articulo.fecha_publicacion).toLocaleDateString("es-ES", {
           day: "2-digit",

@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import { getArticulos, getCategorias } from "../../lib/content";
+import { getNoticias, getCategoriasNoticia } from "../../lib/content";
 import ArticleCard from "../../components/ArticleCard.astro";
 import Pagination from "../../components/Pagination.astro";
 import { Image, Picture } from "astro:assets";
@@ -79,8 +79,8 @@ export async function getStaticPaths() {
         return paths;
     }
 
-    const articulos = await getArticulos();
-    const categorias = await getCategorias();
+    const articulos = await getNoticias();
+    const categorias = await getCategoriasNoticia();
 
     const paths: any[] = [];
 
@@ -109,7 +109,7 @@ export async function getStaticPaths() {
 
         const articulosCategoria = articulos.filter(
             (articulo: any) =>
-                articulo.categoria_tematica?.slug === categoriaSlug,
+                articulo.categoria_noticia?.slug === categoriaSlug,
         );
 
         paths.push(

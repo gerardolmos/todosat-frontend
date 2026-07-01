@@ -13,17 +13,17 @@ const isLarge = variant === "large";
 const imagenUrl = getMediaUrl(destacado.imagen);
 
 const relaciones = [
-    destacado.marca && {
+    destacado.operador && {
         tipo: "Operador",
-        href: `/operadores/${destacado.marca.slug}`,
+        href: `/operadores/${destacado.operador.slug}`,
     },
-    destacado.modelo && {
+    destacado.hardware && {
         tipo: "Modelo",
-        href: `/hardware/${destacado.modelo.slug}`,
+        href: `/hardware/${destacado.hardware.slug}`,
     },
-    destacado.articulo && {
+    destacado.noticia && {
         tipo: "Artículo",
-        href: `/noticias/${destacado.articulo.slug}`,
+        href: `/noticias/${destacado.noticia.slug}`,
     },
     destacado.manual && {
         tipo: "Manual",
