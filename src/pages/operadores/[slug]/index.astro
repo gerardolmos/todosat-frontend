@@ -109,11 +109,115 @@ const detallesTecnicos = [
         icon: orbitaIcon,
     },
 ].filter((item) => item.text || item.value);
+
+function toIsoDate(value: unknown) {
+    if (!value) return null;
+
+    const date = new Date(String(value));
+
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+const operatorName = String(marca.nombre || "").trim();
+const operatorPath = `/operadores/${marca.slug}`;
+const operatorImage = imagenPortadaUrl || logoUrl;
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const operatorUrl = new URL(`${operatorPath}/`, siteUrl).toString();
+const homeUrl = new URL("/", siteUrl).toString();
+const operatorsUrl = new URL("/operadores/", siteUrl).toString();
+const modifiedTime = toIsoDate(marca.updatedAt);
+
+const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "WebPage",
+            "@id": operatorUrl,
+            url: operatorUrl,
+            name: operatorName,
+            description: marca.descripcion_corta,
+            inLanguage: "es-ES",
+            mainEntity: {
+                "@id": `${operatorUrl}#organization`,
+            },
+            ...(operatorImage
+                ? {
+                      primaryImageOfPage: {
+                          "@type": "ImageObject",
+                          url: operatorImage,
+                      },
+                  }
+                : {}),
+            ...(modifiedTime
+                ? {
+                      dateModified: modifiedTime,
+                  }
+                : {}),
+        },
+        {
+            "@type": "Organization",
+            "@id": `${operatorUrl}#organization`,
+            name: operatorName,
+            description: marca.descripcion_corta,
+            url: operatorUrl,
+            ...(logoUrl
+                ? {
+                      logo: {
+                          "@type": "ImageObject",
+                          url: logoUrl,
+                      },
+                  }
+                : {}),
+            ...(imagenPortadaUrl
+                ? {
+                      image: [imagenPortadaUrl],
+                  }
+                : {}),
+            ...(marca.web_oficial
+                ? {
+                      sameAs: [marca.web_oficial],
+                  }
+                : {}),
+            ...(marca.cobertura
+                ? {
+                      areaServed: marca.cobertura,
+                  }
+                : {}),
+        },
+        {
+            "@type": "BreadcrumbList",
+            "@id": `${operatorUrl}#breadcrumb`,
+            itemListElement: [
+                {
+                    "@type": "ListItem",
+                    position: 1,
+                    name: "Inicio",
+                    item: homeUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 2,
+                    name: "Operadores",
+                    item: operatorsUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 3,
+                    name: operatorName,
+                    item: operatorUrl,
+                },
+            ],
+        },
+    ],
+};
 ---
 
 <Layout
-    title={`${marca.nombre} | TodoSatcom`}
+    title={`${operatorName} | TodoSatcom`}
     description={marca.descripcion_corta}
+    canonical={operatorPath}
+    image={operatorImage}
+    structuredData={structuredData}
 >
     <main class="min-h-screen bg-slate-950 text-white">
         <section class="bg-slate-950 py-8 md:py-12">
@@ -354,7 +458,7 @@ const detallesTecnicos = [
                             <h3
                                 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300"
                             >
-                                Artículos relacionados
+                                Noticias relacionadas
                             </h3>
 
                             {
@@ -362,7 +466,7 @@ const detallesTecnicos = [
                                     <div class="grid gap-5 [&>a]:h-full [&>a]:min-h-[190px]">
                                         {articulos.map((articulo: any) => (
                                             <RelatedCard
-                                                type="Artículo"
+                                                type="Noticia"
                                                 title={articulo.titulo}
                                                 description={articulo.subtitulo}
                                                 meta={
@@ -378,7 +482,7 @@ const detallesTecnicos = [
                                     </div>
                                 ) : (
                                     <p class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 text-sm leading-6 text-slate-400">
-                                        Todavía no hay artículos relacionados
+                                        Todavía no hay noticias relacionadas
                                         con este operador.
                                     </p>
                                 )

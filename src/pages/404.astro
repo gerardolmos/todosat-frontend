@@ -4,7 +4,12 @@ import { Picture } from "astro:assets";
 import senalPerdida404 from "../assets/images/404-senal-perdida.png";
 ---
 
-<Layout title="404 | Señal perdida">
+<Layout
+    title="404 | Señal perdida"
+    description="La página solicitada no está disponible en TodoSatcom."
+    robots="noindex, nofollow"
+    canonical={null}
+>
     <main class="bg-[#00020B] md:min-h-screen">
         <div
             class="mx-auto flex max-w-5xl flex-col items-center px-6 py-6 md:min-h-screen md:justify-center md:py-12"

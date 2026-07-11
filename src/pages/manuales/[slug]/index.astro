@@ -47,11 +47,133 @@ const meta = [
             value: manual.oficial ? "Manual oficial" : "Manual no oficial",
         },
 ].filter(Boolean);
+
+function toIsoDate(value: unknown) {
+    if (!value) return null;
+
+    const date = new Date(String(value));
+
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+const manualTitle = String(manual.titulo || "").trim();
+const manualPath = `/manuales/${manual.slug}`;
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const manualUrl = new URL(`${manualPath}/`, siteUrl).toString();
+const homeUrl = new URL("/", siteUrl).toString();
+const manualsUrl = new URL("/manuales/", siteUrl).toString();
+const modifiedTime = toIsoDate(manual.updatedAt);
+
+const about = [
+    ...marcas.map((marca: any) => ({
+        "@type": "Organization",
+        name: String(marca.nombre || "").trim(),
+        url: new URL(
+            `/operadores/${marca.slug}/`,
+            siteUrl,
+        ).toString(),
+    })),
+    ...modelos.map((modelo: any) => ({
+        "@type": "Product",
+        name: String(modelo.nombre || "").trim(),
+        url: new URL(
+            `/hardware/${modelo.slug}/`,
+            siteUrl,
+        ).toString(),
+    })),
+];
+
+const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "WebPage",
+            "@id": manualUrl,
+            url: manualUrl,
+            name: manualTitle,
+            description: manual.descripcion,
+            inLanguage: "es-ES",
+            mainEntity: {
+                "@id": `${manualUrl}#document`,
+            },
+            ...(imagenUrl
+                ? {
+                      primaryImageOfPage: {
+                          "@type": "ImageObject",
+                          url: imagenUrl,
+                      },
+                  }
+                : {}),
+            ...(modifiedTime
+                ? {
+                      dateModified: modifiedTime,
+                  }
+                : {}),
+        },
+        {
+            "@type": "DigitalDocument",
+            "@id": `${manualUrl}#document`,
+            name: manualTitle,
+            description: manual.descripcion,
+            url: manualUrl,
+            ...(imagenUrl ? { image: [imagenUrl] } : {}),
+            ...(manual.idioma
+                ? {
+                      inLanguage: formatLabel(manual.idioma),
+                  }
+                : {}),
+            ...(manual.version
+                ? {
+                      version: String(manual.version),
+                  }
+                : {}),
+            ...(about.length > 0 ? { about } : {}),
+            ...(archivoPdfUrl
+                ? {
+                      encoding: {
+                          "@type": "MediaObject",
+                          contentUrl: archivoPdfUrl,
+                          encodingFormat:
+                              manual.archivo_pdf?.mime ||
+                              "application/pdf",
+                      },
+                  }
+                : {}),
+        },
+        {
+            "@type": "BreadcrumbList",
+            "@id": `${manualUrl}#breadcrumb`,
+            itemListElement: [
+                {
+                    "@type": "ListItem",
+                    position: 1,
+                    name: "Inicio",
+                    item: homeUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 2,
+                    name: "Manuales",
+                    item: manualsUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 3,
+                    name: manualTitle,
+                    item: manualUrl,
+                },
+            ],
+        },
+    ],
+};
 ---
 
 <Layout
-    title={`${manual.titulo} | TodoSatcom`}
+    title={`${manualTitle} | TodoSatcom`}
     description={manual.descripcion}
+    canonical={manualPath}
+    image={imagenUrl}
+    structuredData={structuredData}
 >
     <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
@@ -194,7 +316,7 @@ const meta = [
                                     <div class="grid gap-5 [&>a]:min-h-[190px] [&>a]:h-full">
                                         {modelos.map((modelo: any) => (
                                             <RelatedCard
-                                                type="Modelo"
+                                                type="Hardware"
                                                 title={modelo.nombre}
                                                 description={
                                                     modelo.descripcion_corta
@@ -210,13 +332,13 @@ const meta = [
                             {articulos.length > 0 && (
                                 <div>
                                     <h3 class="mb-5 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
-                                        Artículos relacionados
+                                        Noticias relacionadas
                                     </h3>
 
                                     <div class="grid gap-5 [&>a]:min-h-[190px] [&>a]:h-full">
                                         {articulos.map((articulo: any) => (
                                             <RelatedCard
-                                                type="Artículo"
+                                                type="Noticia"
                                                 title={articulo.titulo}
                                                 description={articulo.subtitulo}
                                                 url={`/noticias/${articulo.slug}`}

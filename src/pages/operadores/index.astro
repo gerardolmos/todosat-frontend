@@ -5,9 +5,50 @@ import { getOperadores } from "../../lib/content";
 import BrandCard from "../../components/BrandCard.astro";
 
 const marcas = await getOperadores();
+
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const operadoresUrl = new URL("/operadores/", siteUrl).toString();
+
+const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "CollectionPage",
+            "@id": operadoresUrl,
+            url: operadoresUrl,
+            name: "Operadores satelitales",
+            description:
+                "Principales operadores, constelaciones y compañías del ecosistema de las comunicaciones satelitales.",
+            inLanguage: "es-ES",
+            mainEntity: {
+                "@id": `${operadoresUrl}#operators`,
+            },
+        },
+        {
+            "@type": "ItemList",
+            "@id": `${operadoresUrl}#operators`,
+            itemListElement: marcas.map(
+                (marca: any, index: number) => ({
+                    "@type": "ListItem",
+                    position: index + 1,
+                    name: String(marca.nombre || "").trim(),
+                    url: new URL(
+                        `/operadores/${marca.slug}/`,
+                        siteUrl,
+                    ).toString(),
+                }),
+            ),
+        },
+    ],
+};
 ---
 
-<Layout title="Operadores | TodoSatcom">
+<Layout
+    title="Operadores satelitales | TodoSatcom"
+    description="Explora los principales operadores, constelaciones y compañías del ecosistema de las comunicaciones satelitales."
+    canonical="/operadores"
+    structuredData={structuredData}
+>
     <main class="min-h-screen bg-slate-950 py-10">
         <Container>
             <section

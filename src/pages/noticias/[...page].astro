@@ -143,9 +143,35 @@ const {
     ordenActual = "recientes",
 } = Astro.props as any;
 
-const title = categoriaActual
-    ? `${categoriaActual.nombre} | Artículos | TodoSatcom`
-    : "Artículos | TodoSatcom";
+const currentPage = page.currentPage;
+const pageSuffix = currentPage > 1 ? ` — Página ${currentPage}` : "";
+
+const sectionName = categoriaActual
+    ? `Noticias de ${categoriaActual.nombre}`
+    : "Noticias y actualidad satelital";
+
+const title = `${sectionName}${pageSuffix} | TodoSatcom`;
+
+const descriptionBase =
+    categoriaActual?.descripcion ||
+    "Noticias, análisis y novedades sobre operadores, internet satelital, hardware, cobertura y comunicaciones satelitales.";
+
+const description =
+    currentPage > 1
+        ? `${descriptionBase} Página ${currentPage}.`
+        : descriptionBase;
+
+const recentBasePath = categoriaActual
+    ? `/noticias/${categoriaActual.slug}`
+    : "/noticias";
+
+const canonicalPath =
+    currentPage > 1
+        ? `${recentBasePath}/${currentPage}`
+        : recentBasePath;
+
+const robots =
+    ordenActual === "antiguos" ? "noindex, follow" : "index, follow";
 
 const basePath =
     ordenActual === "antiguos"
@@ -167,7 +193,12 @@ const ordenAntiguosUrl = categoriaActual
 const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
 ---
 
-<Layout title={title}>
+<Layout
+    title={title}
+    description={description}
+    canonical={canonicalPath}
+    robots={robots}
+>
     <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>
             <section

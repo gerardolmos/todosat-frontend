@@ -81,11 +81,111 @@ const specs = [
 
 const hasAside =
     Boolean(modelo.operador) || articulos.length > 0 || manuales.length > 0;
+
+function toIsoDate(value: unknown) {
+    if (!value) return null;
+
+    const date = new Date(String(value));
+
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+const hardwarePath = `/hardware/${modelo.slug}`;
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const hardwareUrl = new URL(`${hardwarePath}/`, siteUrl).toString();
+const homeUrl = new URL("/", siteUrl).toString();
+const hardwareListUrl = new URL("/hardware/", siteUrl).toString();
+const modifiedTime = toIsoDate(modelo.updatedAt);
+
+const productProperties = specs.map((spec: any) => ({
+    "@type": "PropertyValue",
+    name: spec.label,
+    value: String(spec.value),
+}));
+
+const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "WebPage",
+            "@id": hardwareUrl,
+            url: hardwareUrl,
+            name: modelo.nombre,
+            description: modelo.descripcion_corta,
+            inLanguage: "es-ES",
+            mainEntity: {
+                "@id": `${hardwareUrl}#product`,
+            },
+            ...(imagenUrl
+                ? {
+                      primaryImageOfPage: {
+                          "@type": "ImageObject",
+                          url: imagenUrl,
+                      },
+                  }
+                : {}),
+            ...(modifiedTime
+                ? {
+                      dateModified: modifiedTime,
+                  }
+                : {}),
+        },
+        {
+            "@type": "Product",
+            "@id": `${hardwareUrl}#product`,
+            name: modelo.nombre,
+            description: modelo.descripcion_corta,
+            url: hardwareUrl,
+            ...(imagenUrl ? { image: [imagenUrl] } : {}),
+            ...(modelo.tipo_hardware
+                ? { category: modelo.tipo_hardware }
+                : {}),
+            ...(modelo.operador?.nombre
+                ? {
+                      brand: {
+                          "@type": "Brand",
+                          name: modelo.operador.nombre,
+                      },
+                  }
+                : {}),
+            ...(productProperties.length > 0
+                ? { additionalProperty: productProperties }
+                : {}),
+        },
+        {
+            "@type": "BreadcrumbList",
+            "@id": `${hardwareUrl}#breadcrumb`,
+            itemListElement: [
+                {
+                    "@type": "ListItem",
+                    position: 1,
+                    name: "Inicio",
+                    item: homeUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 2,
+                    name: "Hardware",
+                    item: hardwareListUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 3,
+                    name: modelo.nombre,
+                    item: hardwareUrl,
+                },
+            ],
+        },
+    ],
+};
 ---
 
 <Layout
     title={`${modelo.nombre} | TodoSatcom`}
     description={modelo.descripcion_corta}
+    canonical={hardwarePath}
+    image={imagenUrl}
+    structuredData={structuredData}
 >
     <main class="min-h-screen bg-slate-950 text-white">
         <section class="bg-slate-950 py-8 md:py-12">
@@ -287,14 +387,14 @@ const hasAside =
                                         {articulos.length > 0 && (
                                             <section>
                                                 <h3 class="mb-4 border-l-2 border-blue-500 pl-3 text-sm font-bold uppercase tracking-[0.16em] text-slate-300">
-                                                    Artículos
+                                                    Noticias
                                                 </h3>
 
                                                 <div class="grid gap-4">
                                                     {articulos.map(
                                                         (articulo: any) => (
                                                             <RelatedCard
-                                                                type="Artículo"
+                                                                type="Noticia"
                                                                 title={
                                                                     articulo.titulo
                                                                 }

@@ -3,15 +3,63 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 
+type PageType = "website" | "article";
+
+type StructuredData =
+    | Record<string, unknown>
+    | Record<string, unknown>[];
+
 interface Props {
     title?: string;
     description?: string;
+    canonical?: string | null;
+    image?: string | null;
+    type?: PageType;
+    robots?: string;
+    publishedTime?: string | null;
+    modifiedTime?: string | null;
+    structuredData?: StructuredData | null;
 }
 
 const {
     title = "TodoSatcom",
     description = "Portal especializado en internet satelital.",
+    canonical,
+    image,
+    type = "website",
+    robots = "index, follow",
+    publishedTime,
+    modifiedTime,
+    structuredData,
 } = Astro.props;
+
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+
+function getAbsoluteUrl(value: string) {
+    return new URL(value, siteUrl).toString();
+}
+
+function getCanonicalUrl(value: string) {
+    const url = new URL(value, siteUrl);
+
+    url.search = "";
+    url.hash = "";
+
+    const pathLooksLikeFile = /\/[^/]+\.[^/]+$/.test(url.pathname);
+
+    if (!pathLooksLikeFile && !url.pathname.endsWith("/")) {
+        url.pathname += "/";
+    }
+
+    return url.toString();
+}
+
+const canonicalUrl =
+    canonical === null
+        ? null
+        : getCanonicalUrl(canonical ?? Astro.url.pathname);
+
+const imageUrl = image ? getAbsoluteUrl(image) : null;
 ---
 
 <!doctype html>
@@ -22,13 +70,77 @@ const {
 
         <title>{title}</title>
         <meta name="description" content={description} />
+        <meta name="robots" content={robots} />
+
+        {
+            canonicalUrl && <link rel="canonical" href={canonicalUrl} />
+        }
+
+        <meta property="og:locale" content="es_ES" />
+        <meta property="og:site_name" content="TodoSatcom" />
+        <meta property="og:type" content={type} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        {
+            canonicalUrl && <meta property="og:url" content={canonicalUrl} />
+        }
+
+        {
+            imageUrl && (
+                <>
+                    <meta property="og:image" content={imageUrl} />
+                    <meta property="og:image:alt" content={title} />
+                </>
+            )
+        }
+
+        {
+            type === "article" && publishedTime && (
+                <meta
+                    property="article:published_time"
+                    content={publishedTime}
+                />
+            )
+        }
+
+        {
+            type === "article" && modifiedTime && (
+                <meta property="article:modified_time" content={modifiedTime} />
+            )
+        }
+
+        <meta
+            name="twitter:card"
+            content={imageUrl ? "summary_large_image" : "summary"}
+        />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+
+        {
+            imageUrl && (
+                <>
+                    <meta name="twitter:image" content={imageUrl} />
+                    <meta name="twitter:image:alt" content={title} />
+                </>
+            )
+        }
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
+
+        {
+            structuredData && (
+                <script
+                    type="application/ld+json"
+                    set:html={JSON.stringify(structuredData)}
+                />
+            )
+        }
     </head>
 
     <body>
         <Header />
+
         <script is:inline>
             const button = document.getElementById("menu-toggle");
             const menu = document.getElementById("mobile-menu");
@@ -64,7 +176,9 @@ const {
                 lastScrollY = currentScrollY;
             });
         </script>
+
         <slot />
+
         <Footer />
     </body>
 </html>

@@ -4,12 +4,22 @@ import Container from "./Container.astro";
 
 interface Props {
     title: string;
+    description: string;
+    robots?: string;
 }
 
-const { title } = Astro.props;
+const {
+    title,
+    description,
+    robots = "noindex, follow",
+} = Astro.props;
 ---
 
-<Layout title={`${title} | TODOSat`}>
+<Layout
+    title={`${title} | TodoSatcom`}
+    description={description}
+    robots={robots}
+>
     <main class="min-h-screen py-10">
         <Container>
             <h1 class="text-5xl font-bold">{title}</h1>
