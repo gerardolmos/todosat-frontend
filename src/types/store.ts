@@ -11,9 +11,13 @@ export type EstadoVentaTienda =
     | "Próximamente"
     | "Descatalogado";
 
-export interface StrapiEntityBase {
+export interface StrapiDocumentIdentity {
     id: number;
     documentId: string;
+}
+
+export interface StrapiEntityBase
+    extends StrapiDocumentIdentity {
     createdAt: string;
     updatedAt: string;
     publishedAt: string | null;
@@ -61,6 +65,12 @@ export interface CaracteristicaProductoTienda {
     valor: string;
 }
 
+export interface CategoriaProductoTiendaResumen
+    extends StrapiDocumentIdentity {
+    nombre: string;
+    slug: string;
+}
+
 export interface CategoriaProductoTienda
     extends StrapiEntityBase {
     nombre: string;
@@ -69,11 +79,10 @@ export interface CategoriaProductoTienda
     activa: boolean;
     orden: number;
     imagen: StrapiMedia | null;
-    productos_tienda?: ProductoTiendaRelacionado[];
 }
 
 export interface HardwareTiendaResumen
-    extends StrapiEntityBase {
+    extends StrapiDocumentIdentity {
     nombre: string;
     slug: string;
     descripcion_corta: string;
@@ -82,7 +91,7 @@ export interface HardwareTiendaResumen
     imagen_principal?: StrapiMedia | null;
 }
 
-interface ProductoTiendaBase extends StrapiEntityBase {
+interface ProductoTiendaCamposComerciales {
     nombre: string;
     slug: string;
     sku: string;
@@ -97,33 +106,52 @@ interface ProductoTiendaBase extends StrapiEntityBase {
     descripcion_corta: string;
 }
 
+export interface ProductoTiendaResumen
+    extends StrapiDocumentIdentity,
+        ProductoTiendaCamposComerciales {
+    imagen_principal: StrapiMedia | null;
+    categoria_producto_tienda:
+        CategoriaProductoTiendaResumen;
+}
+
 export interface ProductoTiendaRelacionado
-    extends ProductoTiendaBase {
-    imagen_principal?: StrapiMedia | null;
+    extends StrapiDocumentIdentity,
+        ProductoTiendaCamposComerciales {
+    imagen_principal: StrapiMedia | null;
 }
 
 export interface ProductoTienda
-    extends ProductoTiendaBase {
+    extends StrapiEntityBase,
+        ProductoTiendaCamposComerciales {
     descripcion_completa: StrapiBlock[] | null;
     imagen_principal: StrapiMedia | null;
     galeria: StrapiMedia[] | null;
     caracteristicas: CaracteristicaProductoTienda[];
     incluye: StrapiBlock[] | null;
     observaciones_envio: string | null;
-    categoria_producto_tienda: CategoriaProductoTienda;
+    categoria_producto_tienda:
+        CategoriaProductoTienda;
     hardware: HardwareTiendaResumen | null;
     compatible_con: ProductoTiendaRelacionado[];
-    accesorios_compatibles: ProductoTiendaRelacionado[];
+    accesorios_compatibles:
+        ProductoTiendaRelacionado[];
+}
+
+export interface StrapiPagination {
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
 }
 
 export interface StrapiCollectionResponse<T> {
     data: T[];
     meta?: {
-        pagination?: {
-            page: number;
-            pageSize: number;
-            pageCount: number;
-            total: number;
-        };
+        pagination?: StrapiPagination;
     };
+}
+
+export interface PaginaTienda<T> {
+    items: T[];
+    pagination: StrapiPagination;
 }
