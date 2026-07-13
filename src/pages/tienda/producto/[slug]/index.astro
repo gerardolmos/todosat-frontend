@@ -2,6 +2,7 @@
 import Layout from "../../../../layouts/Layout.astro";
 import Container from "../../../../components/Container.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+import ProductCommercialStatus from "../../../../components/store/ProductCommercialStatus.astro";
 
 import {
     getProductoTiendaPorSlug,
@@ -56,16 +57,6 @@ const incluyeHTML = renderBlocks(
     producto.incluye || [],
 );
 
-const precio =
-    producto.precio_centimos !== null
-        ? new Intl.NumberFormat("es-ES", {
-              style: "currency",
-              currency: producto.moneda,
-          }).format(
-              producto.precio_centimos / 100,
-          )
-        : null;
-
 const productoPath =
     `/tienda/producto/${producto.slug}`;
 
@@ -74,11 +65,6 @@ const robots =
         ? "noindex, follow"
         : "index, follow";
 
-const estadoPrincipal =
-    producto.estado_venta === "Disponible" &&
-    precio
-        ? precio
-        : producto.estado_venta;
 ---
 
 <Layout
@@ -155,14 +141,12 @@ const estadoPrincipal =
                             {producto.descripcion_corta}
                         </p>
 
-                        <div class="mt-8 rounded-2xl border border-white/10 bg-slate-900 p-6">
-                            <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
-                                Estado de venta
-                            </p>
-
-                            <p class="mt-2 text-2xl font-bold text-white">
-                                {estadoPrincipal}
-                            </p>
+                        <div class="mt-8">
+                            <ProductCommercialStatus
+                                estado={producto.estado_venta}
+                                precioCentimos={producto.precio_centimos}
+                                moneda={producto.moneda}
+                            />
                         </div>
                     </header>
                 </div>

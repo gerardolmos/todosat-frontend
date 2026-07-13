@@ -1,0 +1,92 @@
+---
+import type {
+    EstadoVentaTienda,
+    MonedaTienda,
+} from "../../types/store";
+
+interface Props {
+    estado: EstadoVentaTienda;
+    precioCentimos: number | null;
+    moneda: MonedaTienda;
+    compact?: boolean;
+}
+
+const {
+    estado,
+    precioCentimos,
+    moneda,
+    compact = false,
+} = Astro.props;
+
+const formattedPrice =
+    precioCentimos !== null
+        ? new Intl.NumberFormat("es-ES", {
+              style: "currency",
+              currency: moneda,
+          }).format(precioCentimos / 100)
+        : null;
+
+let label: string;
+let eyebrow = "Estado";
+let statusClass: string;
+
+switch (estado) {
+    case "Disponible":
+        if (formattedPrice) {
+            eyebrow = "Precio";
+            label = formattedPrice;
+        } else {
+            label = "Disponible";
+        }
+
+        statusClass =
+            "border-orange-300 bg-orange-50 text-orange-950";
+        break;
+
+    case "Bajo consulta":
+        label = "Consultar disponibilidad";
+        statusClass =
+            "border-amber-300 bg-amber-50 text-amber-950";
+        break;
+
+    case "Agotado":
+        label = "Agotado";
+        statusClass =
+            "border-slate-300 bg-slate-100 text-slate-700";
+        break;
+
+    case "Próximamente":
+        label = "Próximamente";
+        statusClass =
+            "border-blue-300 bg-blue-50 text-blue-950";
+        break;
+
+    case "Descatalogado":
+        label = "Descatalogado";
+        statusClass =
+            "border-slate-300 bg-slate-200 text-slate-600";
+        break;
+}
+
+const wrapperClass = compact
+    ? `inline-flex rounded-full border px-3 py-1.5 text-sm font-bold ${statusClass}`
+    : `rounded-2xl border p-5 ${statusClass}`;
+---
+
+{
+    compact ? (
+        <span class={wrapperClass}>
+            {label}
+        </span>
+    ) : (
+        <div class={wrapperClass}>
+            <p class="text-xs font-bold uppercase tracking-[0.16em] opacity-65">
+                {eyebrow}
+            </p>
+
+            <p class="mt-2 text-2xl font-bold">
+                {label}
+            </p>
+        </div>
+    )
+}
