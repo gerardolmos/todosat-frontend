@@ -81,6 +81,11 @@ export interface CategoriaProductoTienda
     imagen: StrapiMedia | null;
 }
 
+export interface CategoriaTiendaConConteo {
+    categoria: CategoriaProductoTienda;
+    totalProductos: number;
+}
+
 export interface HardwareTiendaResumen
     extends StrapiDocumentIdentity {
     nombre: string;

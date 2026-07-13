@@ -2,6 +2,7 @@ import { fetchAllAPI, fetchAPI } from "./api";
 
 import type {
     CategoriaProductoTienda,
+    CategoriaTiendaConConteo,
     PaginaTienda,
     ProductoTienda,
     ProductoTiendaResumen,
@@ -104,6 +105,33 @@ Promise<CategoriaProductoTienda[]> {
     );
 
     return response.data as CategoriaProductoTienda[];
+}
+
+export async function getCategoriasTiendaConConteo():
+Promise<CategoriaTiendaConConteo[]> {
+    const categorias = await getCategoriasTienda();
+
+    const categoriasConConteo = await Promise.all(
+        categorias.map(async (categoria) => {
+            const catalogo =
+                await getProductosTiendaPorCategoriaPage(
+                    categoria.slug,
+                    1,
+                    1,
+                );
+
+            return {
+                categoria,
+                totalProductos:
+                    catalogo.pagination.total,
+            };
+        }),
+    );
+
+    return categoriasConConteo.filter(
+        ({ totalProductos }) =>
+            totalProductos > 0,
+    );
 }
 
 export async function getCategoriaTiendaPorSlug(

@@ -2,23 +2,35 @@
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
 import Pagination from "../../components/Pagination.astro";
+import CategoryCard from "../../components/store/CategoryCard.astro";
 import ProductCard from "../../components/store/ProductCard.astro";
 
 import {
+    getCategoriasTiendaConConteo,
+    getProductosDestacadosTienda,
     getProductosTiendaPage,
     PRODUCTOS_TIENDA_POR_PAGINA,
 } from "../../lib/store";
 
 import type {
+    CategoriaTiendaConConteo,
     PaginaTienda,
     ProductoTiendaResumen,
 } from "../../types/store";
 
 export async function getStaticPaths() {
-    const firstPage = await getProductosTiendaPage(
-        1,
-        PRODUCTOS_TIENDA_POR_PAGINA,
-    );
+    const [
+        firstPage,
+        categorias,
+        destacados,
+    ] = await Promise.all([
+        getProductosTiendaPage(
+            1,
+            PRODUCTOS_TIENDA_POR_PAGINA,
+        ),
+        getCategoriasTiendaConConteo(),
+        getProductosDestacadosTienda(6),
+    ]);
 
     const totalPages = Math.max(
         1,
@@ -32,6 +44,8 @@ export async function getStaticPaths() {
             },
             props: {
                 catalogo: firstPage,
+                categorias,
+                destacados,
             },
         },
     ];
@@ -53,6 +67,8 @@ export async function getStaticPaths() {
             },
             props: {
                 catalogo,
+                categorias: [],
+                destacados: [],
             },
         });
     }
@@ -60,8 +76,14 @@ export async function getStaticPaths() {
     return paths;
 }
 
-const { catalogo } = Astro.props as {
+const {
+    catalogo,
+    categorias,
+    destacados,
+} = Astro.props as {
     catalogo: PaginaTienda<ProductoTiendaResumen>;
+    categorias: CategoriaTiendaConConteo[];
+    destacados: ProductoTiendaResumen[];
 };
 
 const currentPage = catalogo.pagination.page;
@@ -70,6 +92,8 @@ const totalPages = Math.max(
     1,
     catalogo.pagination.pageCount,
 );
+
+const isFirstPage = currentPage === 1;
 
 const pageSuffix =
     currentPage > 1
@@ -99,9 +123,14 @@ const canonicalPath =
     canonical={canonicalPath}
 >
     <main class="min-h-screen bg-slate-100 text-slate-950">
-        <section class="bg-slate-950 py-12 text-white md:py-16">
+        <section class="relative overflow-hidden bg-slate-950 py-14 text-white md:py-20">
+            <div
+                class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-orange-500/10 blur-3xl"
+                aria-hidden="true"
+            ></div>
+
             <Container>
-                <header class="max-w-4xl">
+                <header class="relative max-w-4xl">
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-orange-400">
                         TodoSatcom
                     </p>
@@ -113,9 +142,88 @@ const canonicalPath =
                     <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
                         {descriptionBase}
                     </p>
+
+                    {
+                        isFirstPage &&
+                        categorias.length > 0 && (
+                            <a
+                                href="#categorias"
+                                class="mt-8 inline-flex rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
+                            >
+                                Explorar categorías
+                            </a>
+                        )
+                    }
                 </header>
             </Container>
         </section>
+
+        {
+            isFirstPage &&
+            destacados.length > 0 && (
+                <section class="border-b border-orange-200 bg-orange-50 py-12 md:py-16">
+                    <Container>
+                        <div class="max-w-3xl">
+                            <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
+                                Selección TodoSatcom
+                            </p>
+
+                            <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+                                Productos destacados
+                            </h2>
+
+                            <p class="mt-4 text-base leading-7 text-slate-600">
+                                Una selección de terminales y accesorios relevantes del catálogo.
+                            </p>
+                        </div>
+
+                        <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+                            {
+                                destacados.map((producto) => (
+                                    <ProductCard
+                                        producto={producto}
+                                    />
+                                ))
+                            }
+                        </div>
+                    </Container>
+                </section>
+            )
+        }
+
+        {
+            isFirstPage &&
+            categorias.length > 0 && (
+                <section
+                    id="categorias"
+                    class="border-b border-slate-200 bg-white py-12 md:py-16"
+                >
+                    <Container>
+                        <div class="max-w-3xl">
+                            <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
+                                Categorías
+                            </p>
+
+                            <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+                                Encuentra el equipo que necesitas
+                            </h2>
+
+                            <p class="mt-4 text-base leading-7 text-slate-600">
+                                Accede directamente a cada familia de productos disponibles.
+                            </p>
+                        </div>
+
+                        <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+                            {
+                                categorias.map((item) => (
+                                    <CategoryCard item={item} />
+                                ))
+                            }
+                        </div>
+                    </Container>
+                </section>
+            )
+        }
 
         <section class="py-12 md:py-16">
             <Container>
@@ -126,7 +234,11 @@ const canonicalPath =
                         </p>
 
                         <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-                            Productos disponibles
+                            {
+                                isFirstPage
+                                    ? "Todos los productos"
+                                    : `Productos — Página ${currentPage}`
+                            }
                         </h2>
                     </div>
 
