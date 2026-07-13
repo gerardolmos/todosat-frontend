@@ -2,7 +2,9 @@
 import Layout from "../../../../layouts/Layout.astro";
 import Container from "../../../../components/Container.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+
 import ProductCommercialStatus from "../../../../components/store/ProductCommercialStatus.astro";
+import RelatedProductCard from "../../../../components/store/RelatedProductCard.astro";
 
 import {
     getProductoTiendaPorSlug,
@@ -14,38 +16,41 @@ import { renderBlocks } from "../../../../lib/renderBlocks";
 
 import type {
     ProductoTienda,
+    ProductoTiendaRelacionado,
+    StrapiMedia,
 } from "../../../../types/store";
 
 export async function getStaticPaths() {
-    const slugs = await getSlugsProductosTienda();
-    const paths = [];
+    const slugs =
+        await getSlugsProductosTienda();
 
-    for (const slug of slugs) {
-        const producto =
-            await getProductoTiendaPorSlug(slug);
+    const productos = await Promise.all(
+        slugs.map((slug) =>
+            getProductoTiendaPorSlug(slug),
+        ),
+    );
 
-        if (!producto) {
-            continue;
-        }
-
-        paths.push({
+    return productos
+        .filter(
+            (producto):
+                producto is ProductoTienda =>
+                Boolean(producto),
+        )
+        .map((producto) => ({
             params: {
-                slug,
+                slug: producto.slug,
             },
             props: {
                 producto,
             },
-        });
-    }
-
-    return paths;
+        }));
 }
 
 const { producto } = Astro.props as {
     producto: ProductoTienda;
 };
 
-const imagenUrl = getMediaUrl(
+const imagenPrincipalUrl = getMediaUrl(
     producto.imagen_principal,
 );
 
@@ -57,219 +62,582 @@ const incluyeHTML = renderBlocks(
     producto.incluye || [],
 );
 
+const caracteristicas =
+    producto.caracteristicas || [];
+
+const galleryMap = new Map<
+    string,
+    StrapiMedia
+>();
+
+if (producto.imagen_principal) {
+    galleryMap.set(
+        producto.imagen_principal.documentId,
+        producto.imagen_principal,
+    );
+}
+
+for (const image of producto.galeria || []) {
+    galleryMap.set(image.documentId, image);
+}
+
+const galleryImages = Array.from(
+    galleryMap.values(),
+);
+
+const relatedProductsMap = new Map<
+    string,
+    ProductoTiendaRelacionado
+>();
+
+for (
+    const relatedProduct of [
+        ...(producto.compatible_con || []),
+        ...(producto.accesorios_compatibles || []),
+    ]
+) {
+    if (
+        relatedProduct.activo &&
+        relatedProduct.slug !== producto.slug
+    ) {
+        relatedProductsMap.set(
+            relatedProduct.documentId,
+            relatedProduct,
+        );
+    }
+}
+
+const relatedProducts = Array.from(
+    relatedProductsMap.values(),
+);
+
 const productoPath =
     `/tienda/producto/${producto.slug}`;
+
+const categoriaPath =
+    `/tienda/categoria/${producto.categoria_producto_tienda.slug}`;
 
 const robots =
     producto.estado_venta === "Descatalogado"
         ? "noindex, follow"
         : "index, follow";
 
+const siteUrl =
+    Astro.site ??
+    new URL("https://todosatcom.com");
+
+const productoUrl = new URL(
+    `${productoPath}/`,
+    siteUrl,
+).toString();
+
+const categoriaUrl = new URL(
+    `${categoriaPath}/`,
+    siteUrl,
+).toString();
+
+const tiendaUrl = new URL(
+    "/tienda/",
+    siteUrl,
+).toString();
+
+const homeUrl = new URL(
+    "/",
+    siteUrl,
+).toString();
+
+const availabilityMap = {
+    Disponible:
+        "https://schema.org/InStock",
+    "Bajo consulta":
+        "https://schema.org/LimitedAvailability",
+    Agotado:
+        "https://schema.org/OutOfStock",
+    Próximamente:
+        "https://schema.org/PreOrder",
+    Descatalogado:
+        "https://schema.org/Discontinued",
+} as const;
+
+const productImages = galleryImages
+    .map((image) => getMediaUrl(image))
+    .filter(
+        (url): url is string =>
+            Boolean(url),
+    );
+
+const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "WebPage",
+            "@id": productoUrl,
+            url: productoUrl,
+            name: producto.nombre,
+            description:
+                producto.descripcion_corta,
+            inLanguage: "es-ES",
+            mainEntity: {
+                "@id":
+                    `${productoUrl}#product`,
+            },
+        },
+        {
+            "@type": "Product",
+            "@id":
+                `${productoUrl}#product`,
+            name: producto.nombre,
+            description:
+                producto.descripcion_corta,
+            url: productoUrl,
+            sku: producto.sku,
+            category:
+                producto
+                    .categoria_producto_tienda
+                    .nombre,
+            ...(productImages.length > 0
+                ? {
+                      image: productImages,
+                  }
+                : {}),
+            ...(caracteristicas.length > 0
+                ? {
+                      additionalProperty:
+                          caracteristicas.map(
+                              (item) => ({
+                                  "@type":
+                                      "PropertyValue",
+                                  name:
+                                      item.etiqueta,
+                                  value:
+                                      item.valor,
+                              }),
+                          ),
+                  }
+                : {}),
+            ...(producto.precio_centimos !==
+            null
+                ? {
+                      offers: {
+                          "@type": "Offer",
+                          url: productoUrl,
+                          priceCurrency:
+                              producto.moneda,
+                          price: (
+                              producto.precio_centimos /
+                              100
+                          ).toFixed(2),
+                          availability:
+                              availabilityMap[
+                                  producto
+                                      .estado_venta
+                              ],
+                          itemCondition:
+                              "https://schema.org/NewCondition",
+                      },
+                  }
+                : {}),
+        },
+        {
+            "@type": "BreadcrumbList",
+            "@id":
+                `${productoUrl}#breadcrumb`,
+            itemListElement: [
+                {
+                    "@type": "ListItem",
+                    position: 1,
+                    name: "Inicio",
+                    item: homeUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 2,
+                    name: "Tienda",
+                    item: tiendaUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 3,
+                    name:
+                        producto
+                            .categoria_producto_tienda
+                            .nombre,
+                    item: categoriaUrl,
+                },
+                {
+                    "@type": "ListItem",
+                    position: 4,
+                    name: producto.nombre,
+                    item: productoUrl,
+                },
+            ],
+        },
+    ],
+};
 ---
 
 <Layout
     title={`${producto.nombre} | Tienda TodoSatcom`}
     description={producto.descripcion_corta}
     canonical={productoPath}
-    image={imagenUrl}
+    image={imagenPrincipalUrl}
     robots={robots}
+    structuredData={structuredData}
 >
-    <main class="min-h-screen bg-slate-950 py-10 text-white">
-        <Container>
-            <Breadcrumbs
-                items={[
-                    {
-                        label: "Tienda",
-                        href: "/tienda",
-                    },
-                    {
-                        label:
-                            producto
-                                .categoria_producto_tienda
-                                .nombre,
-                        href: `/tienda/categoria/${
-                            producto
-                                .categoria_producto_tienda
-                                .slug
-                        }`,
-                    },
-                    {
-                        label: producto.nombre,
-                    },
-                ]}
-            />
-
-            <article class="mt-8">
-                <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
-                    <section>
+    <main class="min-h-screen bg-slate-100 text-slate-950">
+        <section class="bg-slate-950 py-8 text-white md:py-12">
+            <Container>
+                <Breadcrumbs
+                    items={[
                         {
-                            imagenUrl ? (
-                                <div class="overflow-hidden rounded-3xl border border-white/10 bg-white p-6">
-                                    <img
-                                        src={imagenUrl}
-                                        alt={
-                                            producto
-                                                .imagen_principal
-                                                ?.alternativeText ||
-                                            producto.nombre
+                            label: "Tienda",
+                            href: "/tienda",
+                        },
+                        {
+                            label:
+                                producto
+                                    .categoria_producto_tienda
+                                    .nombre,
+                            href: categoriaPath,
+                        },
+                        {
+                            label: producto.nombre,
+                        },
+                    ]}
+                />
+
+                <a
+                    href="/tienda"
+                    class="mt-8 inline-flex text-sm font-semibold text-orange-400 transition hover:text-orange-300"
+                >
+                    ← Volver a la tienda
+                </a>
+            </Container>
+        </section>
+
+        <section class="py-10 md:py-16">
+            <Container>
+                <article>
+                    <div class="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-start">
+                        <section>
+                            {
+                                imagenPrincipalUrl ? (
+                                    <div class="flex min-h-[360px] items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:min-h-[540px]">
+                                        <img
+                                            src={
+                                                imagenPrincipalUrl
+                                            }
+                                            alt={
+                                                producto
+                                                    .imagen_principal
+                                                    ?.alternativeText ||
+                                                producto.nombre
+                                            }
+                                            class="max-h-[500px] w-full object-contain"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div class="flex min-h-[360px] items-center justify-center rounded-3xl border border-slate-200 bg-white text-slate-400 shadow-sm md:min-h-[540px]">
+                                        Imagen no disponible
+                                    </div>
+                                )
+                            }
+
+                            {
+                                galleryImages.length >
+                                    1 && (
+                                    <div class="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3">
+                                        {
+                                            galleryImages.map(
+                                                (
+                                                    image,
+                                                ) => {
+                                                    const url =
+                                                        getMediaUrl(
+                                                            image,
+                                                        );
+
+                                                    return url ? (
+                                                        <a
+                                                            href={
+                                                                url
+                                                            }
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="flex h-36 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-orange-400"
+                                                        >
+                                                            <img
+                                                                src={
+                                                                    url
+                                                                }
+                                                                alt={
+                                                                    image.alternativeText ||
+                                                                    producto.nombre
+                                                                }
+                                                                class="h-full w-full object-contain"
+                                                                loading="lazy"
+                                                            />
+                                                        </a>
+                                                    ) : null;
+                                                },
+                                            )
                                         }
-                                        class="h-[320px] w-full object-contain md:h-[480px]"
-                                    />
-                                </div>
-                            ) : (
-                                <div class="flex h-[320px] items-center justify-center rounded-3xl border border-white/10 bg-slate-900 text-slate-500 md:h-[480px]">
-                                    Sin imagen
-                                </div>
-                            )
-                        }
-                    </section>
-
-                    <header>
-                        <p class="text-sm font-bold uppercase tracking-[0.18em] text-blue-400">
-                            {producto.tipo_producto}
-                        </p>
-
-                        <h1 class="mt-4 text-4xl font-bold leading-tight tracking-tight !text-white md:text-6xl">
-                            {producto.nombre}
-                        </h1>
-
-                        <p class="mt-5 text-sm text-slate-400">
-                            SKU: {producto.sku}
-                        </p>
-
-                        <p class="mt-6 text-lg leading-8 text-slate-300">
-                            {producto.descripcion_corta}
-                        </p>
-
-                        <div class="mt-8">
-                            <ProductCommercialStatus
-                                estado={producto.estado_venta}
-                                precioCentimos={producto.precio_centimos}
-                                moneda={producto.moneda}
-                            />
-                        </div>
-                    </header>
-                </div>
-
-                {
-                    producto.caracteristicas.length > 0 && (
-                        <section class="mt-14 rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8">
-                            <h2 class="text-3xl font-bold text-white">
-                                Características
-                            </h2>
-
-                            <dl class="mt-8 grid gap-x-10 md:grid-cols-2">
-                                {
-                                    producto.caracteristicas.map(
-                                        (caracteristica) => (
-                                            <div class="border-b border-white/10 py-5">
-                                                <dt class="text-xs font-bold uppercase tracking-[0.16em] text-blue-400">
-                                                    {
-                                                        caracteristica.etiqueta
-                                                    }
-                                                </dt>
-
-                                                <dd class="mt-2 text-lg text-slate-200">
-                                                    {
-                                                        caracteristica.valor
-                                                    }
-                                                </dd>
-                                            </div>
-                                        ),
-                                    )
-                                }
-                            </dl>
+                                    </div>
+                                )
+                            }
                         </section>
-                    )
-                }
 
-                {
-                    descripcionHTML && (
-                        <section class="mt-14 rounded-3xl bg-white p-6 text-slate-950 md:p-10">
-                            <h2 class="mb-8 text-3xl font-bold text-slate-950">
-                                Descripción
-                            </h2>
+                        <header class="lg:sticky lg:top-28">
+                            <div class="flex flex-wrap gap-2">
+                                <a
+                                    href={categoriaPath}
+                                    class="rounded-full border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-800 transition hover:bg-orange-100"
+                                >
+                                    {
+                                        producto
+                                            .categoria_producto_tienda
+                                            .nombre
+                                    }
+                                </a>
 
-                            <div
-                                class="prose prose-slate max-w-none"
-                                set:html={descripcionHTML}
-                            />
-                        </section>
-                    )
-                }
+                                <span class="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+                                    {
+                                        producto.tipo_producto
+                                    }
+                                </span>
+                            </div>
 
-                {
-                    incluyeHTML && (
-                        <section class="mt-10 rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-10">
-                            <h2 class="mb-8 text-3xl font-bold text-white">
-                                Contenido incluido
-                            </h2>
+                            <h1 class="mt-6 text-4xl font-bold leading-tight tracking-tight text-slate-950 md:text-6xl">
+                                {producto.nombre}
+                            </h1>
 
-                            <div
-                                class="text-slate-300"
-                                set:html={incluyeHTML}
-                            />
-                        </section>
-                    )
-                }
-
-                {
-                    producto.hardware && (
-                        <section class="mt-10 rounded-3xl border border-blue-500/30 bg-blue-500/10 p-6 md:p-8">
-                            <p class="text-xs font-bold uppercase tracking-[0.16em] text-blue-300">
-                                Información relacionada
+                            <p class="mt-4 text-sm font-semibold text-slate-500">
+                                SKU: {producto.sku}
                             </p>
 
-                            <h2 class="mt-3 text-2xl font-bold text-white">
-                                {producto.hardware.nombre}
-                            </h2>
-
-                            <a
-                                href={`/hardware/${producto.hardware.slug}`}
-                                class="mt-5 inline-flex text-sm font-bold text-blue-300 transition hover:text-white"
-                            >
-                                Consultar ficha informativa →
-                            </a>
-                        </section>
-                    )
-                }
-
-                {
-                    producto.accesorios_compatibles.length >
-                        0 && (
-                        <section class="mt-14">
-                            <h2 class="text-3xl font-bold text-white">
-                                Accesorios compatibles
-                            </h2>
-
-                            <div class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                            <p class="mt-6 text-lg leading-8 text-slate-600">
                                 {
-                                    producto
-                                        .accesorios_compatibles
-                                        .map((accesorio) => (
-                                            <a
-                                                href={`/tienda/producto/${accesorio.slug}`}
-                                                class="rounded-2xl border border-white/10 bg-slate-900 p-5 transition hover:border-blue-500/50"
-                                            >
-                                                <p class="text-xs font-bold uppercase tracking-[0.16em] text-blue-400">
+                                    producto.descripcion_corta
+                                }
+                            </p>
+
+                            <div class="mt-8">
+                                <ProductCommercialStatus
+                                    estado={
+                                        producto.estado_venta
+                                    }
+                                    precioCentimos={
+                                        producto.precio_centimos
+                                    }
+                                    moneda={
+                                        producto.moneda
+                                    }
+                                />
+                            </div>
+
+                            {
+                                producto.requiere_envio && (
+                                    <p class="mt-5 rounded-2xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                                        Producto físico con envío.
+                                        Las condiciones definitivas
+                                        se mostrarán durante el
+                                        proceso de compra.
+                                    </p>
+                                )
+                            }
+                        </header>
+                    </div>
+
+                    {
+                        caracteristicas.length > 0 && (
+                            <section class="mt-14 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
+                                <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
+                                    Especificaciones
+                                </p>
+
+                                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+                                    Características técnicas
+                                </h2>
+
+                                <dl class="mt-8 grid gap-x-12 md:grid-cols-2">
+                                    {
+                                        caracteristicas.map(
+                                            (item) => (
+                                                <div class="border-b border-slate-200 py-5">
+                                                    <dt class="text-xs font-bold uppercase tracking-[0.16em] text-orange-700">
+                                                        {
+                                                            item.etiqueta
+                                                        }
+                                                    </dt>
+
+                                                    <dd class="mt-2 text-lg font-semibold text-slate-800">
+                                                        {
+                                                            item.valor
+                                                        }
+                                                    </dd>
+                                                </div>
+                                            ),
+                                        )
+                                    }
+                                </dl>
+                            </section>
+                        )
+                    }
+
+                    {
+                        descripcionHTML && (
+                            <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
+                                <h2 class="text-3xl font-bold tracking-tight text-slate-950">
+                                    Descripción
+                                </h2>
+
+                                <div
+                                    class="prose prose-slate mt-8 max-w-none prose-headings:text-slate-950 prose-a:text-orange-700 prose-strong:text-slate-950"
+                                    set:html={
+                                        descripcionHTML
+                                    }
+                                />
+                            </section>
+                        )
+                    }
+
+                    {
+                        incluyeHTML && (
+                            <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
+                                <h2 class="text-3xl font-bold tracking-tight text-slate-950">
+                                    Contenido incluido
+                                </h2>
+
+                                <div
+                                    class="prose prose-slate mt-8 max-w-none prose-headings:text-slate-950 prose-a:text-orange-700 prose-strong:text-slate-950"
+                                    set:html={
+                                        incluyeHTML
+                                    }
+                                />
+                            </section>
+                        )
+                    }
+
+                    {
+                        producto.observaciones_envio && (
+                            <section class="mt-10 rounded-3xl border border-orange-200 bg-orange-50 p-6 md:p-10">
+                                <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
+                                    Entrega
+                                </p>
+
+                                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+                                    Observaciones de envío
+                                </h2>
+
+                                <p class="mt-5 max-w-4xl text-base leading-7 text-slate-700">
+                                    {
+                                        producto.observaciones_envio
+                                    }
+                                </p>
+                            </section>
+                        )
+                    }
+
+                    {
+                        producto.hardware && (
+                            <section class="mt-10 overflow-hidden rounded-3xl bg-slate-950 text-white shadow-sm">
+                                <div class="grid md:grid-cols-[260px_minmax(0,1fr)]">
+                                    {
+                                        getMediaUrl(
+                                            producto
+                                                .hardware
+                                                .imagen_principal,
+                                        ) && (
+                                            <div class="flex min-h-64 items-center justify-center bg-white p-6">
+                                                <img
+                                                    src={
+                                                        getMediaUrl(
+                                                            producto
+                                                                .hardware
+                                                                .imagen_principal,
+                                                        )!
+                                                    }
+                                                    alt={
+                                                        producto
+                                                            .hardware
+                                                            .nombre
+                                                    }
+                                                    class="max-h-52 w-full object-contain"
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                        )
+                                    }
+
+                                    <div class="p-7 md:p-10">
+                                        <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-400">
+                                            Información técnica
+                                        </p>
+
+                                        <h2 class="mt-3 text-3xl font-bold text-white">
+                                            {
+                                                producto
+                                                    .hardware
+                                                    .nombre
+                                            }
+                                        </h2>
+
+                                        {
+                                            producto.hardware
+                                                .descripcion_corta && (
+                                                <p class="mt-5 max-w-2xl leading-7 text-slate-300">
                                                     {
-                                                        accesorio.tipo_producto
+                                                        producto
+                                                            .hardware
+                                                            .descripcion_corta
                                                     }
                                                 </p>
+                                            )
+                                        }
 
-                                                <h3 class="mt-3 text-xl font-bold text-white">
-                                                    {
-                                                        accesorio.nombre
+                                        <a
+                                            href={`/hardware/${producto.hardware.slug}`}
+                                            class="mt-7 inline-flex rounded-full bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
+                                        >
+                                            Consultar ficha informativa
+                                        </a>
+                                    </div>
+                                </div>
+                            </section>
+                        )
+                    }
+
+                    {
+                        relatedProducts.length > 0 && (
+                            <section class="mt-14">
+                                <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
+                                    Compatibilidad
+                                </p>
+
+                                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+                                    Productos compatibles
+                                </h2>
+
+                                <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+                                    {
+                                        relatedProducts.map(
+                                            (
+                                                relatedProduct,
+                                            ) => (
+                                                <RelatedProductCard
+                                                    producto={
+                                                        relatedProduct
                                                     }
-                                                </h3>
-                                            </a>
-                                        ))
-                                }
-                            </div>
-                        </section>
-                    )
-                }
-            </article>
-        </Container>
+                                                />
+                                            ),
+                                        )
+                                    }
+                                </div>
+                            </section>
+                        )
+                    }
+                </article>
+            </Container>
+        </section>
     </main>
 </Layout>

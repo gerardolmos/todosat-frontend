@@ -1,0 +1,70 @@
+---
+import { getMediaUrl } from "../../lib/media";
+import ProductCommercialStatus from "./ProductCommercialStatus.astro";
+
+import type {
+    ProductoTiendaRelacionado,
+} from "../../types/store";
+
+interface Props {
+    producto: ProductoTiendaRelacionado;
+}
+
+const { producto } = Astro.props;
+
+const imageUrl = getMediaUrl(
+    producto.imagen_principal,
+);
+
+const productUrl =
+    `/tienda/producto/${producto.slug}`;
+---
+
+<a
+    href={productUrl}
+    class="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl"
+>
+    <div class="flex h-52 items-center justify-center border-b border-slate-200 bg-slate-50 p-5">
+        {
+            imageUrl ? (
+                <img
+                    src={imageUrl}
+                    alt={
+                        producto.imagen_principal
+                            ?.alternativeText ||
+                        producto.nombre
+                    }
+                    class="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]"
+                    loading="lazy"
+                />
+            ) : (
+                <span class="text-sm font-semibold text-slate-400">
+                    Imagen no disponible
+                </span>
+            )
+        }
+    </div>
+
+    <div class="flex flex-1 flex-col p-5">
+        <p class="text-xs font-bold uppercase tracking-[0.16em] text-orange-700">
+            {producto.tipo_producto}
+        </p>
+
+        <h3 class="mt-3 text-xl font-bold leading-tight text-slate-950 transition group-hover:text-orange-700">
+            {producto.nombre}
+        </h3>
+
+        <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">
+            {producto.descripcion_corta}
+        </p>
+
+        <div class="mt-auto pt-5">
+            <ProductCommercialStatus
+                estado={producto.estado_venta}
+                precioCentimos={producto.precio_centimos}
+                moneda={producto.moneda}
+                compact
+            />
+        </div>
+    </div>
+</a>
