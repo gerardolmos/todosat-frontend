@@ -22,6 +22,11 @@ const productUrl =
 
 const categoryUrl =
     `/tienda/categoria/${producto.categoria_producto_tienda.slug}`;
+
+const actionLabel =
+    producto.estado_venta === "Bajo consulta"
+        ? "Consultar disponibilidad"
+        : "Ver producto";
 ---
 
 <article
@@ -96,7 +101,7 @@ const categoryUrl =
                 href={productUrl}
                 class="mt-5 inline-flex items-center text-sm font-bold text-slate-950 transition hover:text-orange-700"
             >
-                Ver producto
+                {actionLabel}
                 <span
                     class="ml-2 transition-transform group-hover:translate-x-1"
                     aria-hidden="true"

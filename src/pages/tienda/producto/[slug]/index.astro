@@ -4,6 +4,7 @@ import Container from "../../../../components/Container.astro";
 import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
 
 import ProductCommercialStatus from "../../../../components/store/ProductCommercialStatus.astro";
+import ProductCommercialAction from "../../../../components/store/ProductCommercialAction.astro";
 import RelatedProductCard from "../../../../components/store/RelatedProductCard.astro";
 
 import {
@@ -431,6 +432,17 @@ const structuredData = {
                                     }
                                     moneda={
                                         producto.moneda
+                                    }
+                                />
+                            </div>
+
+                            <div class="mt-6">
+                                <ProductCommercialAction
+                                    estado={
+                                        producto.estado_venta
+                                    }
+                                    productoNombre={
+                                        producto.nombre
                                     }
                                 />
                             </div>
