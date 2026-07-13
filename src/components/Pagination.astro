@@ -5,20 +5,78 @@ type Props = {
     basePath: string;
 };
 
-const { currentPage, totalPages, basePath } = Astro.props;
+type PaginationItem =
+    | number
+    | "ellipsis-start"
+    | "ellipsis-end";
+
+const { currentPage, totalPages, basePath } =
+    Astro.props;
 
 const getPageUrl = (page: number) => {
-    if (page === 1) return basePath;
+    if (page === 1) {
+        return basePath;
+    }
+
     return `${basePath}/${page}`;
 };
+
+function getVisibleItems(): PaginationItem[] {
+    if (totalPages <= 7) {
+        return Array.from(
+            { length: totalPages },
+            (_, index) => index + 1,
+        );
+    }
+
+    if (currentPage <= 4) {
+        return [
+            1,
+            2,
+            3,
+            4,
+            5,
+            "ellipsis-end",
+            totalPages,
+        ];
+    }
+
+    if (currentPage >= totalPages - 3) {
+        return [
+            1,
+            "ellipsis-start",
+            totalPages - 4,
+            totalPages - 3,
+            totalPages - 2,
+            totalPages - 1,
+            totalPages,
+        ];
+    }
+
+    return [
+        1,
+        "ellipsis-start",
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        "ellipsis-end",
+        totalPages,
+    ];
+}
+
+const visibleItems = getVisibleItems();
 ---
 
 {
     totalPages > 1 && (
-        <nav class="mt-14 flex items-center justify-center gap-2 text-sm">
+        <nav
+            class="mt-14 flex items-center justify-center gap-2 text-sm"
+            aria-label="Paginación"
+        >
             {currentPage > 1 && (
                 <a
                     href={getPageUrl(currentPage - 1)}
+                    rel="prev"
                     class="rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-xs font-semibold text-slate-300 transition-all duration-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)] md:px-5 md:py-2.5 md:text-sm"
                 >
                     ←<span class="hidden md:inline"> Anterior</span>
@@ -30,27 +88,41 @@ const getPageUrl = (page: number) => {
             </div>
 
             <div class="hidden items-center gap-2 md:flex">
-                {Array.from({ length: totalPages }, (_, index) => {
-                    const page = index + 1;
-
-                    return (
-                        <a
-                            href={getPageUrl(page)}
-                            class={`flex h-10 w-10 items-center justify-center rounded-full border font-semibold transition-all duration-300 ${
-                                page === currentPage
-                                    ? "border-[#005EFF] bg-[#005EFF] text-white shadow-[0_0_18px_rgba(0,94,255,0.45)]"
-                                    : "border-white/10 bg-slate-900/60 text-slate-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)]"
-                            }`}
-                        >
-                            {page}
-                        </a>
-                    );
-                })}
+                {
+                    visibleItems.map((item) =>
+                        typeof item === "number" ? (
+                            <a
+                                href={getPageUrl(item)}
+                                aria-label={`Ir a la página ${item}`}
+                                aria-current={
+                                    item === currentPage
+                                        ? "page"
+                                        : undefined
+                                }
+                                class={`flex h-10 w-10 items-center justify-center rounded-full border font-semibold transition-all duration-300 ${
+                                    item === currentPage
+                                        ? "border-[#005EFF] bg-[#005EFF] text-white shadow-[0_0_18px_rgba(0,94,255,0.45)]"
+                                        : "border-white/10 bg-slate-900/60 text-slate-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)]"
+                                }`}
+                            >
+                                {item}
+                            </a>
+                        ) : (
+                            <span
+                                class="flex h-10 w-6 items-center justify-center text-slate-500"
+                                aria-hidden="true"
+                            >
+                                …
+                            </span>
+                        ),
+                    )
+                }
             </div>
 
             {currentPage < totalPages && (
                 <a
                     href={getPageUrl(currentPage + 1)}
+                    rel="next"
                     class="rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-xs font-semibold text-slate-300 transition-all duration-300 hover:border-[#005EFF] hover:text-white hover:shadow-[0_0_14px_rgba(0,94,255,0.35)] md:px-5 md:py-2.5 md:text-sm"
                 >
                     <span class="hidden md:inline">Siguiente </span>→
