@@ -25,31 +25,48 @@ const navItems = [
             />
         </a>
 
-        <nav
-            class="hidden items-center text-sm font-semibold text-slate-300 md:flex"
-            aria-label="Navegación principal"
-        >
-            {
-                navItems.map((item, index) => (
-                    <>
-                        <a
-                            href={item.href}
-                            class={`px-5 py-2 transition hover:text-white ${
-                                item.href === "/tienda"
-                                    ? "font-bold text-orange-400 hover:text-orange-300"
-                                    : ""
-                            }`}
-                        >
-                            {item.label}
-                        </a>
+        <div class="hidden items-center gap-4 md:flex">
+            <nav
+                class="flex items-center text-sm font-semibold text-slate-300"
+                aria-label="Navegación principal"
+            >
+                {
+                    navItems.map((item, index) => (
+                        <>
+                            <a
+                                href={item.href}
+                                class={`px-5 py-2 transition hover:text-white ${
+                                    item.href === "/tienda"
+                                        ? "font-bold text-orange-400 hover:text-orange-300"
+                                        : ""
+                                }`}
+                            >
+                                {item.label}
+                            </a>
 
-                        {index < navItems.length - 1 && (
-                            <span class="h-5 w-px bg-slate-500" />
-                        )}
-                    </>
-                ))
-            }
-        </nav>
+                            {index < navItems.length - 1 && (
+                                <span class="h-5 w-px bg-slate-500" />
+                            )}
+                        </>
+                    ))
+                }
+            </nav>
+
+            <a
+                href="/tienda/carrito"
+                class="relative inline-flex items-center justify-center rounded-full border border-orange-400/40 bg-orange-400/10 px-4 py-2.5 text-sm font-bold text-orange-200 transition hover:bg-orange-400/20 hover:text-white"
+            >
+                Carrito
+
+                <span
+                    data-cart-count
+                    hidden
+                    class="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-orange-500 px-1.5 py-0.5 text-xs font-black text-white"
+                >
+                    0
+                </span>
+            </a>
+        </div>
 
         <button
             id="menu-toggle"
@@ -83,6 +100,21 @@ const navItems = [
                     </a>
                 ))
             }
+
+            <a
+                href="/tienda/carrito"
+                class="mt-2 flex items-center justify-between rounded-xl border border-orange-400/30 bg-orange-400/10 px-4 py-3 font-bold text-orange-200 transition hover:bg-orange-400/20"
+            >
+                <span>Carrito</span>
+
+                <span
+                    data-cart-count
+                    hidden
+                    class="inline-flex min-w-6 items-center justify-center rounded-full bg-orange-500 px-1.5 py-0.5 text-xs font-black text-white"
+                >
+                    0
+                </span>
+            </a>
 
             <a
                 href="/buscar"

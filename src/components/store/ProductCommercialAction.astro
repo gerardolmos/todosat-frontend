@@ -1,16 +1,31 @@
 ---
 import type {
     EstadoVentaTienda,
+    MonedaTienda,
 } from "../../types/store";
 
 interface Props {
     estado: EstadoVentaTienda;
+    productoDocumentId: string;
+    productoSlug: string;
     productoNombre: string;
+    productoSku: string;
+    precioCentimos: number | null;
+    moneda: MonedaTienda;
+    imagenUrl?: string | null;
+    requiereEnvio: boolean;
 }
 
 const {
     estado,
+    productoDocumentId,
+    productoSlug,
     productoNombre,
+    productoSku,
+    precioCentimos,
+    moneda,
+    imagenUrl = null,
+    requiereEnvio,
 } = Astro.props;
 
 const contactUrl =
@@ -28,25 +43,71 @@ const unavailableLabels: Partial<
 
 const unavailableLabel =
     unavailableLabels[estado];
+
+const canAddToCart =
+    estado === "Disponible" &&
+    moneda === "EUR" &&
+    Number.isSafeInteger(
+        precioCentimos,
+    ) &&
+    Number(precioCentimos) > 0;
 ---
 
 <div>
     {
-        estado === "Disponible" && (
-            <>
+        estado === "Disponible" &&
+            canAddToCart && (
+                <>
+                    <button
+                        type="button"
+                        data-cart-add
+                        data-document-id={
+                            productoDocumentId
+                        }
+                        data-slug={
+                            productoSlug
+                        }
+                        data-nombre={
+                            productoNombre
+                        }
+                        data-sku={
+                            productoSku
+                        }
+                        data-precio-centimos={String(
+                            precioCentimos,
+                        )}
+                        data-moneda={
+                            moneda
+                        }
+                        data-imagen-url={
+                            imagenUrl || ""
+                        }
+                        data-requiere-envio={String(
+                            requiereEnvio,
+                        )}
+                        class="inline-flex w-full items-center justify-center rounded-full bg-orange-500 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-200 sm:w-auto"
+                    >
+                        Añadir al carrito
+                    </button>
+
+                    <p class="mt-3 max-w-md text-sm leading-6 text-slate-500">
+                        El importe definitivo se comprobará nuevamente en el servidor antes del pago.
+                    </p>
+                </>
+            )
+    }
+
+    {
+        estado === "Disponible" &&
+            !canAddToCart && (
                 <button
                     type="button"
                     disabled
-                    class="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full bg-orange-500 px-6 py-3.5 text-sm font-bold text-white opacity-70 sm:w-auto"
+                    class="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full border border-slate-300 bg-slate-200 px-6 py-3.5 text-sm font-bold text-slate-500 sm:w-auto"
                 >
-                    Comprar
+                    Precio no disponible
                 </button>
-
-                <p class="mt-3 max-w-md text-sm leading-6 text-slate-500">
-                    La compra online se activará cuando incorporemos el carrito y el pago seguro.
-                </p>
-            </>
-        )
+            )
     }
 
     {
