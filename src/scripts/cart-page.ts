@@ -8,6 +8,12 @@ import {
     setCartItemQuantity,
     type CartItem,
 } from "../lib/cart";
+import {
+    CartValidationError,
+    isCartValidationEnabled,
+    validateCartWithServer,
+    type ValidatedCart,
+} from "../lib/cart-validation";
 
 const cartItemsRegion =
     document.querySelector<HTMLElement>(
@@ -39,6 +45,11 @@ const cartError =
         "[data-cart-error]",
     );
 
+const cartSubtotalLabel =
+    document.querySelector<HTMLElement>(
+        "[data-cart-subtotal-label]",
+    );
+
 const clearButton =
     document.querySelector<HTMLButtonElement>(
         "[data-cart-clear]",
@@ -49,6 +60,24 @@ const currencyFormatter =
         style: "currency",
         currency: "EUR",
     });
+
+let validatedCart:
+    ValidatedCart | null = null;
+
+let validatedCartSignature = "";
+
+let validationRequestSequence = 0;
+
+let validationController:
+    AbortController | null = null;
+
+let validationDebounceTimer:
+    number | null = null;
+
+const CART_VALIDATION_DEBOUNCE_MS =
+    800;
+
+let refreshScheduled = false;
 
 function formatPrice(
     valueCentimos: number,
@@ -439,6 +468,67 @@ function createCartItem(
     return article;
 }
 
+function getCartSignature(
+    items: CartItem[],
+): string {
+    return items
+        .map(
+            (item) =>
+                `${item.documentId}:${item.cantidad}`,
+        )
+        .sort()
+        .join("|");
+}
+
+function getDisplayItems(
+    items: CartItem[],
+    activeValidation:
+        ValidatedCart | null,
+): CartItem[] {
+    if (!activeValidation) {
+        return items;
+    }
+
+    const validatedLines =
+        new Map(
+            activeValidation.lineas.map(
+                (line) => [
+                    line.documentId,
+                    line,
+                ],
+            ),
+        );
+
+    return items.map((item) => {
+        const validatedLine =
+            validatedLines.get(
+                item.documentId,
+            );
+
+        if (!validatedLine) {
+            return item;
+        }
+
+        return {
+            ...item,
+
+            nombre:
+                validatedLine.nombre,
+
+            sku:
+                validatedLine.sku,
+
+            precioCentimos:
+                validatedLine
+                    .precioUnitarioCentimos,
+
+            requiereEnvio:
+                validatedLine
+                    .requiereEnvio,
+        };
+    });
+}
+
 function renderCart() {
     if (
         !cartItemsRegion ||
@@ -451,11 +541,28 @@ function renderCart() {
     }
 
     const items = readCart();
+
+    const signature =
+        getCartSignature(items);
+
+    const activeValidation =
+        validatedCart &&
+        validatedCartSignature ===
+            signature
+            ? validatedCart
+            : null;
+
+    const displayItems =
+        getDisplayItems(
+            items,
+            activeValidation,
+        );
+
     const isEmpty =
         items.length === 0;
 
     cartItemsRegion.replaceChildren(
-        ...items.map(
+        ...displayItems.map(
             createCartItem,
         ),
     );
@@ -470,7 +577,10 @@ function renderCart() {
         isEmpty;
 
     const units =
-        getCartCount(items);
+        activeValidation
+            ? activeValidation
+                  .cantidadTotal
+            : getCartCount(items);
 
     cartUnits.textContent =
         `${units} ${
@@ -479,15 +589,198 @@ function renderCart() {
                 : "unidades"
         }`;
 
+    const subtotal =
+        activeValidation
+            ? activeValidation
+                  .subtotalProductosCentimos
+            : getCartSubtotal(items);
+
     cartSubtotal.textContent =
-        formatPrice(
-            getCartSubtotal(items),
-        );
+        formatPrice(subtotal);
+
+    if (cartSubtotalLabel) {
+        cartSubtotalLabel.textContent =
+            activeValidation
+                ? "Subtotal verificado"
+                : "Subtotal estimado";
+    }
 
     if (clearButton) {
         clearButton.disabled =
             isEmpty;
     }
+
+}
+
+async function validateCurrentCart(
+    items: CartItem[],
+) {
+    const requestSequence =
+        ++validationRequestSequence;
+
+    validationController?.abort();
+    validationController = null;
+
+    if (items.length === 0) {
+        return;
+    }
+
+    if (!isCartValidationEnabled()) {
+
+
+        return;
+    }
+
+    const requestedSignature =
+        getCartSignature(items);
+
+    const controller =
+        new AbortController();
+
+    validationController =
+        controller;
+
+
+    try {
+        const result =
+            await validateCartWithServer(
+                items,
+                controller.signal,
+            );
+
+        if (
+            requestSequence !==
+                validationRequestSequence ||
+            getCartSignature(
+                readCart(),
+            ) !== requestedSignature
+        ) {
+            return;
+        }
+
+        validatedCart =
+            result;
+
+        validatedCartSignature =
+            requestedSignature;
+
+        renderCart();
+
+    } catch (error) {
+        if (
+            error instanceof DOMException &&
+            error.name === "AbortError"
+        ) {
+            return;
+        }
+
+        if (
+            requestSequence !==
+            validationRequestSequence
+        ) {
+            return;
+        }
+
+        validatedCart = null;
+        validatedCartSignature = "";
+
+        renderCart();
+
+        const message =
+            error instanceof
+            CartValidationError
+                ? error.message
+                : "No se ha podido comprobar el carrito.";
+
+
+        showError(message);
+    } finally {
+        if (
+            requestSequence ===
+            validationRequestSequence
+        ) {
+            validationController =
+                null;
+        }
+    }
+}
+
+function refreshCart() {
+    validatedCart = null;
+    validatedCartSignature = "";
+
+    /*
+     * Un cambio en cantidades invalida
+     * cualquier comprobación anterior.
+     */
+    validationController?.abort();
+    validationController = null;
+    validationRequestSequence += 1;
+
+    if (
+        validationDebounceTimer !==
+        null
+    ) {
+        window.clearTimeout(
+            validationDebounceTimer,
+        );
+
+        validationDebounceTimer =
+            null;
+    }
+
+    const items = readCart();
+
+    renderCart();
+
+    if (items.length === 0) {
+        return;
+    }
+
+    /*
+     * Cuando la función está desactivada
+     * no existe petición HTTP, por lo que
+     * podemos mostrar el estado inmediatamente.
+     */
+    if (!isCartValidationEnabled()) {
+        void validateCurrentCart(
+            items,
+        );
+
+        return;
+    }
+
+
+    /*
+     * Evita enviar una petición por cada
+     * pulsación en los botones + y −.
+     */
+    validationDebounceTimer =
+        window.setTimeout(
+            () => {
+                validationDebounceTimer =
+                    null;
+
+                void validateCurrentCart(
+                    readCart(),
+                );
+            },
+
+            CART_VALIDATION_DEBOUNCE_MS,
+        );
+}
+
+function scheduleCartRefresh() {
+    if (refreshScheduled) {
+        return;
+    }
+
+    refreshScheduled = true;
+
+    queueMicrotask(() => {
+        refreshScheduled = false;
+        refreshCart();
+    });
 }
 
 document.addEventListener(
@@ -530,7 +823,7 @@ document.addEventListener(
             );
 
             if (!item) {
-                renderCart();
+                scheduleCartRefresh();
                 return;
             }
 
@@ -571,7 +864,7 @@ document.addEventListener(
                 );
             }
 
-            renderCart();
+            scheduleCartRefresh();
             return;
         }
 
@@ -582,14 +875,14 @@ document.addEventListener(
 
         if (clearControl) {
             clearCart();
-            renderCart();
+            scheduleCartRefresh();
         }
     },
 );
 
 window.addEventListener(
     CART_CHANGE_EVENT,
-    renderCart,
+    scheduleCartRefresh,
 );
 
 window.addEventListener(
@@ -599,9 +892,9 @@ window.addEventListener(
             event.key ===
             "todosatcom:cart:v1"
         ) {
-            renderCart();
+            scheduleCartRefresh();
         }
     },
 );
 
-renderCart();
+scheduleCartRefresh();
