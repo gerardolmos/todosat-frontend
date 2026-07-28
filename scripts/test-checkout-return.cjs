@@ -51,7 +51,9 @@ assert.match(
 );
 
 assert.match(
-  returnScript,
+  read(
+    "src/lib/checkout-status.ts",
+  ),
   /cs_\(\?:test\|live\)_/,
 );
 

@@ -34,18 +34,24 @@ import Layout from "../../../layouts/Layout.astro";
                     aria-live="polite"
                     class="mt-5 text-base leading-7 text-slate-700"
                 >
-                    Regresar desde la pasarela de pago no demuestra que el cobro se haya completado. El pedido solo podrá considerarse pagado después de que el servidor valide la notificación segura correspondiente.
+                    Regresar desde la pasarela de pago no demuestra que el cobro se haya completado.
                 </p>
 
                 <div
-                    class="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5"
+                    class="mt-7 rounded-2xl border border-slate-200 bg-slate-50 p-5"
                 >
-                    <p class="font-bold text-amber-950">
-                        No se ha confirmado ningún cobro desde esta página.
+                    <p
+                        data-checkout-return-notice-title
+                        class="font-bold text-slate-950"
+                    >
+                        No se ha confirmado ningún cobro desde esta página
                     </p>
 
-                    <p class="mt-2 text-sm leading-6 text-amber-900">
-                        No cierres otras confirmaciones que puedas recibir y no repitas el pago por el simple hecho de ver esta pantalla.
+                    <p
+                        data-checkout-return-notice-message
+                        class="mt-2 text-sm leading-6 text-slate-700"
+                    >
+                        El pedido solo podrá considerarse pagado después de que el servidor valide la notificación segura correspondiente.
                     </p>
                 </div>
 
