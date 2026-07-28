@@ -1,0 +1,76 @@
+---
+import Container from "../../../components/Container.astro";
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Estado del pago | TodoSatcom"
+    description="Consulta el estado del proceso de pago de tu pedido en TodoSatcom."
+    canonical="/tienda/compra/confirmacion"
+    robots="noindex, nofollow"
+>
+    <main class="min-h-[70vh] bg-slate-50 py-12 md:py-16">
+        <Container>
+            <section
+                data-checkout-return
+                class="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:p-10"
+            >
+                <p
+                    class="text-sm font-black uppercase tracking-[0.16em] text-orange-700"
+                >
+                    Estado del proceso de pago
+                </p>
+
+                <h1
+                    data-checkout-return-title
+                    class="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-4xl"
+                >
+                    Estamos esperando una confirmación segura
+                </h1>
+
+                <p
+                    data-checkout-return-message
+                    role="status"
+                    aria-live="polite"
+                    class="mt-5 text-base leading-7 text-slate-700"
+                >
+                    Regresar desde la pasarela de pago no demuestra que el cobro se haya completado. El pedido solo podrá considerarse pagado después de que el servidor valide la notificación segura correspondiente.
+                </p>
+
+                <div
+                    class="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5"
+                >
+                    <p class="font-bold text-amber-950">
+                        No se ha confirmado ningún cobro desde esta página.
+                    </p>
+
+                    <p class="mt-2 text-sm leading-6 text-amber-900">
+                        No cierres otras confirmaciones que puedas recibir y no repitas el pago por el simple hecho de ver esta pantalla.
+                    </p>
+                </div>
+
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a
+                        href="/tienda"
+                        referrerpolicy="no-referrer"
+                        class="inline-flex items-center justify-center rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
+                    >
+                        Volver a la tienda
+                    </a>
+
+                    <a
+                        href="/tienda/carrito"
+                        referrerpolicy="no-referrer"
+                        class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
+                    >
+                        Revisar el carrito
+                    </a>
+                </div>
+            </section>
+        </Container>
+    </main>
+
+    <script>
+        import "../../../scripts/checkout-return";
+    </script>
+</Layout>

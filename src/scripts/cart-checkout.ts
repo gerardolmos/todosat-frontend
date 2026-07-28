@@ -31,6 +31,44 @@ const IDEMPOTENCY_STORAGE_KEY =
 
 let checkoutInProgress = false;
 
+function consumeCheckoutCancellation():
+    boolean {
+    try {
+        const url =
+            new URL(window.location.href);
+
+        const params =
+            url.searchParams;
+
+        if (
+            params.get("checkout") !==
+            "cancelado"
+        ) {
+            return false;
+        }
+
+        params.delete("checkout");
+
+        const cleanAddress =
+            `${url.pathname}` +
+            `${url.search}` +
+            `${url.hash}`;
+
+        window.history.replaceState(
+            window.history.state,
+            "",
+            cleanAddress,
+        );
+
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+const checkoutWasCancelled =
+    consumeCheckoutCancellation();
+
 function getCartSignature(
     items: CartItem[],
 ): string {
@@ -296,3 +334,9 @@ window.addEventListener(
 );
 
 updateCheckoutControl();
+
+if (checkoutWasCancelled) {
+    setStatus(
+        "Has vuelto sin completar el pago. Tu carrito se conserva.",
+    );
+}
