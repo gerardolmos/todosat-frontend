@@ -1023,3 +1023,17 @@ Estas decisiones proceden del cuestionario respondido por el usuario antes de la
 La reconstrucción del estado real queda **COMPLETADA Y VALIDADA**.
 
 El proyecto puede continuar desde la evidencia recuperada. No está listo para producción y no debe aceptar pagos reales. El límite actual consiste en avanzar técnicamente hasta que la siguiente decisión dependa exclusivamente de información empresarial, contractual o credenciales que todavía no existen.
+
+# CIERRE DEL PUNTO DE CONTROL 0
+
+**Fecha:** 30 de julio de 2026
+
+El Punto de Control 0 queda completado para el entorno actual de desarrollo.
+
+El backend conserva la autoridad sobre productos, precios, totales y estados de pago. El checkout real, la recogida productiva de datos y las conexiones externas permanecen desactivados.
+
+El proyecto continúa con el estado:
+
+**PREPARADO PARA CONTINUAR EL DESARROLLO — NO APTO PARA PRODUCCIÓN.**
+
+La siguiente etapa se centrará en el flujo visible previo al checkout: datos del comprador bajo simulación, revisión del pedido, validaciones, mensajes, accesibilidad y experiencia responsive.
