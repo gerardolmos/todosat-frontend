@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test:tienda": "node --test scripts/test-storefront-checkout.mjs",
     "astro": "astro"
   },
   "dependencies": {

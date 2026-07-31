@@ -1060,3 +1060,25 @@ La implementación se dividirá en cuatro bloques:
 4. QA reproducible, documentación y cierre.
 
 Las banderas de validación, checkout, consulta de estado y conexiones reales permanecerán desactivadas por defecto.
+
+# BLOQUE 1 — ESTADOS VISIBLES DEL CARRITO
+
+**Fecha:** 31 de julio de 2026
+
+Se ha implementado el primer bloque del flujo visible previo al checkout.
+
+Incluye:
+
+- indicador `Carrito → Pago seguro → Confirmación`;
+- estados explícitos de carrito estimado, validando, verificado y error;
+- explicación del origen del subtotal;
+- información diferenciada de envío;
+- bloque de privacidad y uso de Stripe;
+- anuncios accesibles mediante `aria-live` y `aria-busy`;
+- primera suite automatizada del frontend.
+
+No se han añadido formularios de datos personales y las banderas reales permanecen desactivadas.
+
+Documento técnico:
+
+`docs/tienda/bloque-1-flujo-visible-checkout.md`

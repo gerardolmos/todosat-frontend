@@ -1,0 +1,103 @@
+---
+interface Props {
+    activeStep?: 1 | 2 | 3;
+}
+
+const {
+    activeStep = 1,
+} = Astro.props;
+
+const steps = [
+    {
+        number: 1,
+        label: "Carrito",
+        description:
+            "Revisa productos y cantidades",
+    },
+    {
+        number: 2,
+        label: "Pago seguro",
+        description:
+            "Datos y pago en Stripe",
+    },
+    {
+        number: 3,
+        label: "Confirmación",
+        description:
+            "Estado verificado por TodoSatcom",
+    },
+] as const;
+---
+
+<nav
+    aria-label="Progreso de compra"
+    class="mt-9"
+>
+    <ol
+        class="grid gap-3 sm:grid-cols-3"
+        data-checkout-steps
+    >
+        {
+            steps.map((step) => {
+                const isCurrent =
+                    step.number === activeStep;
+
+                const isComplete =
+                    step.number < activeStep;
+
+                return (
+                    <li
+                        aria-current={
+                            isCurrent
+                                ? "step"
+                                : undefined
+                        }
+                        class:list={[
+                            "rounded-2xl border p-4",
+                            isCurrent
+                                ? "border-orange-300 bg-orange-50"
+                                : "border-slate-200 bg-white",
+                        ]}
+                    >
+                        <div class="flex items-start gap-3">
+                            <span
+                                aria-hidden="true"
+                                class:list={[
+                                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black",
+                                    isCurrent
+                                        ? "bg-orange-500 text-white"
+                                        : isComplete
+                                          ? "bg-emerald-100 text-emerald-800"
+                                          : "bg-slate-100 text-slate-600",
+                                ]}
+                            >
+                                {
+                                    isComplete
+                                        ? "✓"
+                                        : step.number
+                                }
+                            </span>
+
+                            <span>
+                                <span
+                                    class:list={[
+                                        "block text-sm font-black",
+                                        isCurrent
+                                            ? "text-orange-950"
+                                            : "text-slate-950",
+                                    ]}
+                                >
+                                    {step.label}
+                                </span>
+
+                                <span class="mt-1 block text-xs leading-5 text-slate-600">
+                                    {step.description}
+                                </span>
+                            </span>
+                        </div>
+                    </li>
+                );
+            })
+        }
+    </ol>
+</nav>

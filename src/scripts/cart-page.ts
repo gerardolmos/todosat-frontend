@@ -14,6 +14,12 @@ import {
     validateCartWithServer,
     type ValidatedCart,
 } from "../lib/cart-validation";
+import {
+    CART_VALIDATION_PHASES,
+    deriveCartViewState,
+    getShippingPresentation,
+    getValidationToneClasses,
+} from "../lib/cart-view-state.js";
 
 const cartItemsRegion =
     document.querySelector<HTMLElement>(
@@ -55,6 +61,56 @@ const clearButton =
         "[data-cart-clear]",
     );
 
+const cartShell =
+    document.querySelector<HTMLElement>(
+        "[data-cart-shell]",
+    );
+
+const validationPanel =
+    document.querySelector<HTMLElement>(
+        "[data-cart-validation-panel]",
+    );
+
+const validationIcon =
+    document.querySelector<HTMLElement>(
+        "[data-cart-validation-icon]",
+    );
+
+const validationEyebrow =
+    document.querySelector<HTMLElement>(
+        "[data-cart-validation-eyebrow]",
+    );
+
+const validationTitle =
+    document.querySelector<HTMLElement>(
+        "[data-cart-validation-title]",
+    );
+
+const validationMessage =
+    document.querySelector<HTMLElement>(
+        "[data-cart-validation-message]",
+    );
+
+const subtotalNote =
+    document.querySelector<HTMLElement>(
+        "[data-cart-subtotal-note]",
+    );
+
+const shippingPanel =
+    document.querySelector<HTMLElement>(
+        "[data-cart-shipping]",
+    );
+
+const shippingTitle =
+    document.querySelector<HTMLElement>(
+        "[data-cart-shipping-title]",
+    );
+
+const shippingMessage =
+    document.querySelector<HTMLElement>(
+        "[data-cart-shipping-message]",
+    );
+
 const currencyFormatter =
     new Intl.NumberFormat("es-ES", {
         style: "currency",
@@ -65,6 +121,13 @@ let validatedCart:
     ValidatedCart | null = null;
 
 let validatedCartSignature = "";
+
+let validationPhase =
+    isCartValidationEnabled()
+        ? CART_VALIDATION_PHASES.IDLE
+        : CART_VALIDATION_PHASES.DISABLED;
+
+let validationErrorMessage = "";
 
 let validationRequestSequence = 0;
 
@@ -529,6 +592,143 @@ function getDisplayItems(
     });
 }
 
+
+function renderCartPresentation(
+    items: CartItem[],
+    activeValidation:
+        ValidatedCart | null,
+) {
+    const viewState =
+        deriveCartViewState({
+            itemCount: items.length,
+
+            validationEnabled:
+                isCartValidationEnabled(),
+
+            phase:
+                validationPhase,
+
+            hasValidatedCart:
+                activeValidation !==
+                null,
+
+            errorMessage:
+                validationErrorMessage,
+        });
+
+    if (cartSubtotalLabel) {
+        cartSubtotalLabel.textContent =
+            viewState
+                .subtotalLabel;
+    }
+
+    if (subtotalNote) {
+        subtotalNote.textContent =
+            viewState
+                .subtotalNote;
+    }
+
+    if (cartShell) {
+        cartShell.setAttribute(
+            "aria-busy",
+            String(
+                viewState.busy,
+            ),
+        );
+    }
+
+    if (
+        validationPanel &&
+        validationIcon &&
+        validationEyebrow &&
+        validationTitle &&
+        validationMessage
+    ) {
+        validationPanel.hidden =
+            items.length === 0;
+
+        validationPanel.dataset.state =
+            viewState.state;
+
+        validationIcon.textContent =
+            viewState.icon;
+
+        validationEyebrow.textContent =
+            viewState.eyebrow;
+
+        validationTitle.textContent =
+            viewState.title;
+
+        validationMessage.textContent =
+            viewState.message;
+
+        const tone =
+            getValidationToneClasses(
+                viewState.tone,
+            );
+
+        const removableClasses = [
+            "border-slate-200",
+            "border-sky-200",
+            "border-amber-200",
+            "border-emerald-200",
+            "border-red-200",
+            "bg-white",
+            "bg-sky-50",
+            "bg-amber-50",
+            "bg-emerald-50",
+            "bg-red-50",
+        ];
+
+        validationPanel.classList.remove(
+            ...removableClasses,
+        );
+
+        validationPanel.classList.add(
+            tone.border,
+            tone.background,
+        );
+
+        validationIcon.className =
+            [
+                "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-black",
+                tone.iconBackground,
+                tone.iconText,
+            ].join(" ");
+
+        validationEyebrow.className =
+            [
+                "text-xs font-black uppercase tracking-[0.14em]",
+                tone.eyebrow,
+            ].join(" ");
+    }
+
+    const shipping =
+        getShippingPresentation({
+            items,
+            validatedCart:
+                activeValidation,
+
+            verified:
+                viewState.verified,
+        });
+
+    if (
+        shippingPanel &&
+        shippingTitle &&
+        shippingMessage
+    ) {
+        shippingPanel.dataset.status =
+            shipping.status;
+
+        shippingTitle.textContent =
+            shipping.title;
+
+        shippingMessage.textContent =
+            shipping.message;
+    }
+}
+
 function renderCart() {
     if (
         !cartItemsRegion ||
@@ -598,18 +798,15 @@ function renderCart() {
     cartSubtotal.textContent =
         formatPrice(subtotal);
 
-    if (cartSubtotalLabel) {
-        cartSubtotalLabel.textContent =
-            activeValidation
-                ? "Subtotal verificado"
-                : "Subtotal estimado";
-    }
+    renderCartPresentation(
+        items,
+        activeValidation,
+    );
 
     if (clearButton) {
         clearButton.disabled =
             isEmpty;
     }
-
 }
 
 async function validateCurrentCart(
@@ -622,14 +819,28 @@ async function validateCurrentCart(
     validationController = null;
 
     if (items.length === 0) {
+        validationPhase =
+            CART_VALIDATION_PHASES.IDLE;
+
+        validationErrorMessage = "";
+        renderCart();
         return;
     }
 
     if (!isCartValidationEnabled()) {
+        validationPhase =
+            CART_VALIDATION_PHASES.DISABLED;
 
-
+        validationErrorMessage = "";
+        renderCart();
         return;
     }
+
+    validationPhase =
+        CART_VALIDATION_PHASES.VALIDATING;
+
+    validationErrorMessage = "";
+    renderCart();
 
     const requestedSignature =
         getCartSignature(items);
@@ -664,6 +875,10 @@ async function validateCurrentCart(
         validatedCartSignature =
             requestedSignature;
 
+        validationPhase =
+            CART_VALIDATION_PHASES.VERIFIED;
+
+        validationErrorMessage = "";
         renderCart();
 
     } catch (error) {
@@ -692,7 +907,13 @@ async function validateCurrentCart(
                 ? error.message
                 : "No se ha podido comprobar el carrito.";
 
+        validationPhase =
+            CART_VALIDATION_PHASES.ERROR;
 
+        validationErrorMessage =
+            message;
+
+        renderCart();
         showError(message);
     } finally {
         if (
@@ -731,25 +952,23 @@ function refreshCart() {
 
     const items = readCart();
 
+    validationErrorMessage = "";
+
+    validationPhase =
+        items.length === 0
+            ? CART_VALIDATION_PHASES.IDLE
+            : isCartValidationEnabled()
+              ? CART_VALIDATION_PHASES.SCHEDULED
+              : CART_VALIDATION_PHASES.DISABLED;
+
     renderCart();
 
-    if (items.length === 0) {
+    if (
+        items.length === 0 ||
+        !isCartValidationEnabled()
+    ) {
         return;
     }
-
-    /*
-     * Cuando la función está desactivada
-     * no existe petición HTTP, por lo que
-     * podemos mostrar el estado inmediatamente.
-     */
-    if (!isCartValidationEnabled()) {
-        void validateCurrentCart(
-            items,
-        );
-
-        return;
-    }
-
 
     /*
      * Evita enviar una petición por cada
