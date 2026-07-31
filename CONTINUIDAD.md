@@ -1037,3 +1037,26 @@ El proyecto continúa con el estado:
 **PREPARADO PARA CONTINUAR EL DESARROLLO — NO APTO PARA PRODUCCIÓN.**
 
 La siguiente etapa se centrará en el flujo visible previo al checkout: datos del comprador bajo simulación, revisión del pedido, validaciones, mensajes, accesibilidad y experiencia responsive.
+
+# ESPECIFICACIÓN DEL FLUJO VISIBLE PREVIO AL CHECKOUT
+
+**Fecha:** 31 de julio de 2026
+
+La siguiente etapa queda definida en:
+
+`docs/tienda/especificacion-flujo-visible-checkout.md`
+
+Decisión principal:
+
+**TodoSatcom no incorporará un formulario propio de comprador o dirección.**
+
+El frontend continuará enviando únicamente identificadores de producto, cantidades y la clave técnica de idempotencia. La información visual explicará que Stripe Checkout recogerá correo y, cuando proceda, dirección y teléfono.
+
+La implementación se dividirá en cuatro bloques:
+
+1. modelo visual, pruebas, pasos, validación, envío y privacidad;
+2. interacciones del carrito, errores, reintento, vaciado y responsive;
+3. estados de confirmación y acciones contextuales;
+4. QA reproducible, documentación y cierre.
+
+Las banderas de validación, checkout, consulta de estado y conexiones reales permanecerán desactivadas por defecto.
