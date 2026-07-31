@@ -1082,3 +1082,23 @@ No se han añadido formularios de datos personales y las banderas reales permane
 Documento técnico:
 
 `docs/tienda/bloque-1-flujo-visible-checkout.md`
+
+# BLOQUE 2 — INTERACCIONES DEL CARRITO
+
+**Fecha:** 31 de julio de 2026
+
+Se completaron las interacciones visibles del carrito:
+
+- errores persistentes y descartables;
+- reintento manual de validación;
+- confirmación accesible antes de vaciar;
+- foco visible y dirigido a errores;
+- controles táctiles de al menos 44 px;
+- mejoras responsive en productos y resumen;
+- respeto de reducción de movimiento.
+
+No se añadieron datos personales ni se activaron funciones reales.
+
+Documento:
+
+`docs/tienda/bloque-2-interacciones-carrito.md`

@@ -51,6 +51,11 @@ const cartError =
         "[data-cart-error]",
     );
 
+const cartErrorMessage =
+    document.querySelector<HTMLElement>(
+        "[data-cart-error-message]",
+    );
+
 const cartSubtotalLabel =
     document.querySelector<HTMLElement>(
         "[data-cart-subtotal-label]",
@@ -91,6 +96,11 @@ const validationMessage =
         "[data-cart-validation-message]",
     );
 
+const validationRetryButton =
+    document.querySelector<HTMLButtonElement>(
+        "[data-cart-validation-retry]",
+    );
+
 const subtotalNote =
     document.querySelector<HTMLElement>(
         "[data-cart-subtotal-note]",
@@ -109,6 +119,11 @@ const shippingTitle =
 const shippingMessage =
     document.querySelector<HTMLElement>(
         "[data-cart-shipping-message]",
+    );
+
+const clearDialog =
+    document.querySelector<HTMLDialogElement>(
+        "[data-cart-clear-dialog]",
     );
 
 const currencyFormatter =
@@ -150,21 +165,34 @@ function formatPrice(
     );
 }
 
-function showError(message: string) {
-    if (!cartError) {
+function clearError() {
+    if (
+        !cartError ||
+        !cartErrorMessage
+    ) {
         return;
     }
 
-    cartError.textContent = message;
+    cartError.hidden = true;
+    cartErrorMessage.textContent = "";
+}
 
-    window.setTimeout(() => {
-        if (
-            cartError.textContent ===
-            message
-        ) {
-            cartError.textContent = "";
-        }
-    }, 5000);
+function showError(message: string) {
+    if (
+        !cartError ||
+        !cartErrorMessage
+    ) {
+        return;
+    }
+
+    cartErrorMessage.textContent =
+        message;
+
+    cartError.hidden = false;
+
+    requestAnimationFrame(() => {
+        cartError.focus();
+    });
 }
 
 function getSafeImageUrl(
@@ -217,7 +245,8 @@ function createButton({
         action;
     button.dataset.documentId =
         documentId;
-    button.className = className;
+    button.className =
+        `${className} min-h-11 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 motion-reduce:transition-none`;
     button.disabled = disabled;
 
     return button;
@@ -232,7 +261,7 @@ function createCartItem(
         );
 
     article.className =
-        "grid gap-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-[140px_1fr]";
+        "grid gap-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-[140px_minmax(0,1fr)] sm:p-6";
 
     const imageLink =
         document.createElement("a");
@@ -243,7 +272,7 @@ function createCartItem(
         )}`;
 
     imageLink.className =
-        "flex h-36 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4";
+        "flex h-44 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 sm:h-36";
 
     const safeImageUrl =
         getSafeImageUrl(
@@ -292,7 +321,7 @@ function createCartItem(
         );
 
     headingRow.className =
-        "flex items-start justify-between gap-4";
+        "flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4";
 
     const titleContainer =
         document.createElement(
@@ -317,7 +346,7 @@ function createCartItem(
         item.nombre;
 
     titleLink.className =
-        "transition hover:text-orange-700";
+        "rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 transition hover:text-orange-700 motion-reduce:transition-none";
 
     title.append(titleLink);
 
@@ -367,7 +396,7 @@ function createCartItem(
         );
 
     controlsRow.className =
-        "mt-auto flex flex-wrap items-end justify-between gap-5 pt-6";
+        "mt-auto grid gap-5 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end";
 
     const quantityContainer =
         document.createElement(
@@ -460,7 +489,7 @@ function createCartItem(
         );
 
     lineTotal.className =
-        "text-right";
+        "text-left sm:text-right";
 
     const lineTotalLabel =
         document.createElement(
@@ -662,6 +691,25 @@ function renderCartPresentation(
         validationMessage.textContent =
             viewState.message;
 
+        validationPanel.setAttribute(
+            "role",
+            viewState.state === "error"
+                ? "alert"
+                : "status",
+        );
+
+        validationPanel.setAttribute(
+            "aria-live",
+            viewState.state === "error"
+                ? "assertive"
+                : "polite",
+        );
+
+        if (validationRetryButton) {
+            validationRetryButton.hidden =
+                viewState.state !== "error";
+        }
+
         const tone =
             getValidationToneClasses(
                 viewState.tone,
@@ -823,6 +871,7 @@ async function validateCurrentCart(
             CART_VALIDATION_PHASES.IDLE;
 
         validationErrorMessage = "";
+        clearError();
         renderCart();
         return;
     }
@@ -914,7 +963,10 @@ async function validateCurrentCart(
             message;
 
         renderCart();
-        showError(message);
+
+        requestAnimationFrame(() => {
+            validationPanel?.focus();
+        });
     } finally {
         if (
             requestSequence ===
@@ -1075,6 +1127,8 @@ document.addEventListener(
                         documentId,
                     );
                 }
+
+                clearError();
             } catch (error) {
                 showError(
                     error instanceof Error
@@ -1093,8 +1147,92 @@ document.addEventListener(
             );
 
         if (clearControl) {
+            if (
+                clearDialog &&
+                typeof clearDialog.showModal ===
+                    "function"
+            ) {
+                clearDialog.showModal();
+                return;
+            }
+
+            if (
+                window.confirm(
+                    "¿Vaciar todo el carrito?",
+                )
+            ) {
+                clearCart();
+                clearError();
+                scheduleCartRefresh();
+            }
+
+            return;
+        }
+
+        const retryControl =
+            target.closest<HTMLButtonElement>(
+                "[data-cart-validation-retry]",
+            );
+
+        if (retryControl) {
+            void validateCurrentCart(
+                readCart(),
+            );
+            return;
+        }
+
+        const dismissControl =
+            target.closest<HTMLButtonElement>(
+                "[data-cart-error-dismiss]",
+            );
+
+        if (dismissControl) {
+            clearError();
+            return;
+        }
+
+        const cancelClearControl =
+            target.closest<HTMLButtonElement>(
+                "[data-cart-clear-cancel]",
+            );
+
+        if (cancelClearControl) {
+            clearDialog?.close("cancel");
+            clearButton?.focus();
+            return;
+        }
+
+        const confirmClearControl =
+            target.closest<HTMLButtonElement>(
+                "[data-cart-clear-confirm]",
+            );
+
+        if (confirmClearControl) {
             clearCart();
+            clearError();
+            clearDialog?.close(
+                "confirm",
+            );
             scheduleCartRefresh();
+        }
+    },
+);
+
+clearDialog?.addEventListener(
+    "cancel",
+    () => {
+        clearButton?.focus();
+    },
+);
+
+clearDialog?.addEventListener(
+    "close",
+    () => {
+        if (
+            clearDialog.returnValue !==
+            "confirm"
+        ) {
+            clearButton?.focus();
         }
     },
 );

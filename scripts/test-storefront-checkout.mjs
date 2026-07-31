@@ -375,3 +375,183 @@ test(
         }
     },
 );
+
+test(
+    "los errores del carrito son persistentes y descartables",
+    () => {
+        const controller =
+            read(
+                "src/scripts/cart-page.ts",
+            );
+
+        const showErrorBlock =
+            controller.slice(
+                controller.indexOf(
+                    "function showError",
+                ),
+                controller.indexOf(
+                    "function getSafeImageUrl",
+                ),
+            );
+
+        assert.doesNotMatch(
+            showErrorBlock,
+            /setTimeout/,
+        );
+
+        assert.match(
+            controller,
+            /function clearError/,
+        );
+
+        const page =
+            read(
+                "src/pages/tienda/carrito.astro",
+            );
+
+        assert.match(
+            page,
+            /data-cart-error-message/,
+        );
+
+        assert.match(
+            page,
+            /data-cart-error-dismiss/,
+        );
+
+        assert.match(
+            page,
+            /tabindex="-1"/,
+        );
+    },
+);
+
+test(
+    "el error de validación permite reintento manual",
+    () => {
+        const page =
+            read(
+                "src/pages/tienda/carrito.astro",
+            );
+
+        const controller =
+            read(
+                "src/scripts/cart-page.ts",
+            );
+
+        assert.match(
+            page,
+            /data-cart-validation-retry/,
+        );
+
+        assert.match(
+            controller,
+            /viewState\.state !== "error"/,
+        );
+
+        assert.match(
+            controller,
+            /validateCurrentCart\(\s*readCart\(\)/s,
+        );
+
+        assert.match(
+            controller,
+            /validationPanel\?\.focus/,
+        );
+    },
+);
+
+test(
+    "vaciar el carrito requiere confirmación accesible",
+    () => {
+        const page =
+            read(
+                "src/pages/tienda/carrito.astro",
+            );
+
+        const controller =
+            read(
+                "src/scripts/cart-page.ts",
+            );
+
+        assert.match(
+            page,
+            /<dialog[\s\S]*data-cart-clear-dialog/,
+        );
+
+        assert.match(
+            page,
+            /aria-labelledby="cart-clear-title"/,
+        );
+
+        assert.match(
+            page,
+            /data-cart-clear-confirm/,
+        );
+
+        assert.match(
+            page,
+            /data-cart-clear-cancel/,
+        );
+
+        assert.match(
+            controller,
+            /showModal/,
+        );
+
+        assert.match(
+            controller,
+            /window\.confirm/,
+        );
+
+        assert.doesNotMatch(
+            controller,
+            /if \(clearControl\) \{\s*clearCart\(\)/,
+        );
+    },
+);
+
+test(
+    "los controles principales cumplen foco y tamaño táctil",
+    () => {
+        const page =
+            read(
+                "src/pages/tienda/carrito.astro",
+            );
+
+        const controller =
+            read(
+                "src/scripts/cart-page.ts",
+            );
+
+        assert.match(
+            page,
+            /focus-visible:outline/,
+        );
+
+        assert.match(
+            page,
+            /motion-reduce:transition-none/,
+        );
+
+        assert.match(
+            page,
+            /min-h-11/,
+        );
+
+        assert.match(
+            controller,
+            /min-h-11 focus-visible:outline/,
+        );
+
+        assert.match(
+            controller,
+            /sm:grid-cols-\[minmax\(0,1fr\)_auto\]/,
+        );
+
+        assert.match(
+            page,
+            /xl:sticky/,
+        );
+    },
+);
