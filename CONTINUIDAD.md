@@ -1102,3 +1102,26 @@ No se añadieron datos personales ni se activaron funciones reales.
 Documento:
 
 `docs/tienda/bloque-2-interacciones-carrito.md`
+
+# BLOQUE 3 — CONFIRMACIÓN DEL PAGO
+
+**Fecha:** 2 de agosto de 2026
+
+Se ha preparado la mejora de `/tienda/compra/confirmacion`.
+
+Cambios principales:
+
+1. lenguaje orientado al comprador en lugar de explicaciones técnicas;
+2. estados visuales para comprobando, pendiente, confirmado, fallido,
+   cancelado, reembolsado, reembolso parcial y no disponible;
+3. reintento manual cuando no puede confirmarse el resultado;
+4. foco, áreas táctiles, responsive y reducción de movimiento;
+5. indicador Carrito → Pago seguro → Confirmación;
+6. suite de tienda ampliada de 12 a 20 pruebas.
+
+Se conservan los límites de seguridad: la página no confirma por sí sola el
+pago, elimina `session_id` de la URL, no persiste la referencia, no vacía el
+carrito y no muestra datos personales o comerciales sensibles.
+
+La limpieza UX de los mensajes técnicos del carrito continúa pendiente para la
+revisión visual final.

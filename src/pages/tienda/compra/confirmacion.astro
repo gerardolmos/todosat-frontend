@@ -1,5 +1,6 @@
 ---
 import Container from "../../../components/Container.astro";
+import CheckoutSteps from "../../../components/store/CheckoutSteps.astro";
 import Layout from "../../../layouts/Layout.astro";
 ---
 
@@ -9,70 +10,117 @@ import Layout from "../../../layouts/Layout.astro";
     canonical="/tienda/compra/confirmacion"
     robots="noindex, nofollow"
 >
-    <main class="min-h-[70vh] bg-slate-50 py-12 md:py-16">
+    <main class="min-h-[70vh] bg-slate-50 py-10 md:py-16">
         <Container>
-            <section
-                data-checkout-return
-                class="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:p-10"
-            >
+            <div class="mx-auto max-w-3xl">
                 <p
                     class="text-sm font-black uppercase tracking-[0.16em] text-orange-700"
                 >
-                    Estado del proceso de pago
+                    Confirmación de compra
                 </p>
 
                 <h1
-                    data-checkout-return-title
-                    class="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-4xl"
+                    class="mt-3 text-3xl font-black tracking-tight text-slate-950 md:text-4xl"
                 >
-                    Estamos esperando una confirmación segura
+                    Estado de tu pago
                 </h1>
 
-                <p
-                    data-checkout-return-message
-                    role="status"
-                    aria-live="polite"
-                    class="mt-5 text-base leading-7 text-slate-700"
-                >
-                    Regresar desde la pasarela de pago no demuestra que el cobro se haya completado.
+                <p class="mt-4 max-w-2xl text-base leading-7 text-slate-700">
+                    Aquí podrás comprobar el resultado del pago y saber cuál es el siguiente paso.
                 </p>
 
-                <div
-                    class="mt-7 rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                <CheckoutSteps activeStep={3} />
+
+                <section
+                    data-checkout-return
+                    data-checkout-state="checking"
+                    aria-busy="true"
+                    class="checkout-return-card mt-8 rounded-3xl border bg-white p-6 shadow-sm md:p-9"
                 >
-                    <p
-                        data-checkout-return-notice-title
-                        class="font-bold text-slate-950"
-                    >
-                        No se ha confirmado ningún cobro desde esta página
-                    </p>
+                    <div class="flex items-start gap-4">
+                        <span
+                            data-checkout-return-icon-wrap
+                            aria-hidden="true"
+                            class="checkout-return-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-xl font-black"
+                        >
+                            <span data-checkout-return-icon>…</span>
+                        </span>
+
+                        <div class="min-w-0">
+                            <p
+                                data-checkout-return-eyebrow
+                                class="checkout-return-eyebrow text-sm font-black uppercase tracking-[0.14em]"
+                            >
+                                Comprobando pago
+                            </p>
+
+                            <h2
+                                data-checkout-return-title
+                                tabindex="-1"
+                                class="mt-2 text-2xl font-black tracking-tight text-slate-950 md:text-3xl"
+                            >
+                                Estamos comprobando tu pago
+                            </h2>
+                        </div>
+                    </div>
 
                     <p
-                        data-checkout-return-notice-message
-                        class="mt-2 text-sm leading-6 text-slate-700"
+                        data-checkout-return-message
+                        role="status"
+                        aria-live="polite"
+                        class="mt-5 text-base leading-7 text-slate-700"
                     >
-                        El pedido solo podrá considerarse pagado después de que el servidor valide la notificación segura correspondiente.
+                        Puede tardar unos segundos. No cierres esta página ni vuelvas a realizar el pago.
                     </p>
-                </div>
 
-                <div class="mt-8 flex flex-wrap gap-3">
-                    <a
-                        href="/tienda"
-                        referrerpolicy="no-referrer"
-                        class="inline-flex items-center justify-center rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
+                    <div
+                        class="checkout-return-notice mt-7 rounded-2xl border p-5"
                     >
-                        Volver a la tienda
-                    </a>
+                        <p
+                            data-checkout-return-notice-title
+                            class="font-bold text-slate-950"
+                        >
+                            Comprobación en curso
+                        </p>
 
-                    <a
-                        href="/tienda/carrito"
-                        referrerpolicy="no-referrer"
-                        class="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100"
+                        <p
+                            data-checkout-return-notice-message
+                            class="mt-2 text-sm leading-6 text-slate-700"
+                        >
+                            Actualizaremos esta pantalla en cuanto tengamos el resultado.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-checkout-return-retry
+                        hidden
+                        class="mt-6 min-h-11 rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-800 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 motion-reduce:transition-none"
                     >
-                        Revisar el carrito
-                    </a>
-                </div>
-            </section>
+                        Volver a comprobar
+                    </button>
+
+                    <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                        <a
+                            data-checkout-return-primary
+                            href="/tienda"
+                            referrerpolicy="no-referrer"
+                            class="inline-flex min-h-11 items-center justify-center rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 motion-reduce:transition-none"
+                        >
+                            Volver a la tienda
+                        </a>
+
+                        <a
+                            data-checkout-return-secondary
+                            href="/tienda/carrito"
+                            referrerpolicy="no-referrer"
+                            class="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 motion-reduce:transition-none"
+                        >
+                            Revisar el carrito
+                        </a>
+                    </div>
+                </section>
+            </div>
         </Container>
     </main>
 
@@ -80,3 +128,101 @@ import Layout from "../../../layouts/Layout.astro";
         import "../../../scripts/checkout-return";
     </script>
 </Layout>
+
+<style>
+    .checkout-return-card {
+        border-color: rgb(186 230 253);
+    }
+
+    .checkout-return-icon {
+        background: rgb(224 242 254);
+        color: rgb(7 89 133);
+    }
+
+    .checkout-return-eyebrow {
+        color: rgb(3 105 161);
+    }
+
+    .checkout-return-notice {
+        border-color: rgb(203 213 225);
+        background: rgb(248 250 252);
+    }
+
+    [data-checkout-state="pending"] {
+        border-color: rgb(253 230 138);
+    }
+
+    [data-checkout-state="pending"] .checkout-return-icon,
+    [data-checkout-state="pending"] .checkout-return-notice {
+        background: rgb(255 251 235);
+    }
+
+    [data-checkout-state="pending"] .checkout-return-icon,
+    [data-checkout-state="pending"] .checkout-return-eyebrow {
+        color: rgb(146 64 14);
+    }
+
+    [data-checkout-state="confirmed"],
+    [data-checkout-state="refunded"],
+    [data-checkout-state="partial-refund"] {
+        border-color: rgb(167 243 208);
+    }
+
+    [data-checkout-state="confirmed"] .checkout-return-icon,
+    [data-checkout-state="refunded"] .checkout-return-icon,
+    [data-checkout-state="partial-refund"] .checkout-return-icon,
+    [data-checkout-state="confirmed"] .checkout-return-notice,
+    [data-checkout-state="refunded"] .checkout-return-notice,
+    [data-checkout-state="partial-refund"] .checkout-return-notice {
+        background: rgb(236 253 245);
+    }
+
+    [data-checkout-state="confirmed"] .checkout-return-icon,
+    [data-checkout-state="refunded"] .checkout-return-icon,
+    [data-checkout-state="partial-refund"] .checkout-return-icon,
+    [data-checkout-state="confirmed"] .checkout-return-eyebrow,
+    [data-checkout-state="refunded"] .checkout-return-eyebrow,
+    [data-checkout-state="partial-refund"] .checkout-return-eyebrow {
+        color: rgb(6 95 70);
+    }
+
+    [data-checkout-state="failed"],
+    [data-checkout-state="cancelled"],
+    [data-checkout-state="unavailable"] {
+        border-color: rgb(254 202 202);
+    }
+
+    [data-checkout-state="failed"] .checkout-return-icon,
+    [data-checkout-state="cancelled"] .checkout-return-icon,
+    [data-checkout-state="unavailable"] .checkout-return-icon,
+    [data-checkout-state="failed"] .checkout-return-notice,
+    [data-checkout-state="cancelled"] .checkout-return-notice,
+    [data-checkout-state="unavailable"] .checkout-return-notice {
+        background: rgb(254 242 242);
+    }
+
+    [data-checkout-state="failed"] .checkout-return-icon,
+    [data-checkout-state="cancelled"] .checkout-return-icon,
+    [data-checkout-state="unavailable"] .checkout-return-icon,
+    [data-checkout-state="failed"] .checkout-return-eyebrow,
+    [data-checkout-state="cancelled"] .checkout-return-eyebrow,
+    [data-checkout-state="unavailable"] .checkout-return-eyebrow {
+        color: rgb(153 27 27);
+    }
+
+    [data-checkout-state="invalid"],
+    [data-checkout-state="disabled"] {
+        border-color: rgb(203 213 225);
+    }
+
+    [data-checkout-state="invalid"] .checkout-return-icon,
+    [data-checkout-state="disabled"] .checkout-return-icon {
+        background: rgb(241 245 249);
+        color: rgb(51 65 85);
+    }
+
+    [data-checkout-state="invalid"] .checkout-return-eyebrow,
+    [data-checkout-state="disabled"] .checkout-return-eyebrow {
+        color: rgb(71 85 105);
+    }
+</style>

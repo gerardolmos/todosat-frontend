@@ -6,6 +6,26 @@ import {
     type CheckoutPublicStatus,
 } from "../lib/checkout-status";
 
+import {
+    CHECKOUT_RETURN_STATES,
+    getCheckoutReturnView,
+} from "../lib/checkout-return-view.js";
+
+const returnRoot =
+    document.querySelector<HTMLElement>(
+        "[data-checkout-return]",
+    );
+
+const returnIcon =
+    document.querySelector<HTMLElement>(
+        "[data-checkout-return-icon]",
+    );
+
+const returnEyebrow =
+    document.querySelector<HTMLElement>(
+        "[data-checkout-return-eyebrow]",
+    );
+
 const returnTitle =
     document.querySelector<HTMLElement>(
         "[data-checkout-return-title]",
@@ -26,41 +46,120 @@ const noticeMessage =
         "[data-checkout-return-notice-message]",
     );
 
+const retryControl =
+    document.querySelector<HTMLButtonElement>(
+        "[data-checkout-return-retry]",
+    );
+
+const primaryAction =
+    document.querySelector<HTMLAnchorElement>(
+        "[data-checkout-return-primary]",
+    );
+
+const secondaryAction =
+    document.querySelector<HTMLAnchorElement>(
+        "[data-checkout-return-secondary]",
+    );
+
 const MAX_STATUS_ATTEMPTS = 8;
 const STATUS_RETRY_DELAY_MS = 2000;
 
 let activeController:
     AbortController | null = null;
 
-function setContent({
-    title,
-    message,
-    notice,
-    detail,
-}: {
-    title: string;
-    message: string;
-    notice: string;
-    detail: string;
-}) {
+let currentSessionId:
+    string | null = null;
+
+function renderView(
+    state: string,
+    options: {
+        canRetry?: boolean;
+        focusTitle?: boolean;
+    } = {},
+) {
+    const view =
+        getCheckoutReturnView(
+            state,
+            {
+                canRetry:
+                    options.canRetry,
+            },
+        );
+
+    if (returnRoot) {
+        returnRoot.dataset.checkoutState =
+            view.state;
+
+        returnRoot.setAttribute(
+            "aria-busy",
+            String(view.busy),
+        );
+    }
+
+    if (returnIcon) {
+        returnIcon.textContent =
+            view.icon;
+    }
+
+    if (returnEyebrow) {
+        returnEyebrow.textContent =
+            view.eyebrow;
+    }
+
     if (returnTitle) {
         returnTitle.textContent =
-            title;
+            view.title;
     }
 
     if (returnMessage) {
         returnMessage.textContent =
-            message;
+            view.message;
     }
 
     if (noticeTitle) {
         noticeTitle.textContent =
-            notice;
+            view.noticeTitle;
     }
 
     if (noticeMessage) {
         noticeMessage.textContent =
-            detail;
+            view.noticeMessage;
+    }
+
+    if (retryControl) {
+        retryControl.hidden =
+            !view.showRetry;
+
+        retryControl.disabled =
+            view.busy;
+    }
+
+    if (primaryAction) {
+        primaryAction.textContent =
+            view.primaryLabel;
+
+        primaryAction.href =
+            view.primaryHref;
+    }
+
+    if (secondaryAction) {
+        secondaryAction.textContent =
+            view.secondaryLabel;
+
+        secondaryAction.href =
+            view.secondaryHref;
+
+        secondaryAction.hidden =
+            !view.showSecondary;
+    }
+
+    if (
+        options.focusTitle &&
+        returnTitle
+    ) {
+        returnTitle.focus({
+            preventScroll: false,
+        });
     }
 }
 
@@ -125,131 +224,68 @@ function shouldRetry(
 
 function renderStatus(
     status: CheckoutPublicStatus,
+    canRetry = false,
 ) {
     switch (status.estadoPago) {
         case "confirmado":
-            setContent({
-                title:
-                    "Pago confirmado",
-
-                message:
-                    "El servidor ha confirmado de forma segura que el pago fue recibido.",
-
-                notice:
-                    "Confirmación recibida",
-
-                detail:
-                    "El pedido ya puede continuar con su procesamiento interno.",
-            });
+            renderView(
+                CHECKOUT_RETURN_STATES.CONFIRMED,
+            );
             return;
 
         case "fallido":
-            setContent({
-                title:
-                    "El pago no se ha completado",
-
-                message:
-                    "El servidor ha registrado que el intento de pago no llegó a completarse.",
-
-                notice:
-                    "No existe un cobro confirmado",
-
-                detail:
-                    "Revisa el carrito antes de iniciar un nuevo intento.",
-            });
+            renderView(
+                CHECKOUT_RETURN_STATES.FAILED,
+            );
             return;
 
         case "cancelado":
-            setContent({
-                title:
-                    "Proceso de pago cancelado",
-
-                message:
-                    "El pedido no tiene un pago confirmado y el proceso ha quedado cancelado.",
-
-                notice:
-                    "No existe un cobro confirmado",
-
-                detail:
-                    "Puedes regresar al carrito para revisar los productos.",
-            });
+            renderView(
+                CHECKOUT_RETURN_STATES.CANCELLED,
+            );
             return;
 
         case "reembolsado":
-            setContent({
-                title:
-                    "Pago reembolsado",
-
-                message:
-                    "El servidor indica que el importe pagado fue reembolsado.",
-
-                notice:
-                    "Estado actualizado",
-
-                detail:
-                    "La devolución consta en el estado interno del pedido.",
-            });
+            renderView(
+                CHECKOUT_RETURN_STATES.REFUNDED,
+            );
             return;
 
         case "reembolso_parcial":
-            setContent({
-                title:
-                    "Reembolso parcial registrado",
-
-                message:
-                    "El servidor indica que el pedido tiene un reembolso parcial.",
-
-                notice:
-                    "Estado actualizado",
-
-                detail:
-                    "La devolución parcial consta en el estado interno del pedido.",
-            });
+            renderView(
+                CHECKOUT_RETURN_STATES.PARTIAL_REFUND,
+            );
             return;
 
         case "pendiente":
         case "no_disponible":
         default:
-            setContent({
-                title:
-                    "Confirmación pendiente",
-
-                message:
-                    "Todavía no hemos recibido una confirmación segura del resultado del pago.",
-
-                notice:
-                    "No repitas el pago por esta pantalla",
-
-                detail:
-                    "La página continuará comprobando durante unos segundos si el servidor recibe la confirmación.",
-            });
+            renderView(
+                CHECKOUT_RETURN_STATES.PENDING,
+                {
+                    canRetry,
+                },
+            );
     }
-}
-
-function renderUnavailable(
-    message: string,
-) {
-    setContent({
-        title:
-            "No se ha podido comprobar el estado",
-
-        message,
-
-        notice:
-            "No se ha confirmado ningún cobro",
-
-        detail:
-            "Un problema al consultar el estado no demuestra que el pago haya fallado ni que se haya completado.",
-    });
 }
 
 async function monitorStatus(
     sessionId: string,
+    {
+        focusTitle = false,
+    } = {},
 ) {
     activeController?.abort();
 
     activeController =
         new AbortController();
+
+    renderView(
+        CHECKOUT_RETURN_STATES.CHECKING,
+        {
+            focusTitle,
+        },
+    );
 
     for (
         let attempt = 1;
@@ -263,12 +299,19 @@ async function monitorStatus(
                     activeController.signal,
                 );
 
-            renderStatus(status);
+            const lastAttempt =
+                attempt ===
+                MAX_STATUS_ATTEMPTS;
+
+            renderStatus(
+                status,
+                lastAttempt &&
+                    shouldRetry(status),
+            );
 
             if (
                 !shouldRetry(status) ||
-                attempt ===
-                    MAX_STATUS_ATTEMPTS
+                lastAttempt
             ) {
                 return;
             }
@@ -286,11 +329,13 @@ async function monitorStatus(
                 attempt ===
                 MAX_STATUS_ATTEMPTS
             ) {
-                renderUnavailable(
-                    error instanceof
-                        CheckoutStatusError
-                        ? error.message
-                        : "No se ha podido consultar el estado del proceso de pago.",
+                void error;
+
+                renderView(
+                    CHECKOUT_RETURN_STATES.UNAVAILABLE,
+                    {
+                        focusTitle: true,
+                    },
                 );
 
                 return;
@@ -310,59 +355,44 @@ function initializeReturnPage() {
             sessionId,
         )
     ) {
-        setContent({
-            title:
-                "No se ha recibido una referencia válida",
-
-            message:
-                "No podemos asociar esta visita a una sesión de pago.",
-
-            notice:
-                "No se ha confirmado ningún cobro",
-
-            detail:
-                "La ausencia de una referencia válida impide consultar el estado del proceso.",
-        });
+        renderView(
+            CHECKOUT_RETURN_STATES.INVALID,
+        );
 
         return;
     }
+
+    currentSessionId =
+        sessionId;
 
     if (
         !isCheckoutStatusEnabled()
     ) {
-        setContent({
-            title:
-                "Estamos esperando una confirmación segura",
-
-            message:
-                "Has regresado desde la pasarela de pago, pero la consulta pública del estado todavía está desactivada.",
-
-            notice:
-                "No se ha confirmado ningún cobro desde esta página",
-
-            detail:
-                "El pedido solo podrá considerarse pagado después de que el servidor valide la notificación segura correspondiente.",
-        });
+        renderView(
+            CHECKOUT_RETURN_STATES.DISABLED,
+        );
 
         return;
     }
 
-    setContent({
-        title:
-            "Comprobando el estado del pago",
-
-        message:
-            "Estamos consultando el estado guardado de forma segura en el servidor.",
-
-        notice:
-            "Comprobación en curso",
-
-        detail:
-            "La página no consulta directamente la pasarela de pago.",
-    });
-
     void monitorStatus(sessionId);
 }
+
+retryControl?.addEventListener(
+    "click",
+    () => {
+        if (!currentSessionId) {
+            return;
+        }
+
+        void monitorStatus(
+            currentSessionId,
+            {
+                focusTitle: true,
+            },
+        );
+    },
+);
 
 window.addEventListener(
     "pagehide",
