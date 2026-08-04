@@ -31,6 +31,16 @@ const checkoutStatus =
         "[data-cart-checkout-status]",
     );
 
+const checkoutDemoDialog =
+    document.querySelector<HTMLDialogElement>(
+        "[data-checkout-demo-dialog]",
+    );
+
+const checkoutDemoCloseButtons =
+    document.querySelectorAll<HTMLButtonElement>(
+        "[data-checkout-demo-close]",
+    );
+
 const IDEMPOTENCY_STORAGE_KEY =
     "todosatcom:checkout-idempotency:v1";
 
@@ -240,18 +250,6 @@ function updateCheckoutControl() {
         return;
     }
 
-    if (!isCheckoutEnabled()) {
-        checkoutButton.disabled = true;
-        checkoutButton.textContent =
-            "Compra online próximamente";
-
-        setStatus(
-            "Puedes preparar tu carrito. La compra online estará disponible próximamente.",
-        );
-
-        return;
-    }
-
     if (!isCartValidationEnabled()) {
         checkoutButton.disabled = true;
         checkoutButton.textContent =
@@ -295,6 +293,17 @@ function updateCheckoutControl() {
         return;
     }
 
+    if (!isCheckoutEnabled()) {
+        checkoutButton.textContent =
+            "Revisar pedido";
+
+        setStatus(
+            "Confirmaremos el precio y la disponibilidad antes de mostrar el siguiente paso.",
+        );
+
+        return;
+    }
+
     checkoutButton.textContent =
         "Continuar al pago";
 
@@ -306,7 +315,6 @@ function updateCheckoutControl() {
 async function startCheckout() {
     if (
         checkoutInProgress ||
-        !isCheckoutEnabled() ||
         !isCartValidationEnabled()
     ) {
         updateCheckoutControl();
@@ -374,6 +382,17 @@ async function startCheckout() {
         reviewRequiredSignature = "";
         reviewMessage = "";
 
+        if (!isCheckoutEnabled()) {
+            checkoutInProgress = false;
+            updateCheckoutControl();
+
+            if (checkoutDemoDialog) {
+                checkoutDemoDialog.showModal();
+            }
+
+            return;
+        }
+
         const checkout =
             await createCheckoutSession(
                 items,
@@ -407,6 +426,17 @@ async function startCheckout() {
         focusCheckoutStatus();
     }
 }
+
+checkoutDemoCloseButtons.forEach(
+    (button) => {
+        button.addEventListener(
+            "click",
+            () => {
+                checkoutDemoDialog?.close();
+            },
+        );
+    },
+);
 
 document.addEventListener(
     "click",

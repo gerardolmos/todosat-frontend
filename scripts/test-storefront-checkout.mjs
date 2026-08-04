@@ -239,7 +239,17 @@ test(
 
         assert.match(
             page,
-            /Pago gestionado por Stripe/,
+            /Compra online próximamente/,
+        );
+
+        assert.match(
+            page,
+            /no se realizan cargos ni se generan pedidos/,
+        );
+
+        assert.match(
+            page,
+            /data-checkout-demo-dialog/,
         );
     },
 );
@@ -639,7 +649,7 @@ test(
         for (
             const expected
             of [
-                "Compra online próximamente",
+                "Revisar pedido",
                 "Continuar al pago",
                 "Comprobando el pedido…",
                 "Confirmar cambios y continuar",
@@ -651,6 +661,29 @@ test(
                 new RegExp(expected),
             );
         }
+
+        assert.match(
+            controller,
+            /data-checkout-demo-dialog/,
+        );
+
+        assert.match(
+            controller,
+            /showModal\(\)/,
+        );
+
+        assert.ok(
+            controller.indexOf(
+                "Confirmar cambios y continuar",
+            ) <
+                controller.indexOf(
+                    'if (!isCheckoutEnabled())',
+                    controller.indexOf(
+                        "function updateCheckoutControl",
+                    ),
+                ),
+            "La revisión de cambios debe tener prioridad sobre la salida demo.",
+        );
 
         assert.doesNotMatch(
             controller,
