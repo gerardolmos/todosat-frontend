@@ -1,6 +1,7 @@
 import {
     CART_CHANGE_EVENT,
     readCart,
+    saveCart,
     type CartItem,
 } from "../lib/cart";
 
@@ -9,6 +10,10 @@ import {
     isCartValidationEnabled,
     validateCartWithServer,
 } from "../lib/cart-validation";
+
+import {
+    reconcileCartWithValidation,
+} from "../lib/cart-checkout-review.js";
 
 import {
     CheckoutError,
@@ -30,6 +35,8 @@ const IDEMPOTENCY_STORAGE_KEY =
     "todosatcom:checkout-idempotency:v1";
 
 let checkoutInProgress = false;
+let reviewRequiredSignature = "";
+let reviewMessage = "";
 
 function consumeCheckoutCancellation():
     boolean {
@@ -140,9 +147,14 @@ function getIdempotencyKey(
     }
 }
 
+type StatusTone =
+    | "neutral"
+    | "warning"
+    | "error";
+
 function setStatus(
     message: string,
-    isError = false,
+    tone: StatusTone = "neutral",
 ) {
     if (!checkoutStatus) {
         return;
@@ -151,15 +163,60 @@ function setStatus(
     checkoutStatus.textContent =
         message;
 
-    checkoutStatus.classList.toggle(
+    checkoutStatus.dataset.tone =
+        tone;
+
+    checkoutStatus.classList.remove(
+        "text-slate-600",
+        "text-amber-800",
         "text-red-700",
-        isError,
+        "font-bold",
     );
 
-    checkoutStatus.classList.toggle(
-        "font-bold",
-        isError,
+    if (tone === "warning") {
+        checkoutStatus.classList.add(
+            "text-amber-800",
+            "font-bold",
+        );
+        return;
+    }
+
+    if (tone === "error") {
+        checkoutStatus.classList.add(
+            "text-red-700",
+            "font-bold",
+        );
+        return;
+    }
+
+    checkoutStatus.classList.add(
+        "text-slate-600",
     );
+}
+
+function focusCheckoutStatus() {
+    requestAnimationFrame(() => {
+        checkoutStatus?.focus();
+    });
+}
+
+function clearReviewWhenCartChanges() {
+    if (!reviewRequiredSignature) {
+        return;
+    }
+
+    const signature =
+        getCartSignature(
+            readCart(),
+        );
+
+    if (
+        signature !==
+        reviewRequiredSignature
+    ) {
+        reviewRequiredSignature = "";
+        reviewMessage = "";
+    }
 }
 
 function updateCheckoutControl() {
@@ -168,14 +225,16 @@ function updateCheckoutControl() {
     }
 
     const items = readCart();
+    const signature =
+        getCartSignature(items);
 
     if (checkoutInProgress) {
         checkoutButton.disabled = true;
         checkoutButton.textContent =
-            "Preparando pago seguro…";
+            "Comprobando el pedido…";
 
         setStatus(
-            "Estamos comprobando nuevamente precios y disponibilidad.",
+            "Estamos confirmando el precio y la disponibilidad.",
         );
 
         return;
@@ -184,10 +243,10 @@ function updateCheckoutControl() {
     if (!isCheckoutEnabled()) {
         checkoutButton.disabled = true;
         checkoutButton.textContent =
-            "Pago todavía no disponible";
+            "Compra online próximamente";
 
         setStatus(
-            "El checkout permanece desactivado durante esta fase de desarrollo.",
+            "Puedes preparar tu carrito. La compra online estará disponible próximamente.",
         );
 
         return;
@@ -196,11 +255,11 @@ function updateCheckoutControl() {
     if (!isCartValidationEnabled()) {
         checkoutButton.disabled = true;
         checkoutButton.textContent =
-            "Validación no disponible";
+            "Compra online no disponible";
 
         setStatus(
-            "El carrito debe poder validarse antes de continuar.",
-            true,
+            "No podemos completar la compra en este momento.",
+            "error",
         );
 
         return;
@@ -219,11 +278,28 @@ function updateCheckoutControl() {
     }
 
     checkoutButton.disabled = false;
+
+    if (
+        reviewRequiredSignature ===
+        signature
+    ) {
+        checkoutButton.textContent =
+            "Confirmar cambios y continuar";
+
+        setStatus(
+            reviewMessage ||
+                "Revisa el carrito actualizado y vuelve a continuar.",
+            "warning",
+        );
+
+        return;
+    }
+
     checkoutButton.textContent =
-        "Continuar al pago seguro";
+        "Continuar al pago";
 
     setStatus(
-        "Antes de abrir Stripe, el carrito se comprobará nuevamente en Strapi.",
+        "Confirmaremos el precio y la disponibilidad antes de abrir el pago.",
     );
 }
 
@@ -244,6 +320,9 @@ async function startCheckout() {
         return;
     }
 
+    const requestedSignature =
+        getCartSignature(items);
+
     checkoutInProgress = true;
     updateCheckoutControl();
 
@@ -251,10 +330,49 @@ async function startCheckout() {
         new AbortController();
 
     try {
-        await validateCartWithServer(
-            items,
-            controller.signal,
-        );
+        const validatedCart =
+            await validateCartWithServer(
+                items,
+                controller.signal,
+            );
+
+        if (
+            getCartSignature(
+                readCart(),
+            ) !== requestedSignature
+        ) {
+            throw new CheckoutError(
+                "CART_CHANGED_DURING_CHECKOUT",
+                "El carrito ha cambiado. Revísalo y vuelve a continuar.",
+                409,
+            );
+        }
+
+        const reconciliation =
+            reconcileCartWithValidation(
+                items,
+                validatedCart,
+            );
+
+        if (reconciliation.changed) {
+            reviewRequiredSignature =
+                requestedSignature;
+
+            reviewMessage =
+                "Hemos actualizado el carrito. Revisa el nuevo importe y vuelve a continuar.";
+
+            saveCart(
+                reconciliation.items,
+            );
+
+            checkoutInProgress = false;
+            updateCheckoutControl();
+            focusCheckoutStatus();
+            return;
+        }
+
+        reviewRequiredSignature = "";
+        reviewMessage = "";
 
         const checkout =
             await createCheckoutSession(
@@ -264,7 +382,7 @@ async function startCheckout() {
             );
 
         setStatus(
-            `Pedido ${checkout.numeroPedido} preparado. Abriendo Stripe…`,
+            "Abriendo el pago…",
         );
 
         window.location.assign(
@@ -279,12 +397,14 @@ async function startCheckout() {
                 CartValidationError ||
             error instanceof CheckoutError
                 ? error.message
-                : "No se ha podido preparar el pago seguro.";
+                : "No hemos podido preparar el pago.";
 
         setStatus(
             message,
-            true,
+            "error",
         );
+
+        focusCheckoutStatus();
     }
 }
 
@@ -318,7 +438,10 @@ document.addEventListener(
 
 window.addEventListener(
     CART_CHANGE_EVENT,
-    updateCheckoutControl,
+    () => {
+        clearReviewWhenCartChanges();
+        updateCheckoutControl();
+    },
 );
 
 window.addEventListener(
@@ -328,6 +451,7 @@ window.addEventListener(
             event.key ===
             "todosatcom:cart:v1"
         ) {
+            clearReviewWhenCartChanges();
             updateCheckoutControl();
         }
     },
@@ -338,5 +462,6 @@ updateCheckoutControl();
 if (checkoutWasCancelled) {
     setStatus(
         "Has vuelto sin completar el pago. Tu carrito se conserva.",
+        "warning",
     );
 }

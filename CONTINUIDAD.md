@@ -1125,3 +1125,22 @@ carrito y no muestra datos personales o comerciales sensibles.
 
 La limpieza UX de los mensajes técnicos del carrito continúa pendiente para la
 revisión visual final.
+
+# BLOQUE 4 — VALIDACIÓN FINAL DEL CARRITO
+
+**Fecha:** 3 de agosto de 2026
+
+Se elimina la validación automática al modificar cantidades. El carrito trabaja
+localmente mientras el comprador lo prepara y mantiene el subtotal como
+estimado.
+
+La comprobación de precio, disponibilidad y envío se ejecuta únicamente al
+pulsar **Continuar al pago**. Si algún dato ha cambiado, el carrito se actualiza
+y se exige una nueva confirmación consciente antes de abrir Stripe.
+
+También se simplifican los textos visibles del carrito para retirar referencias
+a Strapi, servidores, flags y fases de desarrollo.
+
+Documento técnico:
+
+`docs/tienda/bloque-4-validacion-final-carrito.md`

@@ -46,65 +46,12 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
 
                 <p class="mt-5 text-lg leading-8 text-slate-600">
                     Revisa los productos y sus cantidades antes de continuar.
-                    Los precios y la disponibilidad se comprobarán nuevamente
-                    en el servidor antes del pago.
+                    Confirmaremos el precio y la disponibilidad cuando pulses
+                    el botón de pago.
                 </p>
             </header>
 
             <CheckoutSteps activeStep={1} />
-
-            <section
-                data-cart-validation-panel
-                data-state="empty"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-                tabindex="-1"
-                hidden
-                class="mt-8 scroll-mt-28 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6"
-            >
-                <div class="flex items-start gap-4">
-                    <span
-                        data-cart-validation-icon
-                        aria-hidden="true"
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-lg font-black text-slate-700"
-                    >
-                        i
-                    </span>
-
-                    <div class="min-w-0">
-                        <p
-                            data-cart-validation-eyebrow
-                            class="text-xs font-black uppercase tracking-[0.14em] text-slate-500"
-                        >
-                            Estado del carrito
-                        </p>
-
-                        <h2
-                            data-cart-validation-title
-                            class="mt-1 text-lg font-black text-slate-950"
-                        >
-                            Pendiente de comprobación
-                        </h2>
-
-                        <p
-                            data-cart-validation-message
-                            class="mt-2 text-sm leading-6 text-slate-700"
-                        >
-                            Los precios y la disponibilidad se comprobarán en el servidor.
-                        </p>
-
-                        <button
-                            type="button"
-                            data-cart-validation-retry
-                            hidden
-                            class="mt-4 inline-flex min-h-11 items-center justify-center rounded-full border border-red-300 bg-white px-5 py-2.5 text-sm font-black text-red-800 transition hover:bg-red-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 motion-reduce:transition-none"
-                        >
-                            Volver a comprobar
-                        </button>
-                    </div>
-                </div>
-            </section>
 
             <section
                 data-cart-error
@@ -231,7 +178,7 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
                                 data-cart-subtotal-note
                                 class="mt-2 text-xs leading-5 text-slate-500"
                             >
-                                Calculado con la información guardada en este navegador.
+                                El importe final se confirmará al continuar al pago.
                             </p>
                         </div>
                     </dl>
@@ -249,14 +196,14 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
                             data-cart-shipping-title
                             class="mt-1 text-sm font-black text-slate-950"
                         >
-                            Pendiente de comprobación
+                            Información de entrega
                         </h3>
 
                         <p
                             data-cart-shipping-message
                             class="mt-2 text-xs leading-5 text-slate-600"
                         >
-                            El servidor confirmará si este pedido requiere dirección de envío.
+                            Confirmaremos los gastos y datos de entrega al continuar al pago.
                         </p>
                     </section>
 
@@ -265,25 +212,19 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
                         class="mt-4 rounded-2xl border border-sky-200 bg-sky-50 p-4"
                     >
                         <p class="text-xs font-black uppercase tracking-[0.12em] text-sky-800">
-                            Pago y privacidad
+                            Pago
                         </p>
 
                         <h3 class="mt-1 text-sm font-black text-slate-950">
-                            Tus datos se introducirán en Stripe
+                            Pago gestionado por Stripe
                         </h3>
 
                         <p class="mt-2 text-xs leading-5 text-slate-700">
-                            TodoSatcom no solicita ni guarda datos de tarjeta.
-                            Cuando el checkout se active, Stripe recogerá el
-                            correo y, si el pedido necesita envío, también la
-                            dirección y el teléfono.
+                            Completarás el pago y, cuando corresponda, los
+                            datos de entrega en la plataforma de Stripe.
                         </p>
                     </section>
 
-                    <p class="mt-4 text-xs leading-5 text-slate-500">
-                        Los impuestos, portes y condiciones definitivas
-                        continúan pendientes de activación.
-                    </p>
 
                     <button
                         type="button"
@@ -292,7 +233,7 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
                         aria-describedby="cart-checkout-status"
                         class="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-orange-500 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 motion-reduce:transition-none"
                     >
-                        Pago todavía no disponible
+                        Compra online próximamente
                     </button>
 
                     <p
@@ -300,9 +241,12 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
                         data-cart-checkout-status
                         role="status"
                         aria-live="polite"
+                        aria-atomic="true"
+                        tabindex="-1"
+                        data-tone="neutral"
                         class="mt-3 text-xs leading-5 text-slate-600"
                     >
-                        El checkout permanece desactivado durante esta fase de desarrollo.
+                        Puedes preparar tu carrito. La compra online estará disponible próximamente.
                     </p>
 
                     <a
@@ -346,8 +290,7 @@ import CheckoutSteps from "../../components/store/CheckoutSteps.astro";
                         id="cart-clear-description"
                         class="mt-3 text-sm leading-6 text-slate-600"
                     >
-                        Se eliminarán todos los productos guardados en este navegador.
-                        Esta acción no afecta a ningún pago ni pedido.
+                        Se eliminarán todos los productos de tu carrito.
                     </p>
 
                     <div class="mt-7 grid gap-3 sm:grid-cols-2">

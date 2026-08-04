@@ -8,18 +8,6 @@ import {
     setCartItemQuantity,
     type CartItem,
 } from "../lib/cart";
-import {
-    CartValidationError,
-    isCartValidationEnabled,
-    validateCartWithServer,
-    type ValidatedCart,
-} from "../lib/cart-validation";
-import {
-    CART_VALIDATION_PHASES,
-    deriveCartViewState,
-    getShippingPresentation,
-    getValidationToneClasses,
-} from "../lib/cart-view-state.js";
 
 const cartItemsRegion =
     document.querySelector<HTMLElement>(
@@ -71,36 +59,6 @@ const cartShell =
         "[data-cart-shell]",
     );
 
-const validationPanel =
-    document.querySelector<HTMLElement>(
-        "[data-cart-validation-panel]",
-    );
-
-const validationIcon =
-    document.querySelector<HTMLElement>(
-        "[data-cart-validation-icon]",
-    );
-
-const validationEyebrow =
-    document.querySelector<HTMLElement>(
-        "[data-cart-validation-eyebrow]",
-    );
-
-const validationTitle =
-    document.querySelector<HTMLElement>(
-        "[data-cart-validation-title]",
-    );
-
-const validationMessage =
-    document.querySelector<HTMLElement>(
-        "[data-cart-validation-message]",
-    );
-
-const validationRetryButton =
-    document.querySelector<HTMLButtonElement>(
-        "[data-cart-validation-retry]",
-    );
-
 const subtotalNote =
     document.querySelector<HTMLElement>(
         "[data-cart-subtotal-note]",
@@ -131,29 +89,6 @@ const currencyFormatter =
         style: "currency",
         currency: "EUR",
     });
-
-let validatedCart:
-    ValidatedCart | null = null;
-
-let validatedCartSignature = "";
-
-let validationPhase =
-    isCartValidationEnabled()
-        ? CART_VALIDATION_PHASES.IDLE
-        : CART_VALIDATION_PHASES.DISABLED;
-
-let validationErrorMessage = "";
-
-let validationRequestSequence = 0;
-
-let validationController:
-    AbortController | null = null;
-
-let validationDebounceTimer:
-    number | null = null;
-
-const CART_VALIDATION_DEBOUNCE_MS =
-    800;
 
 let refreshScheduled = false;
 
@@ -560,206 +495,31 @@ function createCartItem(
     return article;
 }
 
-function getCartSignature(
-    items: CartItem[],
-): string {
-    return items
-        .map(
-            (item) =>
-                `${item.documentId}:${item.cantidad}`,
-        )
-        .sort()
-        .join("|");
-}
-
-function getDisplayItems(
-    items: CartItem[],
-    activeValidation:
-        ValidatedCart | null,
-): CartItem[] {
-    if (!activeValidation) {
-        return items;
-    }
-
-    const validatedLines =
-        new Map(
-            activeValidation.lineas.map(
-                (line) => [
-                    line.documentId,
-                    line,
-                ],
-            ),
-        );
-
-    return items.map((item) => {
-        const validatedLine =
-            validatedLines.get(
-                item.documentId,
-            );
-
-        if (!validatedLine) {
-            return item;
-        }
-
-        return {
-            ...item,
-
-            nombre:
-                validatedLine.nombre,
-
-            sku:
-                validatedLine.sku,
-
-            precioCentimos:
-                validatedLine
-                    .precioUnitarioCentimos,
-
-            requiereEnvio:
-                validatedLine
-                    .requiereEnvio,
-        };
-    });
-}
-
-
 function renderCartPresentation(
     items: CartItem[],
-    activeValidation:
-        ValidatedCart | null,
 ) {
-    const viewState =
-        deriveCartViewState({
-            itemCount: items.length,
-
-            validationEnabled:
-                isCartValidationEnabled(),
-
-            phase:
-                validationPhase,
-
-            hasValidatedCart:
-                activeValidation !==
-                null,
-
-            errorMessage:
-                validationErrorMessage,
-        });
-
     if (cartSubtotalLabel) {
         cartSubtotalLabel.textContent =
-            viewState
-                .subtotalLabel;
+            "Subtotal estimado";
     }
 
     if (subtotalNote) {
         subtotalNote.textContent =
-            viewState
-                .subtotalNote;
+            "El importe final se confirmará al continuar al pago.";
     }
 
     if (cartShell) {
         cartShell.setAttribute(
             "aria-busy",
-            String(
-                viewState.busy,
-            ),
+            "false",
         );
     }
 
-    if (
-        validationPanel &&
-        validationIcon &&
-        validationEyebrow &&
-        validationTitle &&
-        validationMessage
-    ) {
-        validationPanel.hidden =
-            items.length === 0;
-
-        validationPanel.dataset.state =
-            viewState.state;
-
-        validationIcon.textContent =
-            viewState.icon;
-
-        validationEyebrow.textContent =
-            viewState.eyebrow;
-
-        validationTitle.textContent =
-            viewState.title;
-
-        validationMessage.textContent =
-            viewState.message;
-
-        validationPanel.setAttribute(
-            "role",
-            viewState.state === "error"
-                ? "alert"
-                : "status",
+    const requiresShipping =
+        items.some(
+            (item) =>
+                item.requiereEnvio,
         );
-
-        validationPanel.setAttribute(
-            "aria-live",
-            viewState.state === "error"
-                ? "assertive"
-                : "polite",
-        );
-
-        if (validationRetryButton) {
-            validationRetryButton.hidden =
-                viewState.state !== "error";
-        }
-
-        const tone =
-            getValidationToneClasses(
-                viewState.tone,
-            );
-
-        const removableClasses = [
-            "border-slate-200",
-            "border-sky-200",
-            "border-amber-200",
-            "border-emerald-200",
-            "border-red-200",
-            "bg-white",
-            "bg-sky-50",
-            "bg-amber-50",
-            "bg-emerald-50",
-            "bg-red-50",
-        ];
-
-        validationPanel.classList.remove(
-            ...removableClasses,
-        );
-
-        validationPanel.classList.add(
-            tone.border,
-            tone.background,
-        );
-
-        validationIcon.className =
-            [
-                "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-black",
-                tone.iconBackground,
-                tone.iconText,
-            ].join(" ");
-
-        validationEyebrow.className =
-            [
-                "text-xs font-black uppercase tracking-[0.14em]",
-                tone.eyebrow,
-            ].join(" ");
-    }
-
-    const shipping =
-        getShippingPresentation({
-            items,
-            validatedCart:
-                activeValidation,
-
-            verified:
-                viewState.verified,
-        });
 
     if (
         shippingPanel &&
@@ -767,13 +527,17 @@ function renderCartPresentation(
         shippingMessage
     ) {
         shippingPanel.dataset.status =
-            shipping.status;
+            "estimated";
 
         shippingTitle.textContent =
-            shipping.title;
+            requiresShipping
+                ? "Este pedido incluye envío"
+                : "No se ha detectado envío";
 
         shippingMessage.textContent =
-            shipping.message;
+            requiresShipping
+                ? "Los gastos y datos de entrega se confirmarán al continuar al pago."
+                : "Confirmaremos este dato antes de abrir el pago.";
     }
 }
 
@@ -789,28 +553,11 @@ function renderCart() {
     }
 
     const items = readCart();
-
-    const signature =
-        getCartSignature(items);
-
-    const activeValidation =
-        validatedCart &&
-        validatedCartSignature ===
-            signature
-            ? validatedCart
-            : null;
-
-    const displayItems =
-        getDisplayItems(
-            items,
-            activeValidation,
-        );
-
     const isEmpty =
         items.length === 0;
 
     cartItemsRegion.replaceChildren(
-        ...displayItems.map(
+        ...items.map(
             createCartItem,
         ),
     );
@@ -825,10 +572,7 @@ function renderCart() {
         isEmpty;
 
     const units =
-        activeValidation
-            ? activeValidation
-                  .cantidadTotal
-            : getCartCount(items);
+        getCartCount(items);
 
     cartUnits.textContent =
         `${units} ${
@@ -837,19 +581,12 @@ function renderCart() {
                 : "unidades"
         }`;
 
-    const subtotal =
-        activeValidation
-            ? activeValidation
-                  .subtotalProductosCentimos
-            : getCartSubtotal(items);
-
     cartSubtotal.textContent =
-        formatPrice(subtotal);
+        formatPrice(
+            getCartSubtotal(items),
+        );
 
-    renderCartPresentation(
-        items,
-        activeValidation,
-    );
+    renderCartPresentation(items);
 
     if (clearButton) {
         clearButton.disabled =
@@ -857,188 +594,8 @@ function renderCart() {
     }
 }
 
-async function validateCurrentCart(
-    items: CartItem[],
-) {
-    const requestSequence =
-        ++validationRequestSequence;
-
-    validationController?.abort();
-    validationController = null;
-
-    if (items.length === 0) {
-        validationPhase =
-            CART_VALIDATION_PHASES.IDLE;
-
-        validationErrorMessage = "";
-        clearError();
-        renderCart();
-        return;
-    }
-
-    if (!isCartValidationEnabled()) {
-        validationPhase =
-            CART_VALIDATION_PHASES.DISABLED;
-
-        validationErrorMessage = "";
-        renderCart();
-        return;
-    }
-
-    validationPhase =
-        CART_VALIDATION_PHASES.VALIDATING;
-
-    validationErrorMessage = "";
-    renderCart();
-
-    const requestedSignature =
-        getCartSignature(items);
-
-    const controller =
-        new AbortController();
-
-    validationController =
-        controller;
-
-
-    try {
-        const result =
-            await validateCartWithServer(
-                items,
-                controller.signal,
-            );
-
-        if (
-            requestSequence !==
-                validationRequestSequence ||
-            getCartSignature(
-                readCart(),
-            ) !== requestedSignature
-        ) {
-            return;
-        }
-
-        validatedCart =
-            result;
-
-        validatedCartSignature =
-            requestedSignature;
-
-        validationPhase =
-            CART_VALIDATION_PHASES.VERIFIED;
-
-        validationErrorMessage = "";
-        renderCart();
-
-    } catch (error) {
-        if (
-            error instanceof DOMException &&
-            error.name === "AbortError"
-        ) {
-            return;
-        }
-
-        if (
-            requestSequence !==
-            validationRequestSequence
-        ) {
-            return;
-        }
-
-        validatedCart = null;
-        validatedCartSignature = "";
-
-        renderCart();
-
-        const message =
-            error instanceof
-            CartValidationError
-                ? error.message
-                : "No se ha podido comprobar el carrito.";
-
-        validationPhase =
-            CART_VALIDATION_PHASES.ERROR;
-
-        validationErrorMessage =
-            message;
-
-        renderCart();
-
-        requestAnimationFrame(() => {
-            validationPanel?.focus();
-        });
-    } finally {
-        if (
-            requestSequence ===
-            validationRequestSequence
-        ) {
-            validationController =
-                null;
-        }
-    }
-}
-
 function refreshCart() {
-    validatedCart = null;
-    validatedCartSignature = "";
-
-    /*
-     * Un cambio en cantidades invalida
-     * cualquier comprobación anterior.
-     */
-    validationController?.abort();
-    validationController = null;
-    validationRequestSequence += 1;
-
-    if (
-        validationDebounceTimer !==
-        null
-    ) {
-        window.clearTimeout(
-            validationDebounceTimer,
-        );
-
-        validationDebounceTimer =
-            null;
-    }
-
-    const items = readCart();
-
-    validationErrorMessage = "";
-
-    validationPhase =
-        items.length === 0
-            ? CART_VALIDATION_PHASES.IDLE
-            : isCartValidationEnabled()
-              ? CART_VALIDATION_PHASES.SCHEDULED
-              : CART_VALIDATION_PHASES.DISABLED;
-
     renderCart();
-
-    if (
-        items.length === 0 ||
-        !isCartValidationEnabled()
-    ) {
-        return;
-    }
-
-    /*
-     * Evita enviar una petición por cada
-     * pulsación en los botones + y −.
-     */
-    validationDebounceTimer =
-        window.setTimeout(
-            () => {
-                validationDebounceTimer =
-                    null;
-
-                void validateCurrentCart(
-                    readCart(),
-                );
-            },
-
-            CART_VALIDATION_DEBOUNCE_MS,
-        );
 }
 
 function scheduleCartRefresh() {
@@ -1166,18 +723,6 @@ document.addEventListener(
                 scheduleCartRefresh();
             }
 
-            return;
-        }
-
-        const retryControl =
-            target.closest<HTMLButtonElement>(
-                "[data-cart-validation-retry]",
-            );
-
-        if (retryControl) {
-            void validateCurrentCart(
-                readCart(),
-            );
             return;
         }
 

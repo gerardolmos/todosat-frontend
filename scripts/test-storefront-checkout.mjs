@@ -3,11 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import {
-    CART_VALIDATION_PHASES,
-    deriveCartViewState,
-    getShippingPresentation,
-    getValidationToneClasses,
-} from "../src/lib/cart-view-state.js";
+    reconcileCartWithValidation,
+} from "../src/lib/cart-checkout-review.js";
 
 const root =
     path.resolve(
@@ -22,186 +19,151 @@ function read(relative) {
     );
 }
 
-test(
-    "el modelo distingue los estados del carrito",
-    () => {
-        const empty =
-            deriveCartViewState({
-                itemCount: 0,
-                validationEnabled:
-                    false,
-                phase:
-                    CART_VALIDATION_PHASES
-                        .IDLE,
-                hasValidatedCart:
-                    false,
-            });
+const localItem = {
+    documentId: "producto-1",
+    slug: "antena-demo",
+    nombre: "Antena demo",
+    sku: "ANT-001",
+    precioCentimos: 10000,
+    moneda: "EUR",
+    imagenUrl: "/demo.jpg",
+    requiereEnvio: true,
+    cantidad: 2,
+};
 
-        assert.equal(
-            empty.state,
-            "empty",
+function validatedLine(
+    overrides = {},
+) {
+    return {
+        documentId:
+            localItem.documentId,
+        sku: localItem.sku,
+        nombre: localItem.nombre,
+        cantidad:
+            localItem.cantidad,
+        precioUnitarioCentimos:
+            localItem.precioCentimos,
+        subtotalCentimos:
+            localItem.precioCentimos *
+            localItem.cantidad,
+        moneda: "EUR",
+        requiereEnvio:
+            localItem.requiereEnvio,
+        ...overrides,
+    };
+}
+
+function validatedCart(
+    lineOverrides = {},
+) {
+    const line =
+        validatedLine(
+            lineOverrides,
         );
 
-        const disabled =
-            deriveCartViewState({
-                itemCount: 1,
-                validationEnabled:
-                    false,
-                phase:
-                    CART_VALIDATION_PHASES
-                        .DISABLED,
-                hasValidatedCart:
-                    false,
-            });
-
-        assert.equal(
-            disabled.state,
-            "estimated",
-        );
-
-        const validating =
-            deriveCartViewState({
-                itemCount: 1,
-                validationEnabled:
-                    true,
-                phase:
-                    CART_VALIDATION_PHASES
-                        .VALIDATING,
-                hasValidatedCart:
-                    false,
-            });
-
-        assert.equal(
-            validating.busy,
+    return {
+        lineas: [line],
+        cantidadTotal:
+            line.cantidad,
+        subtotalProductosCentimos:
+            line.subtotalCentimos,
+        moneda: "EUR",
+        requiereEnvio:
+            line.requiereEnvio,
+        pagosRealesBloqueados:
             true,
-        );
-
-        const verified =
-            deriveCartViewState({
-                itemCount: 1,
-                validationEnabled:
-                    true,
-                phase:
-                    CART_VALIDATION_PHASES
-                        .VERIFIED,
-                hasValidatedCart:
-                    true,
-            });
-
-        assert.equal(
-            verified.state,
-            "verified",
-        );
-
-        assert.equal(
-            verified.subtotalLabel,
-            "Subtotal verificado",
-        );
-
-        const failed =
-            deriveCartViewState({
-                itemCount: 1,
-                validationEnabled:
-                    true,
-                phase:
-                    CART_VALIDATION_PHASES
-                        .ERROR,
-                hasValidatedCart:
-                    false,
-                errorMessage:
-                    "Error controlado",
-            });
-
-        assert.equal(
-            failed.message,
-            "Error controlado",
-        );
-    },
-);
+    };
+}
 
 test(
-    "la información de envío cambia con la validación",
+    "la revisión final no cambia un carrito que coincide",
     () => {
-        const estimated =
-            getShippingPresentation({
-                items: [
-                    {
-                        requiereEnvio:
-                            true,
-                    },
-                ],
-            });
+        const result =
+            reconcileCartWithValidation(
+                [localItem],
+                validatedCart(),
+            );
 
         assert.equal(
-            estimated.requiresShipping,
-            true,
-        );
-
-        assert.equal(
-            estimated.status,
-            "estimated",
-        );
-
-        const verified =
-            getShippingPresentation({
-                items: [],
-                validatedCart: {
-                    requiereEnvio:
-                        false,
-                },
-                verified: true,
-            });
-
-        assert.equal(
-            verified.requiresShipping,
+            result.changed,
             false,
         );
 
+        assert.deepEqual(
+            result.changes,
+            [],
+        );
+
         assert.equal(
-            verified.status,
-            "verified",
-        );
-
-        assert.match(
-            verified.title,
-            /no requiere/i,
+            result.items[0]
+                .precioCentimos,
+            10000,
         );
     },
 );
 
 test(
-    "todos los tonos visuales están definidos",
+    "la revisión final actualiza precio y envío sin perder datos visuales",
     () => {
-        for (
-            const tone
-            of [
-                "neutral",
-                "information",
-                "pending",
-                "success",
-                "error",
-            ]
-        ) {
-            const classes =
-                getValidationToneClasses(
-                    tone,
-                );
-
-            assert.match(
-                classes.border,
-                /^border-/,
+        const result =
+            reconcileCartWithValidation(
+                [localItem],
+                validatedCart({
+                    nombre:
+                        "Antena actualizada",
+                    sku: "ANT-002",
+                    precioUnitarioCentimos:
+                        12500,
+                    subtotalCentimos:
+                        25000,
+                    requiereEnvio:
+                        false,
+                }),
             );
 
-            assert.match(
-                classes.background,
-                /^bg-/,
-            );
-        }
+        assert.equal(
+            result.changed,
+            true,
+        );
+
+        assert.deepEqual(
+            result.changes[0]
+                .fields,
+            [
+                "nombre",
+                "sku",
+                "precio",
+                "envío",
+            ],
+        );
+
+        assert.equal(
+            result.items[0].slug,
+            localItem.slug,
+        );
+
+        assert.equal(
+            result.items[0]
+                .imagenUrl,
+            localItem.imagenUrl,
+        );
+
+        assert.equal(
+            result.items[0]
+                .cantidad,
+            2,
+        );
+
+        assert.equal(
+            result.items[0]
+                .precioCentimos,
+            12500,
+        );
     },
 );
 
 test(
-    "la página incluye pasos, validación, envío y privacidad",
+    "el carrito muestra solo información útil para comprar",
     () => {
         const page =
             read(
@@ -216,13 +178,11 @@ test(
         for (
             const selector
             of [
-                "data-cart-validation-panel",
-                "data-cart-validation-title",
-                "data-cart-validation-message",
                 "data-cart-shipping-title",
                 "data-cart-shipping-message",
                 "data-cart-privacy",
                 "data-cart-subtotal-note",
+                "data-cart-checkout-status",
             ]
         ) {
             assert.match(
@@ -233,82 +193,222 @@ test(
 
         assert.doesNotMatch(
             page,
+            /data-cart-validation-panel/,
+        );
+
+        assert.doesNotMatch(
+            page,
+            /data-cart-validation-retry/,
+        );
+
+        assert.doesNotMatch(
+            page,
             /<(?:input|select|textarea)\b/i,
+        );
+    },
+);
+
+test(
+    "los textos visibles del carrito no exponen lenguaje interno",
+    () => {
+        const page =
+            read(
+                "src/pages/tienda/carrito.astro",
+            );
+
+        for (
+            const forbidden
+            of [
+                /en el servidor/i,
+                /Strapi/i,
+                /fase de desarrollo/i,
+                /validación del servidor/i,
+                /pagos reales bloqueados/i,
+            ]
+        ) {
+            assert.doesNotMatch(
+                page,
+                forbidden,
+            );
+        }
+
+        assert.match(
+            page,
+            /El importe final se confirmará al continuar al pago/,
         );
 
         assert.match(
             page,
-            /Stripe/,
+            /Pago gestionado por Stripe/,
         );
     },
 );
 
 test(
-    "el indicador de pasos es informativo y accesible",
-    () => {
-        const component =
-            read(
-                "src/components/store/CheckoutSteps.astro",
-            );
-
-        assert.match(
-            component,
-            /aria-label="Progreso de compra"/,
-        );
-
-        assert.match(
-            component,
-            /aria-current=/,
-        );
-
-        assert.match(
-            component,
-            /Carrito/,
-        );
-
-        assert.match(
-            component,
-            /Pago seguro/,
-        );
-
-        assert.match(
-            component,
-            /Confirmación/,
-        );
-
-        assert.doesNotMatch(
-            component,
-            /<a\b/,
-        );
-    },
-);
-
-test(
-    "el controlador utiliza el modelo explícito de estados",
+    "cambiar cantidades no consulta Strapi ni programa validaciones",
     () => {
         const controller =
             read(
                 "src/scripts/cart-page.ts",
             );
 
-        assert.match(
+        assert.doesNotMatch(
             controller,
-            /deriveCartViewState/,
+            /validateCartWithServer/,
+        );
+
+        assert.doesNotMatch(
+            controller,
+            /cart-validation/,
+        );
+
+        assert.doesNotMatch(
+            controller,
+            /validationDebounceTimer|CART_VALIDATION_DEBOUNCE_MS/,
+        );
+
+        assert.doesNotMatch(
+            controller,
+            /window\.setTimeout/,
         );
 
         assert.match(
             controller,
-            /getShippingPresentation/,
+            /setCartItemQuantity/,
         );
 
         assert.match(
             controller,
-            /validationPhase/,
+            /getCartSubtotal/,
+        );
+    },
+);
+
+test(
+    "la comprobación se ejecuta únicamente al ordenar el pago",
+    () => {
+        const controller =
+            read(
+                "src/scripts/cart-checkout.ts",
+            );
+
+        const start =
+            controller.indexOf(
+                "async function startCheckout",
+            );
+
+        const validation =
+            controller.indexOf(
+                "validateCartWithServer",
+                start,
+            );
+
+        const creation =
+            controller.indexOf(
+                "createCheckoutSession",
+                start,
+            );
+
+        assert.ok(start >= 0);
+        assert.ok(validation > start);
+        assert.ok(creation > validation);
+
+        assert.equal(
+            controller.indexOf(
+                "validateCartWithServer",
+                validation + 1,
+            ),
+            -1,
+        );
+    },
+);
+
+test(
+    "si cambia el carrito se actualiza y exige un segundo clic",
+    () => {
+        const controller =
+            read(
+                "src/scripts/cart-checkout.ts",
+            );
+
+        assert.match(
+            controller,
+            /reconcileCartWithValidation/,
         );
 
         assert.match(
             controller,
-            /aria-busy/,
+            /if \(reconciliation\.changed\)/,
+        );
+
+        assert.match(
+            controller,
+            /saveCart\(\s*reconciliation\.items/s,
+        );
+
+        assert.match(
+            controller,
+            /Confirmar cambios y continuar/,
+        );
+
+        assert.match(
+            controller,
+            /Revisa el nuevo importe y vuelve a continuar/i,
+        );
+
+        const changedBlock =
+            controller.slice(
+                controller.indexOf(
+                    "if (reconciliation.changed)",
+                ),
+                controller.indexOf(
+                    "reviewRequiredSignature = \"\";",
+                ),
+            );
+
+        assert.doesNotMatch(
+            changedBlock,
+            /createCheckoutSession/,
+        );
+    },
+);
+
+test(
+    "el clic final conserva la validación autoritativa del backend",
+    () => {
+        const checkout =
+            read(
+                "src/lib/checkout.ts",
+            );
+
+        const validation =
+            read(
+                "src/lib/cart-validation.ts",
+            );
+
+        assert.match(
+            validation,
+            /\/api\/tienda\/carrito\/validar/,
+        );
+
+        assert.match(
+            checkout,
+            /\/api\/tienda\/checkout/,
+        );
+
+        assert.match(
+            checkout,
+            /documentId/,
+        );
+
+        assert.match(
+            checkout,
+            /cantidad/,
+        );
+
+        assert.doesNotMatch(
+            checkout,
+            /precioCentimos\s*:/,
         );
     },
 );
@@ -321,32 +421,24 @@ test(
                 "src/lib/checkout.ts",
             );
 
-        const cartPage =
-            read(
-                "src/scripts/cart-page.ts",
-            );
-
-        const combined =
-            `${checkout}\n${cartPage}`;
+        const controllers =
+            [
+                read(
+                    "src/scripts/cart-page.ts",
+                ),
+                read(
+                    "src/scripts/cart-checkout.ts",
+                ),
+            ].join("\n");
 
         assert.doesNotMatch(
-            combined,
+            `${checkout}\n${controllers}`,
             /\b(?:nombreCliente|customerEmail|telefonoCliente|direccionEnvio)\b/,
         );
 
         assert.match(
             checkout,
             /credentials:\s*"omit"/,
-        );
-
-        assert.match(
-            checkout,
-            /documentId/,
-        );
-
-        assert.match(
-            checkout,
-            /cantidad/,
         );
     },
 );
@@ -399,11 +491,6 @@ test(
             /setTimeout/,
         );
 
-        assert.match(
-            controller,
-            /function clearError/,
-        );
-
         const page =
             read(
                 "src/pages/tienda/carrito.astro",
@@ -422,41 +509,6 @@ test(
         assert.match(
             page,
             /tabindex="-1"/,
-        );
-    },
-);
-
-test(
-    "el error de validación permite reintento manual",
-    () => {
-        const page =
-            read(
-                "src/pages/tienda/carrito.astro",
-            );
-
-        const controller =
-            read(
-                "src/scripts/cart-page.ts",
-            );
-
-        assert.match(
-            page,
-            /data-cart-validation-retry/,
-        );
-
-        assert.match(
-            controller,
-            /viewState\.state !== "error"/,
-        );
-
-        assert.match(
-            controller,
-            /validateCurrentCart\(\s*readCart\(\)/s,
-        );
-
-        assert.match(
-            controller,
-            /validationPanel\?\.focus/,
         );
     },
 );
@@ -485,16 +537,6 @@ test(
         );
 
         assert.match(
-            page,
-            /data-cart-clear-confirm/,
-        );
-
-        assert.match(
-            page,
-            /data-cart-clear-cancel/,
-        );
-
-        assert.match(
             controller,
             /showModal/,
         );
@@ -502,11 +544,6 @@ test(
         assert.match(
             controller,
             /window\.confirm/,
-        );
-
-        assert.doesNotMatch(
-            controller,
-            /if \(clearControl\) \{\s*clearCart\(\)/,
         );
     },
 );
@@ -545,13 +582,114 @@ test(
         );
 
         assert.match(
-            controller,
-            /sm:grid-cols-\[minmax\(0,1fr\)_auto\]/,
+            page,
+            /data-cart-checkout-status[\s\S]*tabindex="-1"/,
+        );
+    },
+);
+
+test(
+    "el indicador de pasos es informativo y accesible",
+    () => {
+        const component =
+            read(
+                "src/components/store/CheckoutSteps.astro",
+            );
+
+        assert.match(
+            component,
+            /aria-label="Progreso de compra"/,
         );
 
         assert.match(
-            page,
-            /xl:sticky/,
+            component,
+            /aria-current=/,
+        );
+
+        assert.match(
+            component,
+            /Carrito/,
+        );
+
+        assert.match(
+            component,
+            /Pago seguro/,
+        );
+
+        assert.match(
+            component,
+            /Confirmación/,
+        );
+
+        assert.doesNotMatch(
+            component,
+            /<a\b/,
+        );
+    },
+);
+
+test(
+    "los estados del botón de pago utilizan lenguaje comprensible",
+    () => {
+        const controller =
+            read(
+                "src/scripts/cart-checkout.ts",
+            );
+
+        for (
+            const expected
+            of [
+                "Compra online próximamente",
+                "Continuar al pago",
+                "Comprobando el pedido…",
+                "Confirmar cambios y continuar",
+                "Abriendo el pago…",
+            ]
+        ) {
+            assert.match(
+                controller,
+                new RegExp(expected),
+            );
+        }
+
+        assert.doesNotMatch(
+            controller,
+            /Strapi|fase de desarrollo|notificación segura|consulta pública/i,
+        );
+    },
+);
+
+test(
+    "la URL de pago y la idempotencia continúan protegidas",
+    () => {
+        const checkout =
+            read(
+                "src/lib/checkout.ts",
+            );
+
+        const controller =
+            read(
+                "src/scripts/cart-checkout.ts",
+            );
+
+        assert.match(
+            checkout,
+            /url\.hostname !==\s*"checkout\.stripe\.com"/,
+        );
+
+        assert.match(
+            checkout,
+            /"Idempotency-Key"/,
+        );
+
+        assert.match(
+            controller,
+            /sessionStorage/,
+        );
+
+        assert.match(
+            controller,
+            /getCartSignature/,
         );
     },
 );

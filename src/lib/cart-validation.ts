@@ -57,13 +57,13 @@ function getErrorMessage(
 ): string {
     const messages: Record<string, string> = {
         CART_VALIDATION_DISABLED:
-            "La validación del servidor todavía no está habilitada.",
+            "No podemos comprobar el carrito en este momento.",
 
         CONTENT_TYPE_INVALID:
-            "La solicitud de validación no tiene un formato válido.",
+            "No hemos podido comprobar el carrito.",
 
         RATE_LIMIT_EXCEEDED:
-            "Se han realizado demasiadas comprobaciones. Inténtalo de nuevo dentro de unos minutos.",
+            "Has realizado varios intentos seguidos. Inténtalo de nuevo dentro de unos minutos.",
 
         CHECKOUT_ITEMS_INVALID:
             "El carrito está vacío o contiene datos no válidos.",
@@ -95,7 +95,7 @@ function getErrorMessage(
 
     return (
         messages[code] ??
-        "No se han podido comprobar los precios y la disponibilidad."
+        "No hemos podido confirmar el precio y la disponibilidad."
     );
 }
 
@@ -350,7 +350,7 @@ validateCartWithServer(
 
         throw new CartValidationError(
             "CART_VALIDATION_NETWORK_ERROR",
-            "No se ha podido conectar con el servidor para comprobar el carrito.",
+            "No hemos podido comprobar el carrito. Revisa tu conexión e inténtalo de nuevo.",
             0,
         );
     }
@@ -363,7 +363,7 @@ validateCartWithServer(
     } catch {
         throw new CartValidationError(
             "CART_VALIDATION_RESPONSE_INVALID",
-            "El servidor ha devuelto una respuesta no válida.",
+            "No hemos podido comprobar el carrito.",
             response.status,
         );
     }
@@ -391,7 +391,7 @@ validateCartWithServer(
     } catch {
         throw new CartValidationError(
             "CART_VALIDATION_RESPONSE_INVALID",
-            "El servidor ha devuelto una validación incoherente.",
+            "No hemos podido confirmar el carrito. Inténtalo de nuevo.",
             response.status,
         );
     }

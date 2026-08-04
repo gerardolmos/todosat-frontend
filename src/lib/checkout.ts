@@ -45,19 +45,19 @@ function getErrorMessage(
 ): string {
     const messages: Record<string, string> = {
         CHECKOUT_DISABLED:
-            "El pago todavía no está disponible.",
+            "La compra online todavía no está disponible.",
 
         CONTENT_TYPE_INVALID:
-            "La solicitud de pago no tiene un formato válido.",
+            "No hemos podido preparar el pago.",
 
         RATE_LIMIT_EXCEEDED:
             "Se han realizado demasiados intentos. Inténtalo de nuevo dentro de unos minutos.",
 
         IDEMPOTENCY_KEY_REQUIRED:
-            "No se ha podido identificar de forma segura este intento de pago.",
+            "No hemos podido preparar este intento de pago. Vuelve a intentarlo.",
 
         IDEMPOTENCY_KEY_INVALID:
-            "No se ha podido identificar de forma segura este intento de pago.",
+            "No hemos podido preparar este intento de pago. Vuelve a intentarlo.",
 
         IDEMPOTENCY_CONFLICT:
             "El carrito ha cambiado. Revísalo antes de continuar.",
@@ -72,12 +72,12 @@ function getErrorMessage(
             "Algún producto ya no está disponible.",
 
         CHECKOUT_INTERNAL_ERROR:
-            "No se ha podido preparar el pago seguro.",
+            "No hemos podido preparar el pago.",
     };
 
     return (
         messages[code] ??
-        "No se ha podido preparar el pago seguro."
+        "No hemos podido preparar el pago."
     );
 }
 
@@ -226,7 +226,7 @@ createCheckoutSession(
 
         throw new CheckoutError(
             "CHECKOUT_NETWORK_ERROR",
-            "No se ha podido conectar con el servidor de pago.",
+            "No hemos podido conectar con el servicio de pago.",
             0,
         );
     }
@@ -239,7 +239,7 @@ createCheckoutSession(
     } catch {
         throw new CheckoutError(
             "CHECKOUT_RESPONSE_INVALID",
-            "El servidor ha devuelto una respuesta no válida.",
+            "No hemos podido preparar el pago.",
             response.status,
         );
     }
@@ -264,7 +264,7 @@ createCheckoutSession(
     } catch {
         throw new CheckoutError(
             "CHECKOUT_RESPONSE_INVALID",
-            "El servidor ha devuelto una sesión de pago no válida.",
+            "No hemos podido preparar el pago.",
             response.status,
         );
     }
