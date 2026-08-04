@@ -234,7 +234,7 @@ test(
 
         assert.match(
             page,
-            /El importe final se confirmará al continuar al pago/,
+            /El importe final se confirmará al revisar el pedido/,
         );
 
         assert.match(
@@ -250,6 +250,11 @@ test(
         assert.match(
             page,
             /data-checkout-demo-dialog/,
+        );
+
+        assert.doesNotMatch(
+            page,
+            /botón de pago|continuar al pago|en el servidor/i,
         );
     },
 );
