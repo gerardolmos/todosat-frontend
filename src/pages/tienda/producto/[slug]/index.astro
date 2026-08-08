@@ -1,5 +1,6 @@
 ---
 import Layout from "../../../../layouts/Layout.astro";
+import { STORE_ENABLED } from "../../../../lib/features";
 import Container from "../../../../components/Container.astro";
 import ProductGallery from "../../../../components/store/ProductGallery.astro";
 
@@ -22,6 +23,10 @@ import type {
 } from "../../../../types/store";
 
 export async function getStaticPaths() {
+    if (!STORE_ENABLED) {
+        return [];
+    }
+
     const slugs =
         await getSlugsProductosTienda();
 

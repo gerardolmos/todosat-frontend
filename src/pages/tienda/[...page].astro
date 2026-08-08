@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { STORE_ENABLED } from "../../lib/features";
 import Container from "../../components/Container.astro";
 import ProductCard from "../../components/store/ProductCard.astro";
 
@@ -16,6 +17,10 @@ import type {
 } from "../../types/store";
 
 export async function getStaticPaths() {
+    if (!STORE_ENABLED) {
+        return [];
+    }
+
     const [
         firstPage,
         productosPrincipales,

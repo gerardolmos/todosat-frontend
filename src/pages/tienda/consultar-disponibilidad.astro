@@ -1,10 +1,13 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { STORE_ENABLED } from "../../lib/features";
 import Container from "../../components/Container.astro";
 import { getProductosBajoConsultaTienda } from "../../lib/store";
 import { getMediaUrl } from "../../lib/media";
 
-const productos = await getProductosBajoConsultaTienda();
+const productos = STORE_ENABLED
+    ? await getProductosBajoConsultaTienda()
+    : [];
 
 const productosDisponibilidad = productos.map((producto) => ({
     slug: producto.slug,

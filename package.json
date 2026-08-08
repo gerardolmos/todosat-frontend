@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "test:tienda": "node --test scripts/test-storefront-checkout.mjs scripts/test-checkout-status-client.cjs",
     "astro": "astro"
