@@ -152,9 +152,15 @@ const sectionName = categoriaActual
 
 const title = `${sectionName}${pageSuffix} | TodoSatcom`;
 
-const descriptionBase =
-    categoriaActual?.descripcion ||
-    "Noticias, análisis y novedades sobre operadores, internet satelital, hardware, cobertura y comunicaciones satelitales.";
+const categoriaDescription =
+    typeof categoriaActual?.descripcion === "string"
+        ? categoriaActual.descripcion.trim()
+        : "";
+
+const descriptionBase = categoriaActual
+    ? categoriaDescription ||
+      `Noticias y análisis sobre ${categoriaActual.nombre}: actualidad, operadores, tecnología, hardware y comunicaciones satelitales.`
+    : "Noticias, análisis y novedades sobre operadores, internet satelital, hardware, cobertura y comunicaciones satelitales.";
 
 const description =
     currentPage > 1
@@ -191,6 +197,44 @@ const ordenAntiguosUrl = categoriaActual
     : "/noticias/orden/antiguos";
 
 const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
+
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const collectionUrl = new URL(`${canonicalPath}/`, siteUrl).toString();
+
+const structuredData =
+    ordenActual === "antiguos"
+        ? undefined
+        : {
+              "@context": "https://schema.org",
+              "@graph": [
+                  {
+                      "@type": "CollectionPage",
+                      "@id": collectionUrl,
+                      url: collectionUrl,
+                      name: `${sectionName}${pageSuffix}`,
+                      description,
+                      inLanguage: "es-ES",
+                      mainEntity: {
+                          "@id": `${collectionUrl}#news`,
+                      },
+                  },
+                  {
+                      "@type": "ItemList",
+                      "@id": `${collectionUrl}#news`,
+                      itemListElement: page.data.map(
+                          (articulo: any, index: number) => ({
+                              "@type": "ListItem",
+                              position: index + 1,
+                              name: String(articulo.titulo || "").trim(),
+                              url: new URL(
+                                  `/noticias/${articulo.slug}/`,
+                                  siteUrl,
+                              ).toString(),
+                          }),
+                      ),
+                  },
+              ],
+          };
 ---
 
 <Layout
@@ -198,6 +242,7 @@ const heroIconUrl = categoriaActual ? getMediaUrl(categoriaActual.icono) : null;
     description={description}
     canonical={canonicalPath}
     robots={robots}
+    structuredData={structuredData}
 >
     <main class="min-h-screen bg-slate-950 py-10 text-white">
         <Container>

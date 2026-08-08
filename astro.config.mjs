@@ -15,6 +15,10 @@ function includeInSitemap(page) {
         "/privacidad",
         "/cookies",
         "/contacto",
+        "/tienda/carrito",
+        "/tienda/compra/confirmacion",
+        "/tienda/consulta-enviada",
+        "/tienda/consultar-disponibilidad",
     ]);
 
     if (excludedExactPaths.has(pathname)) {

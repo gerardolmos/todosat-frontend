@@ -8,9 +8,10 @@ import type {
     ProductoTiendaResumen,
     StrapiCollectionResponse,
     StrapiPagination,
+    TipoProductoTienda,
 } from "../types/store";
 
-export const PRODUCTOS_TIENDA_POR_PAGINA = 24;
+export const PRODUCTOS_TIENDA_POR_PAGINA = 8;
 
 const PRODUCTO_RESUMEN_FIELDS = [
     "fields[0]=nombre",
@@ -255,6 +256,42 @@ export async function getProductosTiendaPorCategoriaPage(
     };
 }
 
+async function getProductosTiendaPorTipo(
+    tipoProducto: TipoProductoTienda,
+): Promise<ProductoTiendaResumen[]> {
+    const response = await fetchAllAPI(
+        [
+            "/api/productos-tienda?",
+            FILTROS_CATALOGO,
+            `&filters[tipo_producto][$eq]=${encodeURIComponent(
+                tipoProducto,
+            )}`,
+            "&",
+            ORDEN_CATALOGO,
+            "&",
+            PRODUCTO_RESUMEN_FIELDS,
+            "&",
+            PRODUCTO_RESUMEN_POPULATE,
+        ].join(""),
+    );
+
+    return response.data as ProductoTiendaResumen[];
+}
+
+export async function getProductosPrincipalesTienda():
+Promise<ProductoTiendaResumen[]> {
+    return getProductosTiendaPorTipo(
+        "Producto principal",
+    );
+}
+
+export async function getAccesoriosTienda():
+Promise<ProductoTiendaResumen[]> {
+    return getProductosTiendaPorTipo(
+        "Accesorio",
+    );
+}
+
 export async function getProductosDestacadosTienda(
     limit = 6,
 ): Promise<ProductoTiendaResumen[]> {
@@ -279,6 +316,27 @@ export async function getProductosDestacadosTienda(
         ) as StrapiCollectionResponse<ProductoTiendaResumen>;
 
     return response.data;
+}
+
+export async function getProductosBajoConsultaTienda():
+Promise<ProductoTiendaResumen[]> {
+    const response = await fetchAllAPI(
+        [
+            "/api/productos-tienda?",
+            "filters[activo][$eq]=true",
+            `&filters[estado_venta][$eq]=${encodeURIComponent(
+                "Bajo consulta",
+            )}`,
+            "&",
+            ORDEN_CATALOGO,
+            "&",
+            PRODUCTO_RESUMEN_FIELDS,
+            "&",
+            PRODUCTO_RESUMEN_POPULATE,
+        ].join(""),
+    );
+
+    return response.data as ProductoTiendaResumen[];
 }
 
 export async function getProductoTiendaPorSlug(

@@ -7,6 +7,12 @@ interface Props {
 
 const { modelo } = Astro.props;
 const imagenUrl = getMediaUrl(modelo.imagen_principal);
+
+const estadoEditorial = modelo.discontinuado
+    ? "Discontinuado"
+    : modelo.descatalogado
+      ? "Descatalogado"
+      : null;
 ---
 
 <a
@@ -33,6 +39,18 @@ const imagenUrl = getMediaUrl(modelo.imagen_principal);
                         {modelo.tipo_hardware && (
                             <p class="inline-flex rounded-full bg-blue-600/90 px-2 py-0.5 text-[10px] tracking-[0.08em] md:px-3 md:py-1 md:text-xs md:tracking-[0.12em] font-bold uppercase text-white backdrop-blur">
                                 {modelo.tipo_hardware}
+                            </p>
+                        )}
+
+                        {estadoEditorial && (
+                            <p
+                                class={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] backdrop-blur md:px-3 md:py-1 md:text-xs md:tracking-[0.12em] ${
+                                    modelo.discontinuado
+                                        ? "border-red-400/60 bg-red-950/85 text-red-200"
+                                        : "border-amber-400/60 bg-amber-950/85 text-amber-200"
+                                }`}
+                            >
+                                {estadoEditorial}
                             </p>
                         )}
                     </div>

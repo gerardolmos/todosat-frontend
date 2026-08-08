@@ -1,127 +1,150 @@
 ---
 import logoTodoSatcom from "../assets/images/logoTodoSatcom.svg";
 
-const navItems = [
+const informationNavItems = [
     { href: "/operadores", label: "Operadores" },
     { href: "/hardware", label: "Hardware" },
     { href: "/noticias", label: "Noticias" },
     { href: "/manuales", label: "Manuales" },
-    { href: "/tienda", label: "Tienda" },
 ];
 ---
 
 <header
     id="site-header"
-    class="sticky top-0 z-50 border-b border-white/10 bg-slate-950 transition-transform duration-300"
+    class="sticky top-0 z-50 border-b border-white/10 bg-slate-950 transition-transform duration-300 overflow-hidden"
 >
-    <div
-        class="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-6 lg:px-8"
-    >
-        <a href="/" class="shrink-0">
-            <img
-                src={logoTodoSatcom.src}
-                alt="TodoSatcom"
-                class="w-[150px] md:w-[210px]"
-            />
-        </a>
+    <div class="mx-auto flex max-w-7xl items-stretch justify-between px-5 sm:px-6 lg:px-8">
+        <div class="flex min-w-0 flex-1 items-center justify-between py-5 pr-4">
+            <a href="/" class="shrink-0">
+                <img
+                    src={logoTodoSatcom.src}
+                    alt="TodoSatcom"
+                    class="w-[150px] md:w-[205px]"
+                />
+            </a>
 
-        <div class="hidden items-center gap-4 md:flex">
             <nav
-                class="flex items-center text-sm font-semibold text-slate-300"
-                aria-label="Navegación principal"
+                class="hidden items-center text-sm font-semibold text-slate-300 md:flex"
+                aria-label="Navegación informativa"
             >
-                {
-                    navItems.map((item, index) => (
-                        <>
-                            <a
-                                href={item.href}
-                                class={`px-5 py-2 transition hover:text-white ${
-                                    item.href === "/tienda"
-                                        ? "font-bold text-orange-400 hover:text-orange-300"
-                                        : ""
-                                }`}
-                            >
-                                {item.label}
-                            </a>
+                <span class="mr-2 text-[0.65rem] font-black uppercase tracking-[0.16em] text-slate-500">
+                    Información
+                </span>
 
-                            {index < navItems.length - 1 && (
-                                <span class="h-5 w-px bg-slate-500" />
-                            )}
-                        </>
+                {
+                    informationNavItems.map((item) => (
+                        <a
+                            href={item.href}
+                            class="rounded-full px-3.5 py-2 transition hover:bg-white/5 hover:text-white"
+                        >
+                            {item.label}
+                        </a>
                     ))
                 }
             </nav>
 
-            <a
-                href="/tienda/carrito"
-                class="relative inline-flex items-center justify-center rounded-full border border-orange-400/40 bg-orange-400/10 px-4 py-2.5 text-sm font-bold text-orange-200 transition hover:bg-orange-400/20 hover:text-white"
+            <button
+                id="menu-toggle"
+                type="button"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white md:hidden"
+                aria-label="Abrir menú"
+                aria-expanded="false"
+                aria-controls="mobile-menu"
             >
-                Carrito
-
-                <span
-                    data-cart-count
-                    hidden
-                    class="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-orange-500 px-1.5 py-0.5 text-xs font-black text-white"
-                >
-                    0
-                </span>
-            </a>
+                <span class="text-2xl leading-none">☰</span>
+            </button>
         </div>
 
-        <button
-            id="menu-toggle"
-            type="button"
-            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white md:hidden"
-            aria-label="Abrir menú"
-            aria-expanded="false"
-            aria-controls="mobile-menu"
-        >
-            <span class="text-2xl leading-none">☰</span>
-        </button>
+        <div class="relative hidden shrink-0 items-center bg-orange-500 pl-5 md:flex">
+            <div
+                class="absolute inset-y-0 left-full w-[100vw] bg-orange-500"
+                aria-hidden="true"
+            ></div>
+
+            <nav class="relative flex items-center" aria-label="Navegación de tienda">
+                <span class="mr-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-orange-950/65">
+                    Tienda
+                </span>
+
+                <a
+                    href="/tienda"
+                    class="inline-flex min-h-11 items-center px-4 py-2.5 text-sm font-black text-slate-950 transition hover:bg-orange-400"
+                >
+                    Productos
+                </a>
+
+                <a
+                    href="/tienda/carrito"
+                    class="relative inline-flex min-h-11 items-center px-4 py-2.5 text-sm font-black text-slate-950 transition hover:bg-orange-400"
+                >
+                    Carrito
+                    <span
+                        data-cart-count
+                        hidden
+                        class="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-slate-950 px-1.5 py-0.5 text-xs font-black text-white"
+                    >
+                        0
+                    </span>
+                </a>
+            </nav>
+        </div>
     </div>
 
     <nav
         id="mobile-menu"
-        class="hidden border-t border-white/10 bg-slate-950/95 px-5 py-5 backdrop-blur-xl md:hidden"
+        class="hidden border-t border-white/10 md:hidden"
         aria-label="Navegación móvil"
     >
-        <div class="flex flex-col gap-2 text-sm font-semibold text-slate-300">
-            {
-                navItems.map((item) => (
-                    <a
-                        href={item.href}
-                        class={`rounded-xl px-4 py-3 transition hover:bg-white/5 hover:text-white ${
-                            item.href === "/tienda"
-                                ? "border border-orange-400/30 bg-orange-400/10 font-bold text-orange-300 hover:bg-orange-400/20"
-                                : ""
-                        }`}
-                    >
-                        {item.label}
-                    </a>
-                ))
-            }
+        <div class="bg-slate-950 px-5 py-5">
+            <p class="px-4 pb-2 text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500">
+                Información
+            </p>
 
-            <a
-                href="/tienda/carrito"
-                class="mt-2 flex items-center justify-between rounded-xl border border-orange-400/30 bg-orange-400/10 px-4 py-3 font-bold text-orange-200 transition hover:bg-orange-400/20"
-            >
-                <span>Carrito</span>
+            <div class="flex flex-col gap-1 text-sm font-semibold text-slate-300">
+                {
+                    informationNavItems.map((item) => (
+                        <a
+                            href={item.href}
+                            class="rounded-xl px-4 py-3 transition hover:bg-white/5 hover:text-white"
+                        >
+                            {item.label}
+                        </a>
+                    ))
+                }
 
-                <span
-                    data-cart-count
-                    hidden
-                    class="inline-flex min-w-6 items-center justify-center rounded-full bg-orange-500 px-1.5 py-0.5 text-xs font-black text-white"
+                <a
+                    href="/buscar"
+                    class="mt-2 rounded-xl border border-sky-400/30 bg-sky-400/10 px-4 py-3 font-bold text-sky-100"
                 >
-                    0
-                </span>
-            </a>
+                    Buscar
+                </a>
+            </div>
+        </div>
 
-            <a
-                href="/buscar"
-                class="mt-2 rounded-xl border border-sky-400/30 bg-sky-400/10 px-4 py-3 font-bold text-sky-100 transition hover:bg-sky-400/20"
-            >
-                Buscar
-            </a>
+        <div class="bg-orange-500 px-5 py-5 text-slate-950">
+            <p class="px-4 pb-2 text-[0.65rem] font-black uppercase tracking-[0.18em] text-orange-950/65">
+                Tienda
+            </p>
+
+            <div class="flex flex-col gap-1 text-sm font-black">
+                <a href="/tienda" class="rounded-xl px-4 py-3 hover:bg-orange-400">
+                    Productos
+                </a>
+
+                <a
+                    href="/tienda/carrito"
+                    class="flex items-center justify-between rounded-xl px-4 py-3 hover:bg-orange-400"
+                >
+                    <span>Carrito</span>
+                    <span
+                        data-cart-count
+                        hidden
+                        class="inline-flex min-w-6 items-center justify-center rounded-full bg-slate-950 px-1.5 py-0.5 text-xs font-black text-white"
+                    >
+                        0
+                    </span>
+                </a>
+            </div>
         </div>
     </nav>
 </header>

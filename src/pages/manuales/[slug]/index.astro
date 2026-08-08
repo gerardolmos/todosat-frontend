@@ -2,6 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import { getManuales } from "../../../lib/content";
+import { renderBlocks } from "../../../lib/renderBlocks";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
@@ -22,8 +23,15 @@ export async function getStaticPaths() {
 
 const { manual } = Astro.props as any;
 
+const estadoEditorial = manual.discontinuado
+    ? "Discontinuado"
+    : manual.descatalogado
+      ? "Descatalogado"
+      : null;
+
 const archivoPdfUrl = getMediaUrl(manual.archivo_pdf);
 const imagenUrl = getMediaUrl(manual.imagen_portada);
+const contenidoHTML = renderBlocks(manual.contenido);
 const marcas = manual.operadores || [];
 const modelos = manual.hardwares || [];
 const articulos = manual.noticias || [];
@@ -208,6 +216,20 @@ const structuredData = {
                                 </p>
                             )
                         }
+
+                        {
+                            estadoEditorial && (
+                                <p
+                                    class={`inline-flex rounded-full border px-4 py-2 text-sm font-bold uppercase tracking-[0.08em] ${
+                                        manual.discontinuado
+                                            ? "border-red-400/60 bg-red-400/10 text-red-300"
+                                            : "border-amber-400/60 bg-amber-400/10 text-amber-300"
+                                    }`}
+                                >
+                                    {estadoEditorial}
+                                </p>
+                            )
+                        }
                     </div>
 
                     <h1
@@ -271,6 +293,26 @@ const structuredData = {
                                 </div>
                             ))}
                         </div>
+                    </section>
+                )
+            }
+
+            {
+                contenidoHTML && (
+                    <section class="mt-16 overflow-hidden rounded-3xl border border-white/10 bg-white text-slate-950 shadow-2xl shadow-slate-950/30">
+                        <div class="border-b border-slate-200 px-6 py-6 md:px-10">
+                            <p class="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">
+                                Documentación
+                            </p>
+                            <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+                                Contenido del manual
+                            </h2>
+                        </div>
+
+                        <div
+                            class="prose prose-slate max-w-none px-6 py-8 prose-headings:text-slate-950 prose-p:text-slate-700 prose-a:text-blue-600 prose-strong:text-slate-950 prose-li:text-slate-700 md:px-10 md:py-12 md:[&_p]:text-[1.08rem] md:[&_p]:leading-8 md:[&_li]:text-[1.08rem] md:[&_li]:leading-8"
+                            set:html={contenidoHTML}
+                        />
                     </section>
                 )
             }

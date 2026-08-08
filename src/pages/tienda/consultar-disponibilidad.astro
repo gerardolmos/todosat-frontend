@@ -1,0 +1,400 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+import { getProductosBajoConsultaTienda } from "../../lib/store";
+import { getMediaUrl } from "../../lib/media";
+
+const productos = await getProductosBajoConsultaTienda();
+
+const productosDisponibilidad = productos.map((producto) => ({
+    slug: producto.slug,
+    nombre: producto.nombre,
+    sku: producto.sku,
+    descripcion: producto.descripcion_corta,
+    imagenUrl: getMediaUrl(producto.imagen_principal),
+}));
+---
+
+<Layout
+    title="Consultar disponibilidad | TodoSatcom"
+    description="Consulta disponibilidad, plazo, precio o compatibilidad de productos TodoSatcom sujetos a confirmación comercial."
+    robots="noindex, follow"
+    canonical="/tienda/consultar-disponibilidad"
+>
+    <main class="min-h-screen bg-slate-50 py-12 text-slate-950 md:py-16">
+        <Container>
+            <div class="mx-auto max-w-6xl">
+                <div class="mb-8">
+                    <a
+                        href="/tienda/"
+                        class="inline-flex items-center text-sm font-bold text-slate-600 transition hover:text-orange-700"
+                    >
+                        ← Volver a la tienda
+                    </a>
+                </div>
+
+                <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-200 bg-slate-950 px-6 py-10 text-white md:px-10 md:py-12">
+                        <p class="text-xs font-bold uppercase tracking-[0.18em] text-orange-400">
+                            Consulta comercial
+                        </p>
+                        <h1 class="mt-4 text-4xl font-bold tracking-tight text-white md:text-5xl">
+                            Consultar disponibilidad
+                        </h1>
+                        <p class="mt-4 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
+                            Envíanos una consulta sobre un producto concreto. El producto queda identificado automáticamente y no necesitas volver a introducir sus datos.
+                        </p>
+                    </div>
+
+                    <div class="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
+                        <aside class="border-b border-slate-200 bg-slate-50 p-6 md:p-8 lg:border-b-0 lg:border-r">
+                            <div
+                                id="availability-product"
+                                class="hidden"
+                                aria-live="polite"
+                            >
+                                <p class="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                                    Producto seleccionado
+                                </p>
+
+                                <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                                    <div
+                                        id="availability-product-image-wrap"
+                                        class="hidden border-b border-slate-200 bg-white p-5"
+                                    >
+                                        <img
+                                            id="availability-product-image"
+                                            src=""
+                                            alt=""
+                                            class="mx-auto h-44 w-full object-contain"
+                                        />
+                                    </div>
+
+                                    <div class="p-5">
+                                        <h2
+                                            id="availability-product-name"
+                                            class="text-xl font-bold leading-tight text-slate-950"
+                                        ></h2>
+                                        <p
+                                            id="availability-product-description"
+                                            class="mt-3 text-sm leading-6 text-slate-600"
+                                        ></p>
+                                        <p class="mt-4 text-sm font-semibold text-slate-500">
+                                            SKU:
+                                            <span
+                                                id="availability-product-sku"
+                                                class="font-bold text-slate-950"
+                                            ></span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <a
+                                    id="availability-product-link"
+                                    href="/tienda/"
+                                    class="mt-5 inline-flex text-sm font-bold text-orange-700 transition hover:text-orange-600"
+                                >
+                                    Ver ficha del producto →
+                                </a>
+                            </div>
+
+                            <div
+                                id="availability-invalid"
+                                class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950"
+                            >
+                                <h2 class="text-lg font-bold">
+                                    Selecciona primero un producto
+                                </h2>
+                                <p class="mt-2 text-sm leading-6">
+                                    Esta página solo permite enviar consultas vinculadas a productos marcados como “Consultar disponibilidad”.
+                                </p>
+                                <a
+                                    href="/tienda/"
+                                    class="mt-4 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                                >
+                                    Ver productos
+                                </a>
+                            </div>
+                        </aside>
+
+                        <section class="p-6 md:p-8 lg:p-10">
+                            <div id="availability-form-wrap" class="hidden">
+                                <h2 class="text-2xl font-bold tracking-tight text-slate-950">
+                                    Consulta sobre este producto
+                                </h2>
+                                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+                                    Utiliza este formulario para disponibilidad, plazo, precio, compatibilidad, instalación o configuración del producto seleccionado.
+                                </p>
+
+                                <form
+                                    name="consulta-disponibilidad"
+                                    method="POST"
+                                    action="/tienda/consulta-enviada/"
+                                    data-netlify="true"
+                                    netlify-honeypot="bot-field"
+                                    class="mt-8 space-y-6"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="form-name"
+                                        value="consulta-disponibilidad"
+                                    />
+                                    <input
+                                        id="availability-product-slug-input"
+                                        type="hidden"
+                                        name="producto_slug"
+                                        value=""
+                                    />
+                                    <input
+                                        id="availability-product-name-input"
+                                        type="hidden"
+                                        name="producto"
+                                        value=""
+                                    />
+                                    <input
+                                        id="availability-product-sku-input"
+                                        type="hidden"
+                                        name="sku"
+                                        value=""
+                                    />
+
+                                    <p class="hidden" aria-hidden="true">
+                                        <label>
+                                            No rellenes este campo:
+                                            <input name="bot-field" tabindex="-1" autocomplete="off" />
+                                        </label>
+                                    </p>
+
+                                    <div class="grid gap-5 sm:grid-cols-2">
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-800">Producto</span>
+                                            <input
+                                                id="availability-product-readonly"
+                                                type="text"
+                                                value=""
+                                                readonly
+                                                tabindex="-1"
+                                                class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 outline-none"
+                                            />
+                                        </label>
+
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-800">SKU</span>
+                                            <input
+                                                id="availability-sku-readonly"
+                                                type="text"
+                                                value=""
+                                                readonly
+                                                tabindex="-1"
+                                                class="mt-2 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 outline-none"
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div class="grid gap-5 sm:grid-cols-2">
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-800">Nombre *</span>
+                                            <input
+                                                type="text"
+                                                name="nombre"
+                                                required
+                                                maxlength="120"
+                                                autocomplete="name"
+                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
+                                            />
+                                        </label>
+
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-800">Email *</span>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                required
+                                                maxlength="254"
+                                                autocomplete="email"
+                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div class="grid gap-5 sm:grid-cols-2">
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-800">Teléfono</span>
+                                            <input
+                                                type="tel"
+                                                name="telefono"
+                                                maxlength="40"
+                                                autocomplete="tel"
+                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
+                                            />
+                                        </label>
+
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-800">Empresa</span>
+                                            <input
+                                                type="text"
+                                                name="empresa"
+                                                maxlength="160"
+                                                autocomplete="organization"
+                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <label class="block">
+                                        <span class="text-sm font-bold text-slate-800">Tipo de consulta *</span>
+                                        <select
+                                            name="tipo_consulta"
+                                            required
+                                            class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
+                                        >
+                                            <option value="">Selecciona una opción</option>
+                                            <option value="Disponibilidad y plazo de entrega">Disponibilidad y plazo de entrega</option>
+                                            <option value="Precio y presupuesto">Precio y presupuesto</option>
+                                            <option value="Compatibilidad">Compatibilidad</option>
+                                            <option value="Instalación o configuración">Instalación o configuración</option>
+                                            <option value="Otra consulta sobre este producto">Otra consulta sobre este producto</option>
+                                        </select>
+                                    </label>
+
+                                    <label class="block">
+                                        <span class="text-sm font-bold text-slate-800">Mensaje *</span>
+                                        <textarea
+                                            name="mensaje"
+                                            required
+                                            minlength="10"
+                                            maxlength="2000"
+                                            rows="7"
+                                            placeholder="Cuéntanos qué necesitas saber sobre este producto."
+                                            class="mt-2 w-full resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-base leading-7 outline-none transition focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
+                                        ></textarea>
+                                    </label>
+
+                                    <label class="flex items-start gap-3 text-sm leading-6 text-slate-600">
+                                        <input
+                                            type="checkbox"
+                                            name="privacidad"
+                                            value="aceptada"
+                                            required
+                                            class="mt-1 h-4 w-4 rounded border-slate-300"
+                                        />
+                                        <span>
+                                            He leído y acepto la
+                                            <a
+                                                href="/privacidad/"
+                                                class="font-bold text-slate-950 underline decoration-slate-300 underline-offset-2 hover:text-orange-700"
+                                            >
+                                                política de privacidad
+                                            </a>.
+                                        </span>
+                                    </label>
+
+                                    <div class="border-t border-slate-200 pt-6">
+                                        <button
+                                            type="submit"
+                                            class="inline-flex w-full items-center justify-center rounded-full bg-orange-500 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-200 sm:w-auto"
+                                        >
+                                            Enviar consulta
+                                        </button>
+                                        <p class="mt-3 text-xs leading-5 text-slate-500">
+                                            Este formulario se procesa mediante Netlify Forms. No realiza peticiones públicas a Strapi.
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </section>
+            </div>
+
+            <script
+                type="application/json"
+                id="availability-products"
+                set:html={JSON.stringify(productosDisponibilidad)}
+            />
+        </Container>
+    </main>
+
+    <script>
+        type AvailabilityProduct = {
+            slug: string;
+            nombre: string;
+            sku: string;
+            descripcion?: string;
+            imagenUrl?: string | null;
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const requestedSlug = params.get("producto")?.trim() || "";
+
+        const dataElement = document.getElementById("availability-products");
+        const formWrap = document.getElementById("availability-form-wrap");
+        const productWrap = document.getElementById("availability-product");
+        const invalidWrap = document.getElementById("availability-invalid");
+
+        if (
+            dataElement instanceof HTMLScriptElement &&
+            formWrap instanceof HTMLElement &&
+            productWrap instanceof HTMLElement &&
+            invalidWrap instanceof HTMLElement
+        ) {
+            const products = JSON.parse(
+                dataElement.textContent || "[]",
+            ) as AvailabilityProduct[];
+
+            const product = products.find(
+                (item) => item.slug === requestedSlug,
+            );
+
+            if (product) {
+                formWrap.classList.remove("hidden");
+                productWrap.classList.remove("hidden");
+                invalidWrap.classList.add("hidden");
+
+                const values: Array<[string, string]> = [
+                    ["availability-product-name", product.nombre],
+                    ["availability-product-description", product.descripcion || ""],
+                    ["availability-product-sku", product.sku],
+                    ["availability-product-slug-input", product.slug],
+                    ["availability-product-name-input", product.nombre],
+                    ["availability-product-sku-input", product.sku],
+                    ["availability-product-readonly", product.nombre],
+                    ["availability-sku-readonly", product.sku],
+                ];
+
+                for (const [id, value] of values) {
+                    const element = document.getElementById(id);
+
+                    if (
+                        element instanceof HTMLInputElement ||
+                        element instanceof HTMLTextAreaElement
+                    ) {
+                        element.value = value;
+                    } else if (element instanceof HTMLElement) {
+                        element.textContent = value;
+                    }
+                }
+
+                const link = document.getElementById("availability-product-link");
+                if (link instanceof HTMLAnchorElement) {
+                    link.href = `/tienda/producto/${encodeURIComponent(product.slug)}/`;
+                }
+
+                const image = document.getElementById("availability-product-image");
+                const imageWrap = document.getElementById(
+                    "availability-product-image-wrap",
+                );
+
+                if (
+                    product.imagenUrl &&
+                    image instanceof HTMLImageElement &&
+                    imageWrap instanceof HTMLElement
+                ) {
+                    image.src = product.imagenUrl;
+                    image.alt = product.nombre;
+                    imageWrap.classList.remove("hidden");
+                }
+            }
+        }
+    </script>
+</Layout>

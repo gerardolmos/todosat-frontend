@@ -1,0 +1,386 @@
+---
+import { getMediaUrl } from "../../lib/media";
+import type { StrapiMedia } from "../../types/store";
+
+interface Props {
+    images: StrapiMedia[];
+    productName: string;
+}
+
+const { images, productName } = Astro.props;
+
+const galleryItems = images
+    .map((image) => ({
+        url: getMediaUrl(image),
+        alt: image.alternativeText || productName,
+    }))
+    .filter(
+        (item): item is { url: string; alt: string } =>
+            Boolean(item.url),
+    );
+---
+
+{
+    galleryItems.length > 0 ? (
+        <section
+            class="product-gallery min-w-0 w-full"
+            data-product-gallery
+            aria-label={`Galería de ${productName}`}
+        >
+            <button
+                type="button"
+                class="group relative flex min-h-[360px] w-full cursor-zoom-in items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:border-orange-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-400/30 md:min-h-[500px]"
+                data-gallery-open
+                data-gallery-index="0"
+                aria-label={`Ampliar imagen de ${productName}`}
+            >
+                <img
+                    src={galleryItems[0].url}
+                    alt={galleryItems[0].alt}
+                    class="max-h-[460px] w-full object-contain transition duration-300 group-hover:scale-[1.015]"
+                />
+                <span
+                    class="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-4 py-2 text-xs font-bold text-slate-800 shadow-sm backdrop-blur"
+                    aria-hidden="true"
+                >
+                    <span class="text-base">＋</span>
+                    Ampliar
+                </span>
+            </button>
+
+            {
+                galleryItems.length > 1 && (
+                    <div
+                        class="mt-4 flex gap-3 overflow-x-auto pb-2"
+                        aria-label="Seleccionar imagen"
+                    >
+                        {galleryItems.map((item, index) => (
+                            <button
+                                type="button"
+                                class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-2 transition hover:border-orange-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                                data-gallery-open
+                                data-gallery-index={String(index)}
+                                aria-label={`Abrir imagen ${index + 1} de ${galleryItems.length}`}
+                            >
+                                <img
+                                    src={item.url}
+                                    alt=""
+                                    class="h-full w-full object-contain"
+                                    loading={index === 0 ? "eager" : "lazy"}
+                                />
+                            </button>
+                        ))}
+                    </div>
+                )
+            }
+
+            <dialog
+                class="product-gallery-dialog m-auto h-[min(90vh,850px)] w-[min(94vw,1180px)] max-w-none overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-0 text-white shadow-2xl"
+                data-gallery-dialog
+                aria-label={`Visor de imágenes de ${productName}`}
+            >
+                <div class="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[130px_minmax(0,1fr)] lg:grid-rows-[auto_minmax(0,1fr)]">
+                    <header class="flex items-center justify-between border-b border-white/10 px-4 py-3 lg:col-span-2">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-[0.16em] text-orange-400">Galería</p>
+                            <p class="mt-1 text-sm font-semibold text-white">{productName}</p>
+                        </div>
+                        <button
+                            type="button"
+                            class="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/5 text-2xl leading-none text-white transition hover:border-orange-400 hover:bg-orange-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                            data-gallery-close
+                            aria-label="Cerrar galería"
+                        >
+                            ×
+                        </button>
+                    </header>
+
+                    {
+                        galleryItems.length > 1 && (
+                            <div
+                                class="order-3 flex min-w-0 gap-2 overflow-x-auto border-t border-white/10 p-3 lg:order-none lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:border-r lg:border-t-0"
+                                aria-label="Miniaturas de la galería"
+                            >
+                                {galleryItems.map((item, index) => (
+                                    <button
+                                        type="button"
+                                        class="gallery-dialog-thumbnail flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white p-2 transition hover:border-orange-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 lg:h-24 lg:w-full"
+                                        data-gallery-select
+                                        data-gallery-index={String(index)}
+                                        aria-label={`Mostrar imagen ${index + 1} de ${galleryItems.length}`}
+                                        aria-current={index === 0 ? "true" : undefined}
+                                    >
+                                        <img src={item.url} alt="" class="h-full w-full object-contain" loading="lazy" />
+                                    </button>
+                                ))}
+                            </div>
+                        )
+                    }
+
+                    <div class="relative flex min-h-0 items-center justify-center overflow-hidden p-4 sm:p-6 lg:p-8">
+                        <button
+                            type="button"
+                            class="absolute left-3 z-10 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-slate-950/75 text-2xl text-white shadow-lg backdrop-blur transition hover:border-orange-400 hover:bg-orange-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:pointer-events-none disabled:opacity-30 sm:left-5"
+                            data-gallery-previous
+                            aria-label="Imagen anterior"
+                        >
+                            ‹
+                        </button>
+
+                        <img
+                            src={galleryItems[0].url}
+                            alt={galleryItems[0].alt}
+                            class="h-full max-h-full w-full max-w-full object-contain"
+                            data-gallery-image
+                        />
+
+                        <button
+                            type="button"
+                            class="absolute right-3 z-10 grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-slate-950/75 text-2xl text-white shadow-lg backdrop-blur transition hover:border-orange-400 hover:bg-orange-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:pointer-events-none disabled:opacity-30 sm:right-5"
+                            data-gallery-next
+                            aria-label="Imagen siguiente"
+                        >
+                            ›
+                        </button>
+
+                        <p
+                            class="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-slate-950/75 px-3 py-1.5 text-xs font-bold text-white backdrop-blur"
+                            data-gallery-counter
+                            aria-live="polite"
+                        >
+                            1 / {galleryItems.length}
+                        </p>
+                    </div>
+                </div>
+            </dialog>
+
+            <script type="application/json" data-gallery-data set:html={JSON.stringify(galleryItems)} />
+        </section>
+    ) : (
+        <div class="flex min-h-[360px] items-center justify-center rounded-3xl border border-slate-200 bg-white text-slate-400 shadow-sm md:min-h-[500px]">
+            Imagen no disponible
+        </div>
+    )
+}
+
+<script>
+    type GalleryItem = {
+        url: string;
+        alt: string;
+    };
+
+    function initialiseProductGallery(root: HTMLElement) {
+        if (root.dataset.galleryReady === "true") return;
+
+        const dialog = root.querySelector<HTMLDialogElement>("[data-gallery-dialog]");
+        const image = root.querySelector<HTMLImageElement>("[data-gallery-image]");
+        const counter = root.querySelector<HTMLElement>("[data-gallery-counter]");
+        const dataElement = root.querySelector<HTMLScriptElement>("[data-gallery-data]");
+        const previous = root.querySelector<HTMLButtonElement>("[data-gallery-previous]");
+        const next = root.querySelector<HTMLButtonElement>("[data-gallery-next]");
+
+        if (!dialog || !image || !counter || !dataElement || !previous || !next) return;
+
+        let items: GalleryItem[] = [];
+
+        try {
+            items = JSON.parse(dataElement.textContent || "[]") as GalleryItem[];
+        } catch {
+            return;
+        }
+
+        if (items.length === 0) return;
+
+        root.dataset.galleryReady = "true";
+
+        let currentIndex = 0;
+        let opener: HTMLElement | null = null;
+        let closingTimer: ReturnType<typeof setTimeout> | null = null;
+
+        const thumbnails = Array.from(
+            root.querySelectorAll<HTMLButtonElement>("[data-gallery-select]"),
+        );
+
+        const normalizeIndex = (index: number) =>
+            (index + items.length) % items.length;
+
+        function render(index: number) {
+            currentIndex = normalizeIndex(index);
+            const item = items[currentIndex];
+
+            image.src = item.url;
+            image.alt = item.alt;
+            counter.textContent = `${currentIndex + 1} / ${items.length}`;
+
+            thumbnails.forEach((thumbnail, thumbnailIndex) => {
+                if (thumbnailIndex === currentIndex) {
+                    thumbnail.setAttribute("aria-current", "true");
+                } else {
+                    thumbnail.removeAttribute("aria-current");
+                }
+            });
+
+            const singleImage = items.length === 1;
+            previous.disabled = singleImage;
+            next.disabled = singleImage;
+        }
+
+        function open(index: number) {
+            if (closingTimer) {
+                clearTimeout(closingTimer);
+                closingTimer = null;
+            }
+
+            opener =
+                document.activeElement instanceof HTMLElement
+                    ? document.activeElement
+                    : null;
+
+            render(index);
+            dialog.removeAttribute("data-closing");
+            dialog.showModal();
+            document.documentElement.classList.add("gallery-open");
+
+            requestAnimationFrame(() => {
+                dialog.setAttribute("data-visible", "true");
+            });
+        }
+
+        function finishClose() {
+            dialog.close();
+            dialog.removeAttribute("data-visible");
+            dialog.removeAttribute("data-closing");
+            document.documentElement.classList.remove("gallery-open");
+            opener?.focus();
+            opener = null;
+            closingTimer = null;
+        }
+
+        function closeAnimated() {
+            if (!dialog.open) return;
+            dialog.removeAttribute("data-visible");
+            dialog.setAttribute("data-closing", "true");
+            closingTimer = setTimeout(finishClose, 180);
+        }
+
+        root.addEventListener("click", (event) => {
+            const target = event.target instanceof Element ? event.target : null;
+
+            const openButton = target?.closest<HTMLElement>("[data-gallery-open]");
+            if (openButton) {
+                open(Number(openButton.dataset.galleryIndex || "0"));
+                return;
+            }
+
+            const selectButton = target?.closest<HTMLElement>("[data-gallery-select]");
+            if (selectButton) {
+                render(Number(selectButton.dataset.galleryIndex || "0"));
+                return;
+            }
+
+            if (target?.closest("[data-gallery-close]")) {
+                closeAnimated();
+                return;
+            }
+
+            if (target?.closest("[data-gallery-previous]")) {
+                render(currentIndex - 1);
+                return;
+            }
+
+            if (target?.closest("[data-gallery-next]")) {
+                render(currentIndex + 1);
+            }
+        });
+
+        dialog.addEventListener("cancel", (event) => {
+            event.preventDefault();
+            closeAnimated();
+        });
+
+        dialog.addEventListener("click", (event) => {
+            if (event.target === dialog) closeAnimated();
+        });
+
+        dialog.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                render(currentIndex - 1);
+            }
+
+            if (event.key === "ArrowRight") {
+                event.preventDefault();
+                render(currentIndex + 1);
+            }
+        });
+    }
+
+    function initialiseProductGalleries() {
+        document
+            .querySelectorAll<HTMLElement>("[data-product-gallery]")
+            .forEach(initialiseProductGallery);
+    }
+
+    initialiseProductGalleries();
+    document.addEventListener("astro:page-load", initialiseProductGalleries);
+</script>
+
+<style is:global>
+    html.gallery-open {
+        overflow: hidden;
+    }
+
+    .product-gallery-dialog {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+        transition:
+            opacity 180ms ease,
+            transform 180ms ease,
+            overlay 180ms ease allow-discrete,
+            display 180ms ease allow-discrete;
+    }
+
+    .product-gallery-dialog[data-visible="true"] {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    .product-gallery-dialog::backdrop {
+        background: rgb(2 6 23 / 0%);
+        backdrop-filter: blur(0);
+        transition:
+            background 180ms ease,
+            backdrop-filter 180ms ease,
+            overlay 180ms ease allow-discrete,
+            display 180ms ease allow-discrete;
+    }
+
+    .product-gallery-dialog[data-visible="true"]::backdrop {
+        background: rgb(2 6 23 / 82%);
+        backdrop-filter: blur(5px);
+    }
+
+    .gallery-dialog-thumbnail[aria-current="true"] {
+        border-color: rgb(251 146 60);
+        box-shadow: 0 0 0 2px rgb(251 146 60 / 35%);
+    }
+
+    @starting-style {
+        .product-gallery-dialog[data-visible="true"] {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+        }
+
+        .product-gallery-dialog[data-visible="true"]::backdrop {
+            background: rgb(2 6 23 / 0%);
+            backdrop-filter: blur(0);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .product-gallery-dialog,
+        .product-gallery-dialog::backdrop {
+            transition-duration: 0.01ms;
+        }
+    }
+</style>

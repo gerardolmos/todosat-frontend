@@ -1,7 +1,7 @@
 ---
 import Layout from "../../../../layouts/Layout.astro";
 import Container from "../../../../components/Container.astro";
-import Breadcrumbs from "../../../../components/Breadcrumbs.astro";
+import ProductGallery from "../../../../components/store/ProductGallery.astro";
 
 import ProductCommercialStatus from "../../../../components/store/ProductCommercialStatus.astro";
 import ProductCommercialAction from "../../../../components/store/ProductCommercialAction.astro";
@@ -115,9 +115,6 @@ const relatedProducts = Array.from(
 const productoPath =
     `/tienda/producto/${producto.slug}`;
 
-const categoriaPath =
-    `/tienda/categoria/${producto.categoria_producto_tienda.slug}`;
-
 const robots =
     producto.estado_venta === "Descatalogado"
         ? "noindex, follow"
@@ -129,21 +126,6 @@ const siteUrl =
 
 const productoUrl = new URL(
     `${productoPath}/`,
-    siteUrl,
-).toString();
-
-const categoriaUrl = new URL(
-    `${categoriaPath}/`,
-    siteUrl,
-).toString();
-
-const tiendaUrl = new URL(
-    "/tienda/",
-    siteUrl,
-).toString();
-
-const homeUrl = new URL(
-    "/",
     siteUrl,
 ).toString();
 
@@ -239,40 +221,6 @@ const structuredData = {
                   }
                 : {}),
         },
-        {
-            "@type": "BreadcrumbList",
-            "@id":
-                `${productoUrl}#breadcrumb`,
-            itemListElement: [
-                {
-                    "@type": "ListItem",
-                    position: 1,
-                    name: "Inicio",
-                    item: homeUrl,
-                },
-                {
-                    "@type": "ListItem",
-                    position: 2,
-                    name: "Tienda",
-                    item: tiendaUrl,
-                },
-                {
-                    "@type": "ListItem",
-                    position: 3,
-                    name:
-                        producto
-                            .categoria_producto_tienda
-                            .nombre,
-                    item: categoriaUrl,
-                },
-                {
-                    "@type": "ListItem",
-                    position: 4,
-                    name: producto.nombre,
-                    item: productoUrl,
-                },
-            ],
-        },
     ],
 };
 ---
@@ -288,28 +236,10 @@ const structuredData = {
     <main class="min-h-screen bg-slate-100 text-slate-950">
         <section class="bg-slate-950 py-8 text-white md:py-12">
             <Container>
-                <Breadcrumbs
-                    items={[
-                        {
-                            label: "Tienda",
-                            href: "/tienda",
-                        },
-                        {
-                            label:
-                                producto
-                                    .categoria_producto_tienda
-                                    .nombre,
-                            href: categoriaPath,
-                        },
-                        {
-                            label: producto.nombre,
-                        },
-                    ]}
-                />
 
                 <a
                     href="/tienda"
-                    class="mt-8 inline-flex text-sm font-semibold text-orange-400 transition hover:text-orange-300"
+                    class="inline-flex text-sm font-semibold text-orange-400 transition hover:text-orange-300"
                 >
                     ← Volver a la tienda
                 </a>
@@ -319,89 +249,17 @@ const structuredData = {
         <section class="py-10 md:py-16">
             <Container>
                 <article>
-                    <div class="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-start">
-                        <section>
-                            {
-                                imagenPrincipalUrl ? (
-                                    <div class="flex min-h-[360px] items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:min-h-[540px]">
-                                        <img
-                                            src={
-                                                imagenPrincipalUrl
-                                            }
-                                            alt={
-                                                producto
-                                                    .imagen_principal
-                                                    ?.alternativeText ||
-                                                producto.nombre
-                                            }
-                                            class="max-h-[500px] w-full object-contain"
-                                        />
-                                    </div>
-                                ) : (
-                                    <div class="flex min-h-[360px] items-center justify-center rounded-3xl border border-slate-200 bg-white text-slate-400 shadow-sm md:min-h-[540px]">
-                                        Imagen no disponible
-                                    </div>
-                                )
-                            }
-
-                            {
-                                galleryImages.length >
-                                    1 && (
-                                    <div class="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3">
-                                        {
-                                            galleryImages.map(
-                                                (
-                                                    image,
-                                                ) => {
-                                                    const url =
-                                                        getMediaUrl(
-                                                            image,
-                                                        );
-
-                                                    return url ? (
-                                                        <a
-                                                            href={
-                                                                url
-                                                            }
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            class="flex h-36 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-orange-400"
-                                                        >
-                                                            <img
-                                                                src={
-                                                                    url
-                                                                }
-                                                                alt={
-                                                                    image.alternativeText ||
-                                                                    producto.nombre
-                                                                }
-                                                                class="h-full w-full object-contain"
-                                                                loading="lazy"
-                                                            />
-                                                        </a>
-                                                    ) : null;
-                                                },
-                                            )
-                                        }
-                                    </div>
-                                )
-                            }
+                    <div class="grid min-w-0 gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-start">
+                        <section class="min-w-0">
+                            <ProductGallery
+                                images={galleryImages}
+                                productName={producto.nombre}
+                            />
                         </section>
 
-                        <header class="lg:sticky lg:top-28">
+                        <header class="min-w-0 lg:sticky lg:top-28">
                             <div class="flex flex-wrap gap-2">
-                                <a
-                                    href={categoriaPath}
-                                    class="rounded-full border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-800 transition hover:bg-orange-100"
-                                >
-                                    {
-                                        producto
-                                            .categoria_producto_tienda
-                                            .nombre
-                                    }
-                                </a>
-
-                                <span class="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+                                <span class="rounded-full border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-800">
                                     {
                                         producto.tipo_producto
                                     }
@@ -516,57 +374,68 @@ const structuredData = {
                             </section>
                         )
                     }
-
                     {
-                        descripcionHTML && (
-                            <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
-                                <h2 class="text-3xl font-bold tracking-tight text-slate-950">
-                                    Descripción
-                                </h2>
-
-                                <div
-                                    class="prose prose-slate mt-8 max-w-none prose-headings:text-slate-950 prose-a:text-orange-700 prose-strong:text-slate-950"
-                                    set:html={
-                                        descripcionHTML
-                                    }
-                                />
-                            </section>
-                        )
-                    }
-
-                    {
-                        incluyeHTML && (
-                            <section class="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
-                                <h2 class="text-3xl font-bold tracking-tight text-slate-950">
-                                    Contenido incluido
-                                </h2>
-
-                                <div
-                                    class="prose prose-slate mt-8 max-w-none prose-headings:text-slate-950 prose-a:text-orange-700 prose-strong:text-slate-950"
-                                    set:html={
-                                        incluyeHTML
-                                    }
-                                />
-                            </section>
-                        )
-                    }
-
-                    {
-                        producto.observaciones_envio && (
-                            <section class="mt-10 rounded-3xl border border-orange-200 bg-orange-50 p-6 md:p-10">
-                                <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
-                                    Entrega
-                                </p>
-
-                                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-                                    Observaciones de envío
-                                </h2>
-
-                                <p class="mt-5 max-w-4xl text-base leading-7 text-slate-700">
+                        (descripcionHTML ||
+                            incluyeHTML ||
+                            producto.observaciones_envio) && (
+                            <section class="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                                <div class="divide-y divide-slate-200">
                                     {
-                                        producto.observaciones_envio
+                                        descripcionHTML && (
+                                            <div class="grid gap-3 px-5 py-5 md:grid-cols-[190px_minmax(0,1fr)] md:gap-8 md:px-7">
+                                                <div>
+                                                    <h2 class="text-lg font-bold tracking-tight text-slate-950">
+                                                        Descripción
+                                                    </h2>
+                                                </div>
+
+                                                <div
+                                                    class="prose prose-slate max-w-3xl text-sm leading-6 prose-headings:text-slate-950 prose-a:text-orange-700 prose-strong:text-slate-950 md:text-base md:leading-7"
+                                                    set:html={
+                                                        descripcionHTML
+                                                    }
+                                                />
+                                            </div>
+                                        )
                                     }
-                                </p>
+
+                                    {
+                                        incluyeHTML && (
+                                            <div class="grid gap-3 px-5 py-5 md:grid-cols-[190px_minmax(0,1fr)] md:gap-8 md:px-7">
+                                                <div>
+                                                    <h2 class="text-lg font-bold tracking-tight text-slate-950">
+                                                        Contenido incluido
+                                                    </h2>
+                                                </div>
+
+                                                <div
+                                                    class="prose prose-slate max-w-3xl text-sm leading-6 prose-headings:text-slate-950 prose-a:text-orange-700 prose-strong:text-slate-950 md:text-base md:leading-7"
+                                                    set:html={
+                                                        incluyeHTML
+                                                    }
+                                                />
+                                            </div>
+                                        )
+                                    }
+
+                                    {
+                                        producto.observaciones_envio && (
+                                            <div class="grid gap-3 border-l-4 border-orange-400 bg-orange-50/60 px-5 py-5 md:grid-cols-[186px_minmax(0,1fr)] md:gap-8 md:px-7">
+                                                <div>
+                                                    <h2 class="text-lg font-bold tracking-tight text-orange-800">
+                                                        Entrega y disponibilidad
+                                                    </h2>
+                                                </div>
+
+                                                <p class="max-w-3xl text-sm leading-6 text-slate-700 md:text-base md:leading-7">
+                                                    {
+                                                        producto.observaciones_envio
+                                                    }
+                                                </p>
+                                            </div>
+                                        )
+                                    }
+                                </div>
                             </section>
                         )
                     }
@@ -648,7 +517,7 @@ const structuredData = {
                                 </p>
 
                                 <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-                                    Productos compatibles
+                                    Accesorios compatibles
                                 </h2>
 
                                 <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">

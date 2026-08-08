@@ -23,6 +23,31 @@ function limpiarTexto(valor: any) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
+function extraerTexto(valor: any): string {
+    if (valor == null) return "";
+    if (typeof valor === "string" || typeof valor === "number") {
+        return String(valor);
+    }
+    if (Array.isArray(valor)) {
+        return valor.map(extraerTexto).join(" ");
+    }
+    if (typeof valor === "object") {
+        return Object.values(valor).map(extraerTexto).join(" ");
+    }
+    return "";
+}
+
+function relacion(etiqueta: string, texto: any) {
+    const value = extraerTexto(texto).trim();
+
+    if (!value) return null;
+
+    return {
+        etiqueta,
+        texto: limpiarTexto(value),
+    };
+}
+
 const datosBusqueda = [
     ...operadores.map((item: any) => ({
         tipo: "Operador",
@@ -30,17 +55,16 @@ const datosBusqueda = [
         descripcion: item.descripcion_corta,
         url: `/operadores/${item.slug}`,
         imageUrl: getMediaUrl(item.imagen_portada || item.logo),
-        texto: limpiarTexto(`
-			${item.nombre}
-			${item.descripcion_home}
-			${item.descripcion_corta}
-			${item.descripcion_completa}
-			${item.pais_origen}
-			${item.tipo_orbita}
-			${item.cobertura}
-			${item.velocidad}
-			${item.latencia}
-		`),
+        contenido: limpiarTexto(extraerTexto([
+            item.descripcion_home,
+            item.descripcion_completa,
+            item.pais_origen,
+            item.tipo_orbita,
+            item.cobertura,
+            item.velocidad,
+            item.latencia,
+        ])),
+        relaciones: [],
     })),
     ...hardwares.map((item: any) => ({
         tipo: "Hardware",
@@ -48,14 +72,17 @@ const datosBusqueda = [
         descripcion: item.descripcion_corta,
         url: `/hardware/${item.slug}`,
         imageUrl: getMediaUrl(item.imagen_principal),
-        texto: limpiarTexto(`
-			${item.nombre}
-			${item.descripcion_corta}
-			${item.descripcion_completa}
-			${item.uso_recomendado}
-${item.tipo_hardware}
-${item.operador?.nombre}
-		`),
+        contenido: limpiarTexto(extraerTexto([
+            item.descripcion_completa,
+            item.uso_recomendado,
+            item.tipo_hardware,
+        ])),
+        relaciones: [
+            relacion(
+                `Operador: ${item.operador?.nombre || ""}`,
+                item.operador?.nombre,
+            ),
+        ].filter(Boolean),
     })),
     ...noticias.map((item: any) => ({
         tipo: "Noticia",
@@ -63,12 +90,22 @@ ${item.operador?.nombre}
         descripcion: item.subtitulo,
         url: `/noticias/${item.slug}`,
         imageUrl: getMediaUrl(item.imagen_principal),
-        texto: limpiarTexto(`
-			${item.titulo}
-			${item.subtitulo}
-			${item.contenido}
-			${item.categoria_noticia?.nombre || ""}
-		`),
+        contenido: limpiarTexto(extraerTexto(item.contenido)),
+        relaciones: [
+            relacion(
+                `Categoría: ${item.categoria_noticia?.nombre || ""}`,
+                item.categoria_noticia?.nombre,
+            ),
+            ...(item.operadores || []).map((operador: any) =>
+                relacion(`Operador: ${operador.nombre}`, operador.nombre),
+            ),
+            ...(item.hardwares || []).map((hardware: any) =>
+                relacion(`Hardware: ${hardware.nombre}`, hardware.nombre),
+            ),
+            ...(item.manuales || []).map((manual: any) =>
+                relacion(`Manual: ${manual.titulo}`, manual.titulo),
+            ),
+        ].filter(Boolean),
     })),
     ...manuales.map((item: any) => ({
         tipo: "Manual",
@@ -76,15 +113,23 @@ ${item.operador?.nombre}
         descripcion: item.descripcion,
         url: `/manuales/${item.slug}`,
         imageUrl: getMediaUrl(item.imagen_portada),
-        texto: limpiarTexto(`
-			${item.titulo}
-			${item.descripcion}
-			${item.idioma}
-			${item.version}
-			${item.ano_publicacion}
-			${item.operadores?.map((marca: any) => marca.nombre).join(" ")}
-			${item.hardwares?.map((modelo: any) => modelo.nombre).join(" ")}
-		`),
+        contenido: limpiarTexto(extraerTexto([
+            item.contenido,
+            item.idioma,
+            item.version,
+            item.ano_publicacion,
+        ])),
+        relaciones: [
+            ...(item.operadores || []).map((operador: any) =>
+                relacion(`Operador: ${operador.nombre}`, operador.nombre),
+            ),
+            ...(item.hardwares || []).map((hardware: any) =>
+                relacion(`Hardware: ${hardware.nombre}`, hardware.nombre),
+            ),
+            ...(item.noticias || []).map((noticia: any) =>
+                relacion(`Noticia: ${noticia.titulo}`, noticia.titulo),
+            ),
+        ].filter(Boolean),
     })),
 ];
 ---
@@ -179,12 +224,18 @@ ${item.operador?.nombre}
     </main>
 
     <script>
+        type SearchRelation = {
+            etiqueta: string;
+            texto: string;
+        };
+
         type SearchItem = {
             tipo: string;
             titulo: string;
             descripcion?: string;
             url: string;
-            texto: string;
+            contenido: string;
+            relaciones?: SearchRelation[];
             imageUrl?: string;
         };
 
@@ -237,11 +288,12 @@ ${item.operador?.nombre}
         ) {
             const titulo = limpiarTexto(item.titulo);
             const descripcion = limpiarTexto(item.descripcion || "");
-            const texto = limpiarTexto(item.texto);
+            const contenido = limpiarTexto(item.contenido || "");
+            const relaciones = item.relaciones || [];
 
             const titleWords = getWords(item.titulo);
             const descriptionWords = getWords(item.descripcion || "");
-            const textWords = getWords(item.texto);
+            const contentWords = getWords(contenido);
 
             let score = 0;
 
@@ -259,16 +311,29 @@ ${item.operador?.nombre}
                     termScore = Math.max(termScore, 50);
 
                 if (hasExactWord(descriptionWords, term))
-                    termScore = Math.max(termScore, 35);
+                    termScore = Math.max(termScore, 55);
                 if (hasWordStartingWith(descriptionWords, term))
-                    termScore = Math.max(termScore, 25);
+                    termScore = Math.max(termScore, 40);
                 if (hasLongPartialMatch(descriptionWords, term))
-                    termScore = Math.max(termScore, 15);
+                    termScore = Math.max(termScore, 25);
 
-                if (hasWordStartingWith(textWords, term))
+                for (const relation of relaciones) {
+                    const relationWords = getWords(relation.texto);
+
+                    if (hasExactWord(relationWords, term))
+                        termScore = Math.max(termScore, 38);
+                    if (hasWordStartingWith(relationWords, term))
+                        termScore = Math.max(termScore, 30);
+                    if (hasLongPartialMatch(relationWords, term))
+                        termScore = Math.max(termScore, 18);
+                }
+
+                if (hasExactWord(contentWords, term))
                     termScore = Math.max(termScore, 12);
-                if (hasLongPartialMatch(textWords, term))
-                    termScore = Math.max(termScore, 6);
+                if (hasWordStartingWith(contentWords, term))
+                    termScore = Math.max(termScore, 9);
+                if (hasLongPartialMatch(contentWords, term))
+                    termScore = Math.max(termScore, 5);
 
                 if (termScore === 0) return 0;
 
@@ -281,11 +346,76 @@ ${item.operador?.nombre}
                 score += 80;
 
             if (descripcion.includes(fullQuery) && fullQuery.length >= 4)
-                score += 20;
+                score += 30;
 
-            if (texto.includes(fullQuery) && fullQuery.length >= 4) score += 5;
+            if (
+                fullQuery.length >= 3 &&
+                relaciones.some((relation) =>
+                    relation.texto.includes(fullQuery),
+                )
+            ) {
+                score += 24;
+            }
+
+            if (contenido.includes(fullQuery) && fullQuery.length >= 4)
+                score += 5;
 
             return score;
+        }
+
+        function obtenerMotivoCoincidencia(
+            item: SearchItem,
+            terms: string[],
+            fullQuery: string,
+        ) {
+            const titulo = limpiarTexto(item.titulo);
+            const descripcion = limpiarTexto(item.descripcion || "");
+            const relaciones = item.relaciones || [];
+
+            if (
+                titulo === fullQuery ||
+                titulo.startsWith(fullQuery) ||
+                terms.every((term) =>
+                    getWords(item.titulo).some(
+                        (word) =>
+                            word === term ||
+                            word.startsWith(term),
+                    ),
+                )
+            ) {
+                return "";
+            }
+
+            if (
+                descripcion.includes(fullQuery) ||
+                terms.every((term) =>
+                    getWords(item.descripcion || "").some(
+                        (word) =>
+                            word === term ||
+                            word.startsWith(term),
+                    ),
+                )
+            ) {
+                return "Coincidencia en la descripción";
+            }
+
+            const relation = relaciones.find((candidate) =>
+                terms.every((term) => {
+                    const words = getWords(candidate.texto);
+
+                    return (
+                        hasExactWord(words, term) ||
+                        hasWordStartingWith(words, term) ||
+                        hasLongPartialMatch(words, term)
+                    );
+                }),
+            );
+
+            if (relation) {
+                return relation.etiqueta;
+            }
+
+            return "Coincidencia en el contenido";
         }
 
         function crearUrlPagina(queryOriginal: string, page: number) {
@@ -438,6 +568,25 @@ ${item.operador?.nombre}
                                     <p class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-blue-400">
                                         ${escapeHtml(item.tipo)}
                                     </p>
+                                    ${
+                                        obtenerMotivoCoincidencia(
+                                            item,
+                                            terms,
+                                            liveQuery,
+                                        )
+                                            ? `
+                                                <p class="mt-1 text-xs font-medium text-slate-500">
+                                                    ${escapeHtml(
+                                                        obtenerMotivoCoincidencia(
+                                                            item,
+                                                            terms,
+                                                            liveQuery,
+                                                        ),
+                                                    )}
+                                                </p>
+                                            `
+                                            : ""
+                                    }
 
                                     ${
                                         item.descripcion
@@ -564,6 +713,25 @@ ${item.operador?.nombre}
                                                             <span class="rounded-full border border-blue-500/50 bg-blue-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-300">
                                                                 ${escapeHtml(item.tipo)}
                                                             </span>
+                                                            ${
+                                                                obtenerMotivoCoincidencia(
+                                                                    item,
+                                                                    terms,
+                                                                    query,
+                                                                )
+                                                                    ? `
+                                                                        <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-300">
+                                                                            ${escapeHtml(
+                                                                                obtenerMotivoCoincidencia(
+                                                                                    item,
+                                                                                    terms,
+                                                                                    query,
+                                                                                ),
+                                                                            )}
+                                                                        </span>
+                                                                    `
+                                                                    : ""
+                                                            }
                                                         </div>
 
                                                         <h3 class="line-clamp-2 text-lg font-bold leading-snug tracking-tight !text-white">

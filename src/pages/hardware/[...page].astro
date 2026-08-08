@@ -159,9 +159,9 @@ const descriptionBase =
     tipoActual && marcaActual
         ? `Consulta equipos de tipo ${tipoActual} relacionados con ${marcaActual.nombre}.`
         : tipoActual
-          ? `Explora equipos de tipo ${tipoActual} para conectividad y comunicaciones satelitales.`
+          ? `Consulta equipos de ${tipoActual} para conectividad satelital, instalaciones profesionales, movilidad y comunicaciones en entornos remotos.`
           : marcaActual
-            ? `Consulta el hardware y los equipos satelitales relacionados con ${marcaActual.nombre}.`
+            ? `Consulta terminales, antenas, routers y otros equipos relacionados con ${marcaActual.nombre} para conectividad y comunicaciones satelitales.`
             : "Explora terminales, antenas, routers y equipos para conectividad satelital en hogares, empresas, movilidad y entornos remotos.";
 
 const description =
@@ -192,6 +192,44 @@ const canonicalPath =
 
 const robots =
     tipoActual && marcaActual ? "noindex, follow" : "index, follow";
+
+const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const collectionUrl = new URL(`${canonicalPath}/`, siteUrl).toString();
+
+const structuredData =
+    tipoActual && marcaActual
+        ? undefined
+        : {
+              "@context": "https://schema.org",
+              "@graph": [
+                  {
+                      "@type": "CollectionPage",
+                      "@id": collectionUrl,
+                      url: collectionUrl,
+                      name: `${sectionName}${pageSuffix}`,
+                      description,
+                      inLanguage: "es-ES",
+                      mainEntity: {
+                          "@id": `${collectionUrl}#hardware`,
+                      },
+                  },
+                  {
+                      "@type": "ItemList",
+                      "@id": `${collectionUrl}#hardware`,
+                      itemListElement: page.data.map(
+                          (modelo: any, index: number) => ({
+                              "@type": "ListItem",
+                              position: index + 1,
+                              name: String(modelo.nombre || "").trim(),
+                              url: new URL(
+                                  `/hardware/${modelo.slug}/`,
+                                  siteUrl,
+                              ).toString(),
+                          }),
+                      ),
+                  },
+              ],
+          };
 ---
 
 <Layout
@@ -199,6 +237,7 @@ const robots =
     description={description}
     canonical={canonicalPath}
     robots={robots}
+    structuredData={structuredData}
 >
     <main class="min-h-screen bg-slate-950 py-10">
         <Container>
@@ -230,7 +269,7 @@ const robots =
                     </p>
 
                     <h1
-                        class="mt-6 max-w-3xl text-3xl font-bold leading-tight tracking-tight !text-white md:text-6xl"
+                        class="mt-6 max-w-none text-3xl font-bold leading-tight tracking-tight !text-white md:text-6xl lg:whitespace-nowrap"
                     >
                         {sectionName}
                     </h1>
@@ -383,12 +422,12 @@ const robots =
                             Tipo de hardware
                         </p>
 
-                        <nav class="mb-5">
+                        <nav class="mb-5 grid grid-cols-2 gap-2">
                             <a
                                 href={marcaActual
                                     ? `/hardware/operador/${marcaActual.slug}`
                                     : "/hardware"}
-                                class={`block rounded border px-4 py-3 text-sm font-semibold transition ${
+                                class={`col-span-2 block rounded border px-4 py-3 text-sm font-semibold transition ${
                                     !tipoActual
                                         ? "border-blue-500 bg-blue-500/15 text-blue-300"
                                         : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"
@@ -405,7 +444,7 @@ const robots =
                                                 ? `/hardware/tipo/${toUrlSlug(tipo)}/operador/${marcaActual.slug}`
                                                 : `/hardware/tipo/${toUrlSlug(tipo)}`
                                         }
-                                        class={`block rounded border px-4 py-2 text-sm transition ${
+                                        class={`flex min-h-[42px] items-center rounded border px-3 py-2 text-sm leading-tight transition ${
                                             tipoActual === tipo
                                                 ? "border-blue-500 bg-blue-500/15 text-blue-300"
                                                 : "border-white/10 bg-white/5 text-slate-300 hover:bg-slate-900"

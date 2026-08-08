@@ -1,19 +1,16 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Container from "../../components/Container.astro";
-import Pagination from "../../components/Pagination.astro";
-import CategoryCard from "../../components/store/CategoryCard.astro";
 import ProductCard from "../../components/store/ProductCard.astro";
 
 import {
-    getCategoriasTiendaConConteo,
-    getProductosDestacadosTienda,
+    getAccesoriosTienda,
+    getProductosPrincipalesTienda,
     getProductosTiendaPage,
     PRODUCTOS_TIENDA_POR_PAGINA,
 } from "../../lib/store";
 
 import type {
-    CategoriaTiendaConConteo,
     PaginaTienda,
     ProductoTiendaResumen,
 } from "../../types/store";
@@ -21,15 +18,15 @@ import type {
 export async function getStaticPaths() {
     const [
         firstPage,
-        categorias,
-        destacados,
+        productosPrincipales,
+        accesorios,
     ] = await Promise.all([
         getProductosTiendaPage(
             1,
             PRODUCTOS_TIENDA_POR_PAGINA,
         ),
-        getCategoriasTiendaConConteo(),
-        getProductosDestacadosTienda(6),
+        getProductosPrincipalesTienda(),
+        getAccesoriosTienda(),
     ]);
 
     const totalPages = Math.max(
@@ -44,8 +41,8 @@ export async function getStaticPaths() {
             },
             props: {
                 catalogo: firstPage,
-                categorias,
-                destacados,
+                productosPrincipales,
+                accesorios,
             },
         },
     ];
@@ -67,8 +64,8 @@ export async function getStaticPaths() {
             },
             props: {
                 catalogo,
-                categorias: [],
-                destacados: [],
+                productosPrincipales: [],
+                accesorios: [],
             },
         });
     }
@@ -78,12 +75,12 @@ export async function getStaticPaths() {
 
 const {
     catalogo,
-    categorias,
-    destacados,
+    productosPrincipales,
+    accesorios,
 } = Astro.props as {
     catalogo: PaginaTienda<ProductoTiendaResumen>;
-    categorias: CategoriaTiendaConConteo[];
-    destacados: ProductoTiendaResumen[];
+    productosPrincipales: ProductoTiendaResumen[];
+    accesorios: ProductoTiendaResumen[];
 };
 
 const currentPage = catalogo.pagination.page;
@@ -104,7 +101,7 @@ const title =
     `Tienda de conectividad satelital${pageSuffix} | TodoSatcom`;
 
 const descriptionBase =
-    "Consulta terminales, accesorios y equipamiento para conectividad satelital.";
+    "Terminales, accesorios y servicios de integración para comunicaciones fiables en entornos marítimos, móviles y profesionales.";
 
 const description =
     currentPage > 1
@@ -123,66 +120,84 @@ const canonicalPath =
     canonical={canonicalPath}
 >
     <main class="min-h-screen bg-slate-100 text-slate-950">
-        <section class="relative overflow-hidden bg-slate-950 py-14 text-white md:py-20">
+        <section class="relative overflow-hidden bg-slate-950 py-10 text-white md:py-14">
             <div
-                class="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-orange-500/10 blur-3xl"
+                class="absolute -right-24 -top-28 h-80 w-80 rounded-full bg-orange-500/15 blur-3xl"
+                aria-hidden="true"
+            ></div>
+
+            <div
+                class="absolute -bottom-40 left-1/3 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl"
                 aria-hidden="true"
             ></div>
 
             <Container>
-                <header class="relative max-w-4xl">
-                    <p class="text-sm font-bold uppercase tracking-[0.2em] text-orange-400">
-                        TodoSatcom
-                    </p>
+                <header class="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+                                Tienda TodoSatcom
+                            </p>
 
-                    <h1 class="mt-4 text-4xl font-bold tracking-tight !text-white md:text-6xl">
-                        Tienda de conectividad satelital
-                    </h1>
+                        </div>
 
-                    <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-                        {descriptionBase}
-                    </p>
+                        <h1 class="mt-4 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight !text-white md:text-5xl xl:text-6xl">
+                            Soluciones de conectividad satelital
+                        </h1>
 
-                    {
-                        isFirstPage &&
-                        categorias.length > 0 && (
-                            <a
-                                href="#categorias"
-                                class="mt-8 inline-flex rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
-                            >
-                                Explorar categorías
-                            </a>
-                        )
-                    }
+                        <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300 md:text-lg">
+                            {descriptionBase}
+                        </p>
+
+                        {
+                            isFirstPage && (
+                                <div class="mt-7 flex flex-wrap gap-3">
+                                    {
+                                        productosPrincipales.length > 0 && (
+                                            <a
+                                                href="#productos-principales"
+                                                class="inline-flex min-h-11 items-center rounded-full bg-orange-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-orange-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-400/30"
+                                            >
+                                                Consultar soluciones
+                                            </a>
+                                        )
+                                    }
+                                </div>
+                            )
+                        }
+                    </div>
                 </header>
             </Container>
         </section>
 
         {
             isFirstPage &&
-            destacados.length > 0 && (
-                <section class="border-b border-orange-200 bg-orange-50 py-12 md:py-16">
+            productosPrincipales.length > 0 && (
+                <section
+                    id="productos-principales"
+                    class="border-b border-orange-200 bg-orange-50 py-9 md:py-11"
+                >
                     <Container>
-                        <div class="max-w-3xl">
-                            <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
-                                Selección TodoSatcom
-                            </p>
+                        <div class="flex flex-col gap-5 border-l-4 border-orange-500 pl-5 md:flex-row md:items-end md:justify-between">
+                            <div class="max-w-3xl">
+                                <p class="text-xs font-black uppercase tracking-[0.2em] text-orange-700">
+                                    01 · Sistemas marítimos
+                                </p>
 
-                            <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-                                Productos destacados
-                            </h2>
+                                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+                                    Starlink satelital marítimo
+                                </h2>
 
-                            <p class="mt-4 text-base leading-7 text-slate-600">
-                                Una selección de terminales y accesorios relevantes del catálogo.
-                            </p>
+                                <p class="mt-3 text-base leading-7 text-slate-600">
+                                    Terminales y equipos seleccionados para embarcaciones, operaciones costeras y despliegues profesionales que requieren conectividad estable.
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+                        <div class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {
-                                destacados.map((producto) => (
-                                    <ProductCard
-                                        producto={producto}
-                                    />
+                                productosPrincipales.map((producto) => (
+                                    <ProductCard producto={producto} />
                                 ))
                             }
                         </div>
@@ -193,30 +208,32 @@ const canonicalPath =
 
         {
             isFirstPage &&
-            categorias.length > 0 && (
+            accesorios.length > 0 && (
                 <section
-                    id="categorias"
-                    class="border-b border-slate-200 bg-white py-12 md:py-16"
+                    id="accesorios"
+                    class="border-b border-slate-200 bg-white py-9 md:py-11"
                 >
                     <Container>
-                        <div class="max-w-3xl">
-                            <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
-                                Categorías
-                            </p>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-5 md:flex md:items-end md:justify-between md:px-6">
+                            <div class="max-w-3xl">
+                                <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+                                    02 · Integración y soporte
+                                </p>
 
-                            <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-                                Encuentra el equipo que necesitas
-                            </h2>
+                                <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+                                    Accesorios y servicios técnicos
+                                </h2>
 
-                            <p class="mt-4 text-base leading-7 text-slate-600">
-                                Accede directamente a cada familia de productos disponibles.
-                            </p>
+                                <p class="mt-3 text-base leading-7 text-slate-600">
+                                    Componentes de instalación, alimentación, montaje y configuración para completar cada solución con criterios profesionales.
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+                        <div class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {
-                                categorias.map((item) => (
-                                    <CategoryCard item={item} />
+                                accesorios.map((producto) => (
+                                    <ProductCard producto={producto} />
                                 ))
                             }
                         </div>
@@ -224,60 +241,5 @@ const canonicalPath =
                 </section>
             )
         }
-
-        <section class="py-12 md:py-16">
-            <Container>
-                <div class="flex flex-wrap items-end justify-between gap-5">
-                    <div>
-                        <p class="text-sm font-bold uppercase tracking-[0.18em] text-orange-700">
-                            Catálogo
-                        </p>
-
-                        <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
-                            {
-                                isFirstPage
-                                    ? "Todos los productos"
-                                    : `Productos — Página ${currentPage}`
-                            }
-                        </h2>
-                    </div>
-
-                    <p class="text-sm font-semibold text-slate-500">
-                        {catalogo.pagination.total}
-                        {
-                            catalogo.pagination.total === 1
-                                ? " producto"
-                                : " productos"
-                        }
-                    </p>
-                </div>
-
-                {
-                    catalogo.items.length > 0 ? (
-                        <div class="mt-8 grid gap-7 md:grid-cols-2 xl:grid-cols-3">
-                            {
-                                catalogo.items.map((producto) => (
-                                    <ProductCard
-                                        producto={producto}
-                                    />
-                                ))
-                            }
-                        </div>
-                    ) : (
-                        <p class="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-slate-600 shadow-sm">
-                            No hay productos disponibles actualmente.
-                        </p>
-                    )
-                }
-
-                <div class="[&_nav_a]:border-slate-300 [&_nav_a]:bg-white [&_nav_a]:text-slate-700 [&_nav_a:hover]:border-orange-400 [&_nav_a:hover]:text-orange-700 [&_nav_div]:border-slate-300 [&_nav_div]:bg-white [&_nav_div]:text-slate-700">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        basePath="/tienda"
-                    />
-                </div>
-            </Container>
-        </section>
     </main>
 </Layout>

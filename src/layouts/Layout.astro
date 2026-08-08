@@ -60,6 +60,13 @@ const canonicalUrl =
         : getCanonicalUrl(canonical ?? Astro.url.pathname);
 
 const imageUrl = image ? getAbsoluteUrl(image) : null;
+
+const siteIndexingEnabled =
+    import.meta.env.PUBLIC_SITE_INDEXING !== "false";
+
+const effectiveRobots = siteIndexingEnabled
+    ? robots
+    : "noindex, nofollow";
 ---
 
 <!doctype html>
@@ -70,7 +77,7 @@ const imageUrl = image ? getAbsoluteUrl(image) : null;
 
         <title>{title}</title>
         <meta name="description" content={description} />
-        <meta name="robots" content={robots} />
+        <meta name="robots" content={effectiveRobots} />
 
         {
             canonicalUrl && <link rel="canonical" href={canonicalUrl} />
