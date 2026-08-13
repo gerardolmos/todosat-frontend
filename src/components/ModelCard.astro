@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import { getMediaUrl } from "../lib/media";
 
 interface Props {
@@ -23,8 +24,9 @@ const estadoEditorial = modelo.discontinuado
         {
             imagenUrl && (
                 <>
-                    <img
+                    <Image
                         src={imagenUrl}
+                        inferSize
                         alt={modelo.nombre}
                         class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                     />
