@@ -3,6 +3,7 @@
 import coberturaIcon from "../assets/images/pictostecnicos/cobertura.png";
 import velocidadIcon from "../assets/images/pictostecnicos/velocidad.png";
 import latenciaIcon from "../assets/images/pictostecnicos/latencia.png";
+import { getImage } from "astro:assets";
 import { getMediaUrl } from "../lib/media";
 
 const { marcas = [] } = Astro.props;
@@ -13,16 +14,48 @@ function getExternalUrl(url: string | null | undefined) {
 	return url.startsWith("http") ? url : `https://${url}`;
 }
 
-function getOperatorData(marca: any) {
+async function localizeMedia(media: any) {
+	const sourceUrl = getMediaUrl(media);
+
+	if (!sourceUrl) {
+		return {
+			src: null,
+			width: null,
+			height: null,
+		};
+	}
+
+	const optimized = await getImage({
+		src: sourceUrl,
+		inferSize: true,
+	});
+
+	return {
+		src: optimized.src,
+		width: optimized.attributes.width,
+		height: optimized.attributes.height,
+	};
+}
+
+async function getOperatorData(marca: any) {
 	const cobertura = marca?.cobertura || "Cobertura en expansión";
 	const velocidad = marca?.velocidad || "Velocidad según disponibilidad";
 	const latencia = marca?.latencia || "Latencia variable";
 
+	const [logoAsset, imagenAsset] = await Promise.all([
+		localizeMedia(marca?.logo),
+		localizeMedia(marca?.imagen_portada),
+	]);
+
 	return {
 		nombre: marca?.nombre || "Operador",
 		slug: marca?.slug || "#",
-		logo: getMediaUrl(marca?.logo),
-		imagen: getMediaUrl(marca?.imagen_portada),
+		logo: logoAsset.src,
+		logoWidth: logoAsset.width,
+		logoHeight: logoAsset.height,
+		imagen: imagenAsset.src,
+		imagenWidth: imagenAsset.width,
+		imagenHeight: imagenAsset.height,
 		descripcion_corta: marca?.descripcion_corta || "Operador satelital",
 		descripcion_home:
 			marca?.descripcion_home ||
@@ -50,7 +83,9 @@ function getOperatorData(marca: any) {
 	};
 }
 
-const operators = marcas.map((marca: any) => getOperatorData(marca));
+const operators = await Promise.all(
+	marcas.map((marca: any) => getOperatorData(marca)),
+);
 const selectedOperator = operators[0];
 ---
 
@@ -106,6 +141,8 @@ const selectedOperator = operators[0];
 									{operator.logo ? (
 										<img
 											src={operator.logo}
+											width={operator.logoWidth}
+											height={operator.logoHeight}
 											alt={operator.nombre}
 											class="max-h-20 max-w-[180px] object-contain"
 										/>
@@ -137,6 +174,8 @@ const selectedOperator = operators[0];
 					<img
 						data-selected-image
 						src={selectedOperator.imagen || ""}
+						width={selectedOperator.imagenWidth}
+						height={selectedOperator.imagenHeight}
 						alt=""
 						class={`absolute inset-0 h-full w-full object-cover opacity-70 ${
 							selectedOperator.imagen ? "" : "hidden"
@@ -153,6 +192,8 @@ const selectedOperator = operators[0];
 							<img
 	data-selected-logo
 	src={selectedOperator.logo || ""}
+	width={selectedOperator.logoWidth}
+	height={selectedOperator.logoHeight}
 	alt={selectedOperator.nombre}
 	class={`max-h-48 max-w-[420px] object-contain ${
 		selectedOperator.logo ? "" : "hidden"
@@ -279,6 +320,19 @@ const selectedOperator = operators[0];
 					if (selectedImage) {
 						if (operator.imagen) {
 							selectedImage.src = operator.imagen;
+
+							if (operator.imagenWidth) {
+							    selectedImage.width = operator.imagenWidth;
+							} else {
+							    selectedImage.removeAttribute("width");
+							}
+
+							if (operator.imagenHeight) {
+							    selectedImage.height = operator.imagenHeight;
+							} else {
+							    selectedImage.removeAttribute("height");
+							}
+
 							selectedImage.classList.remove("hidden");
 						} else {
 							selectedImage.classList.add("hidden");
@@ -289,6 +343,19 @@ const selectedOperator = operators[0];
 						if (operator.logo) {
 							selectedLogo.src = operator.logo;
 							selectedLogo.alt = operator.nombre;
+
+							if (operator.logoWidth) {
+							    selectedLogo.width = operator.logoWidth;
+							} else {
+							    selectedLogo.removeAttribute("width");
+							}
+
+							if (operator.logoHeight) {
+							    selectedLogo.height = operator.logoHeight;
+							} else {
+							    selectedLogo.removeAttribute("height");
+							}
+
 							selectedLogo.classList.remove("hidden");
 						} else {
 							selectedLogo.classList.add("hidden");
