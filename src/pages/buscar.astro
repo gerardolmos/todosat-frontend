@@ -8,6 +8,7 @@ import {
     getManuales,
 } from "../lib/content";
 
+import { getImage } from "astro:assets";
 import { getMediaUrl } from "../lib/media";
 import searchIcon from "../assets/images/icons/search.svg";
 
@@ -48,89 +49,178 @@ function relacion(etiqueta: string, texto: any) {
     };
 }
 
+async function localizeSearchImage(media: any) {
+    const sourceUrl = getMediaUrl(media);
+
+    if (!sourceUrl) {
+        return {
+            src: null,
+            width: null,
+            height: null,
+        };
+    }
+
+    const optimized = await getImage({
+        src: sourceUrl,
+        inferSize: true,
+    });
+
+    return {
+        src: optimized.src,
+        width: optimized.attributes.width,
+        height: optimized.attributes.height,
+    };
+}
+
+const operadoresBusqueda = await Promise.all(
+    operadores.map(async (item: any) => {
+        const image = await localizeSearchImage(
+            item.imagen_portada || item.logo,
+        );
+
+        return {
+            tipo: "Operador",
+            titulo: item.nombre,
+            descripcion: item.descripcion_corta,
+            url: `/operadores/${item.slug}`,
+            imageUrl: image.src,
+            imageWidth: image.width,
+            imageHeight: image.height,
+            contenido: limpiarTexto(extraerTexto([
+                item.descripcion_home,
+                item.descripcion_completa,
+                item.pais_origen,
+                item.tipo_orbita,
+                item.cobertura,
+                item.velocidad,
+                item.latencia,
+            ])),
+            relaciones: [],
+        };
+    }),
+);
+
+const hardwaresBusqueda = await Promise.all(
+    hardwares.map(async (item: any) => {
+        const image = await localizeSearchImage(
+            item.imagen_principal,
+        );
+
+        return {
+            tipo: "Hardware",
+            titulo: item.nombre,
+            descripcion: item.descripcion_corta,
+            url: `/hardware/${item.slug}`,
+            imageUrl: image.src,
+            imageWidth: image.width,
+            imageHeight: image.height,
+            contenido: limpiarTexto(extraerTexto([
+                item.descripcion_completa,
+                item.uso_recomendado,
+                item.tipo_hardware,
+            ])),
+            relaciones: [
+                relacion(
+                    `Operador: ${item.operador?.nombre || ""}`,
+                    item.operador?.nombre,
+                ),
+            ].filter(Boolean),
+        };
+    }),
+);
+
+const noticiasBusqueda = await Promise.all(
+    noticias.map(async (item: any) => {
+        const image = await localizeSearchImage(
+            item.imagen_principal,
+        );
+
+        return {
+            tipo: "Noticia",
+            titulo: item.titulo,
+            descripcion: item.subtitulo,
+            url: `/noticias/${item.slug}`,
+            imageUrl: image.src,
+            imageWidth: image.width,
+            imageHeight: image.height,
+            contenido: limpiarTexto(extraerTexto(item.contenido)),
+            relaciones: [
+                relacion(
+                    `Categoría: ${item.categoria_noticia?.nombre || ""}`,
+                    item.categoria_noticia?.nombre,
+                ),
+                ...(item.operadores || []).map((operador: any) =>
+                    relacion(
+                        `Operador: ${operador.nombre}`,
+                        operador.nombre,
+                    ),
+                ),
+                ...(item.hardwares || []).map((hardware: any) =>
+                    relacion(
+                        `Hardware: ${hardware.nombre}`,
+                        hardware.nombre,
+                    ),
+                ),
+                ...(item.manuales || []).map((manual: any) =>
+                    relacion(
+                        `Manual: ${manual.titulo}`,
+                        manual.titulo,
+                    ),
+                ),
+            ].filter(Boolean),
+        };
+    }),
+);
+
+const manualesBusqueda = await Promise.all(
+    manuales.map(async (item: any) => {
+        const image = await localizeSearchImage(
+            item.imagen_portada,
+        );
+
+        return {
+            tipo: "Manual",
+            titulo: item.titulo,
+            descripcion: item.descripcion,
+            url: `/manuales/${item.slug}`,
+            imageUrl: image.src,
+            imageWidth: image.width,
+            imageHeight: image.height,
+            contenido: limpiarTexto(extraerTexto([
+                item.contenido,
+                item.idioma,
+                item.version,
+                item.ano_publicacion,
+            ])),
+            relaciones: [
+                ...(item.operadores || []).map((operador: any) =>
+                    relacion(
+                        `Operador: ${operador.nombre}`,
+                        operador.nombre,
+                    ),
+                ),
+                ...(item.hardwares || []).map((hardware: any) =>
+                    relacion(
+                        `Hardware: ${hardware.nombre}`,
+                        hardware.nombre,
+                    ),
+                ),
+                ...(item.noticias || []).map((noticia: any) =>
+                    relacion(
+                        `Noticia: ${noticia.titulo}`,
+                        noticia.titulo,
+                    ),
+                ),
+            ].filter(Boolean),
+        };
+    }),
+);
+
 const datosBusqueda = [
-    ...operadores.map((item: any) => ({
-        tipo: "Operador",
-        titulo: item.nombre,
-        descripcion: item.descripcion_corta,
-        url: `/operadores/${item.slug}`,
-        imageUrl: getMediaUrl(item.imagen_portada || item.logo),
-        contenido: limpiarTexto(extraerTexto([
-            item.descripcion_home,
-            item.descripcion_completa,
-            item.pais_origen,
-            item.tipo_orbita,
-            item.cobertura,
-            item.velocidad,
-            item.latencia,
-        ])),
-        relaciones: [],
-    })),
-    ...hardwares.map((item: any) => ({
-        tipo: "Hardware",
-        titulo: item.nombre,
-        descripcion: item.descripcion_corta,
-        url: `/hardware/${item.slug}`,
-        imageUrl: getMediaUrl(item.imagen_principal),
-        contenido: limpiarTexto(extraerTexto([
-            item.descripcion_completa,
-            item.uso_recomendado,
-            item.tipo_hardware,
-        ])),
-        relaciones: [
-            relacion(
-                `Operador: ${item.operador?.nombre || ""}`,
-                item.operador?.nombre,
-            ),
-        ].filter(Boolean),
-    })),
-    ...noticias.map((item: any) => ({
-        tipo: "Noticia",
-        titulo: item.titulo,
-        descripcion: item.subtitulo,
-        url: `/noticias/${item.slug}`,
-        imageUrl: getMediaUrl(item.imagen_principal),
-        contenido: limpiarTexto(extraerTexto(item.contenido)),
-        relaciones: [
-            relacion(
-                `Categoría: ${item.categoria_noticia?.nombre || ""}`,
-                item.categoria_noticia?.nombre,
-            ),
-            ...(item.operadores || []).map((operador: any) =>
-                relacion(`Operador: ${operador.nombre}`, operador.nombre),
-            ),
-            ...(item.hardwares || []).map((hardware: any) =>
-                relacion(`Hardware: ${hardware.nombre}`, hardware.nombre),
-            ),
-            ...(item.manuales || []).map((manual: any) =>
-                relacion(`Manual: ${manual.titulo}`, manual.titulo),
-            ),
-        ].filter(Boolean),
-    })),
-    ...manuales.map((item: any) => ({
-        tipo: "Manual",
-        titulo: item.titulo,
-        descripcion: item.descripcion,
-        url: `/manuales/${item.slug}`,
-        imageUrl: getMediaUrl(item.imagen_portada),
-        contenido: limpiarTexto(extraerTexto([
-            item.contenido,
-            item.idioma,
-            item.version,
-            item.ano_publicacion,
-        ])),
-        relaciones: [
-            ...(item.operadores || []).map((operador: any) =>
-                relacion(`Operador: ${operador.nombre}`, operador.nombre),
-            ),
-            ...(item.hardwares || []).map((hardware: any) =>
-                relacion(`Hardware: ${hardware.nombre}`, hardware.nombre),
-            ),
-            ...(item.noticias || []).map((noticia: any) =>
-                relacion(`Noticia: ${noticia.titulo}`, noticia.titulo),
-            ),
-        ].filter(Boolean),
-    })),
+    ...operadoresBusqueda,
+    ...hardwaresBusqueda,
+    ...noticiasBusqueda,
+    ...manualesBusqueda,
 ];
 ---
 
@@ -237,6 +327,8 @@ const datosBusqueda = [
             contenido: string;
             relaciones?: SearchRelation[];
             imageUrl?: string;
+            imageWidth?: number;
+            imageHeight?: number;
         };
 
         type RankedSearchItem = {
@@ -699,6 +791,8 @@ const datosBusqueda = [
                                                                 <div class="h-24 w-24 shrink-0 overflow-hidden rounded">
                                                                     <img
                                                                         src="${item.imageUrl}"
+                                                                        width="${item.imageWidth}"
+                                                                        height="${item.imageHeight}"
                                                                         alt="${escapeHtml(item.titulo)}"
                                                                         class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                                                                         loading="lazy"
