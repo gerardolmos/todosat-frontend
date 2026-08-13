@@ -8,6 +8,7 @@ import {
     getManuales,
 } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
+import { getImage } from "astro:assets";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import { formatLabel } from "../../../lib/format";
@@ -35,8 +36,32 @@ export async function getStaticPaths() {
 const { marca } = Astro.props as any;
 
 const descripcionHTML = renderBlocks(marca.descripcion_completa);
-const logoUrl = getMediaUrl(marca.logo);
-const imagenPortadaUrl = getMediaUrl(marca.imagen_portada);
+
+const logoOrigenUrl = getMediaUrl(marca.logo);
+const logoOptimizado = logoOrigenUrl
+    ? await getImage({
+          src: logoOrigenUrl,
+          inferSize: true,
+      })
+    : null;
+
+const logoUrl = logoOptimizado?.src ?? null;
+const logoWidth = logoOptimizado?.attributes.width;
+const logoHeight = logoOptimizado?.attributes.height;
+
+const imagenPortadaOrigenUrl = getMediaUrl(marca.imagen_portada);
+const imagenPortadaOptimizada = imagenPortadaOrigenUrl
+    ? await getImage({
+          src: imagenPortadaOrigenUrl,
+          inferSize: true,
+      })
+    : null;
+
+const imagenPortadaUrl = imagenPortadaOptimizada?.src ?? null;
+const imagenPortadaWidth =
+    imagenPortadaOptimizada?.attributes.width;
+const imagenPortadaHeight =
+    imagenPortadaOptimizada?.attributes.height;
 
 const modelos = (await getHardwares()).filter(
     (modelo: any) => modelo.operador?.slug === marca.slug,
@@ -122,6 +147,18 @@ const operatorName = String(marca.nombre || "").trim();
 const operatorPath = `/operadores/${marca.slug}`;
 const operatorImage = imagenPortadaUrl || logoUrl;
 const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+
+const operatorImageSeoUrl = operatorImage
+    ? new URL(operatorImage, siteUrl).toString()
+    : null;
+
+const logoSeoUrl = logoUrl
+    ? new URL(logoUrl, siteUrl).toString()
+    : null;
+
+const imagenPortadaSeoUrl = imagenPortadaUrl
+    ? new URL(imagenPortadaUrl, siteUrl).toString()
+    : null;
 const operatorUrl = new URL(`${operatorPath}/`, siteUrl).toString();
 const homeUrl = new URL("/", siteUrl).toString();
 const operatorsUrl = new URL("/operadores/", siteUrl).toString();
@@ -140,11 +177,11 @@ const structuredData = {
             mainEntity: {
                 "@id": `${operatorUrl}#organization`,
             },
-            ...(operatorImage
+            ...(operatorImageSeoUrl
                 ? {
                       primaryImageOfPage: {
                           "@type": "ImageObject",
-                          url: operatorImage,
+                          url: operatorImageSeoUrl,
                       },
                   }
                 : {}),
@@ -160,17 +197,17 @@ const structuredData = {
             name: operatorName,
             description: marca.descripcion_corta,
             url: operatorUrl,
-            ...(logoUrl
+            ...(logoSeoUrl
                 ? {
                       logo: {
                           "@type": "ImageObject",
-                          url: logoUrl,
+                          url: logoSeoUrl,
                       },
                   }
                 : {}),
-            ...(imagenPortadaUrl
+            ...(imagenPortadaSeoUrl
                 ? {
-                      image: [imagenPortadaUrl],
+                      image: [imagenPortadaSeoUrl],
                   }
                 : {}),
             ...(marca.web_oficial
@@ -264,6 +301,8 @@ const structuredData = {
                                         <div>
                                             <img
                                                 src={logoUrl}
+                                                width={logoWidth}
+                                                height={logoHeight}
                                                 alt={`Logo de ${marca.nombre}`}
                                                 class="max-h-16 w-auto max-w-[220px] object-contain md:max-h-40 md:max-w-[400px]"
                                             />
@@ -304,6 +343,8 @@ const structuredData = {
 
                                             <img
                                                 src={imagenPortadaUrl}
+                                                width={imagenPortadaWidth}
+                                                height={imagenPortadaHeight}
                                                 alt={marca.nombre}
                                                 class="relative aspect-[16/11] w-full rounded-2xl object-contain"
                                             />
