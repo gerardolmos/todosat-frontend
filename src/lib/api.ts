@@ -1,7 +1,16 @@
-const STRAPI_URL = import.meta.env.PUBLIC_STRAPI_URL || "http://localhost:1337";
+import { getSecret } from "astro:env/server";
+import { STRAPI_URL } from "./strapi-url";
 
 export async function fetchAPI(path: string) {
-    const res = await fetch(`${STRAPI_URL}${path}`);
+    const token = getSecret("STRAPI_API_TOKEN");
+
+    const res = await fetch(`${STRAPI_URL}${path}`, {
+        headers: token
+            ? {
+                  Authorization: `Bearer ${token}`,
+              }
+            : undefined,
+    });
 
     if (!res.ok) {
         throw new Error(`Error al conectar con Strapi: ${res.status}`);
@@ -32,5 +41,3 @@ export async function fetchAllAPI(path: string) {
         data: allData,
     };
 }
-
-export { STRAPI_URL };

@@ -1,4 +1,4 @@
-import { STRAPI_URL } from "./api";
+import { STRAPI_URL } from "./strapi-url";
 
 export type CheckoutPublicState =
     | "pendiente"

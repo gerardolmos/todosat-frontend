@@ -1,4 +1,4 @@
-import { STRAPI_URL } from "./api";
+import { STRAPI_URL } from "./strapi-url";
 import type { CartItem } from "./cart";
 
 export interface CreatedCheckout {
