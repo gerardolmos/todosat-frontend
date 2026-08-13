@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import { getMediaUrl } from "../lib/media";
 import { getReadingTime } from "../lib/renderBlocks";
 
@@ -28,8 +29,9 @@ const readingTime = getReadingTime(articulo.contenido);
     <div class="relative h-44 overflow-hidden bg-slate-800">
         {
             imagenUrl && (
-                <img
+                <Image
                     src={imagenUrl}
+                    inferSize
                     alt={articulo.titulo}
                     class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
