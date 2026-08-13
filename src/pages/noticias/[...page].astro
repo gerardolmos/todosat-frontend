@@ -261,8 +261,9 @@ const structuredData =
                 {
                     categoriaActual ? (
                         heroIconUrl && (
-                            <img
+                            <Image
                                 src={heroIconUrl}
+                                inferSize
                                 alt=""
                                 class="pointer-events-none absolute right-12 top-1/2 hidden h-72 w-72 -translate-y-1/2 rounded-full object-contain opacity-80 md:block"
                             />
@@ -437,8 +438,9 @@ const structuredData =
                                             }`}
                                         >
                                             {iconoUrl && (
-                                                <img
+                                                <Image
                                                     src={iconoUrl}
+                                                    inferSize
                                                     alt={categoria.nombre}
                                                     class="h-18 w-18 object-contain transition-transform duration-300 group-hover:scale-110"
                                                 />
