@@ -66,6 +66,14 @@ function includeInSitemap(page) {
 }
 
 export default defineConfig({
+    image: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "res.cloudinary.com",
+            },
+        ],
+    },
     site: SITE_URL,
 
     integrations: [
