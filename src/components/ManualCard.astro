@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import { getMediaUrl } from "../lib/media";
 import { formatLabel } from "../lib/format";
 
@@ -24,8 +25,9 @@ const estadoEditorial = manual.discontinuado
     <div class="h-40 overflow-hidden bg-slate-800">
         {
             imagenUrl && (
-                <img
+                <Image
                     src={imagenUrl}
+                    inferSize
                     alt={manual.titulo}
                     class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
                 />
