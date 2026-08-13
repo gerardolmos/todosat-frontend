@@ -3,6 +3,7 @@ import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import { getManuales } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
+import { getImage } from "astro:assets";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
@@ -30,7 +31,19 @@ const estadoEditorial = manual.discontinuado
       : null;
 
 const archivoPdfUrl = getMediaUrl(manual.archivo_pdf);
-const imagenUrl = getMediaUrl(manual.imagen_portada);
+
+const imagenOrigenUrl = getMediaUrl(manual.imagen_portada);
+const imagenOptimizada = imagenOrigenUrl
+    ? await getImage({
+          src: imagenOrigenUrl,
+          inferSize: true,
+      })
+    : null;
+
+const imagenUrl = imagenOptimizada?.src ?? null;
+const imagenWidth = imagenOptimizada?.attributes.width;
+const imagenHeight = imagenOptimizada?.attributes.height;
+
 const contenidoHTML = renderBlocks(manual.contenido);
 const marcas = manual.operadores || [];
 const modelos = manual.hardwares || [];
@@ -67,6 +80,9 @@ function toIsoDate(value: unknown) {
 const manualTitle = String(manual.titulo || "").trim();
 const manualPath = `/manuales/${manual.slug}`;
 const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const imagenSeoUrl = imagenUrl
+    ? new URL(imagenUrl, siteUrl).toString()
+    : null;
 const manualUrl = new URL(`${manualPath}/`, siteUrl).toString();
 const homeUrl = new URL("/", siteUrl).toString();
 const manualsUrl = new URL("/manuales/", siteUrl).toString();
@@ -104,11 +120,11 @@ const structuredData = {
             mainEntity: {
                 "@id": `${manualUrl}#document`,
             },
-            ...(imagenUrl
+            ...(imagenSeoUrl
                 ? {
                       primaryImageOfPage: {
                           "@type": "ImageObject",
-                          url: imagenUrl,
+                          url: imagenSeoUrl,
                       },
                   }
                 : {}),
@@ -124,7 +140,7 @@ const structuredData = {
             name: manualTitle,
             description: manual.descripcion,
             url: manualUrl,
-            ...(imagenUrl ? { image: [imagenUrl] } : {}),
+            ...(imagenSeoUrl ? { image: [imagenSeoUrl] } : {}),
             ...(manual.idioma
                 ? {
                       inLanguage: formatLabel(manual.idioma),
@@ -265,6 +281,8 @@ const structuredData = {
                         <div class="overflow-hidden">
                             <img
                                 src={imagenUrl}
+                                width={imagenWidth}
+                                height={imagenHeight}
                                 alt={manual.titulo}
                                 class="h-[320px] w-full object-contain lg:h-[420px]"
                             />

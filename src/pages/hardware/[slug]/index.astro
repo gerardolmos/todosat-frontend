@@ -3,6 +3,7 @@ import Layout from "../../../layouts/Layout.astro";
 import Container from "../../../components/Container.astro";
 import { getHardwares, getNoticias, getManuales } from "../../../lib/content";
 import { renderBlocks } from "../../../lib/renderBlocks";
+import { getImage } from "astro:assets";
 import { getMediaUrl } from "../../../lib/media";
 import RelatedCard from "../../../components/RelatedCard.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
@@ -30,8 +31,41 @@ const estadoEditorial = modelo.discontinuado
       : null;
 
 const contenidoHTML = renderBlocks(modelo.descripcion_completa);
-const imagenUrl = getMediaUrl(modelo.imagen_principal);
+
+const imagenOrigenUrl = getMediaUrl(modelo.imagen_principal);
+const imagenOptimizada = imagenOrigenUrl
+    ? await getImage({
+          src: imagenOrigenUrl,
+          inferSize: true,
+      })
+    : null;
+
+const imagenUrl = imagenOptimizada?.src ?? null;
+const imagenWidth = imagenOptimizada?.attributes.width;
+const imagenHeight = imagenOptimizada?.attributes.height;
+
 const galeria = modelo.galeria || [];
+
+const galeriaOptimizada = (
+    await Promise.all(
+        galeria.map(async (imagen: any) => {
+            const origenUrl = getMediaUrl(imagen);
+
+            if (!origenUrl) return null;
+
+            const optimizada = await getImage({
+                src: origenUrl,
+                inferSize: true,
+            });
+
+            return {
+                src: optimizada.src,
+                width: optimizada.attributes.width,
+                height: optimizada.attributes.height,
+            };
+        }),
+    )
+).filter(Boolean);
 
 const articulos = (await getNoticias()).filter((articulo: any) =>
     articulo.hardwares?.some(
@@ -98,6 +132,9 @@ function toIsoDate(value: unknown) {
 
 const hardwarePath = `/hardware/${modelo.slug}`;
 const siteUrl = Astro.site ?? new URL("https://todosatcom.com");
+const imagenSeoUrl = imagenUrl
+    ? new URL(imagenUrl, siteUrl).toString()
+    : null;
 const hardwareUrl = new URL(`${hardwarePath}/`, siteUrl).toString();
 const homeUrl = new URL("/", siteUrl).toString();
 const hardwareListUrl = new URL("/hardware/", siteUrl).toString();
@@ -122,11 +159,11 @@ const structuredData = {
             mainEntity: {
                 "@id": `${hardwareUrl}#product`,
             },
-            ...(imagenUrl
+            ...(imagenSeoUrl
                 ? {
                       primaryImageOfPage: {
                           "@type": "ImageObject",
-                          url: imagenUrl,
+                          url: imagenSeoUrl,
                       },
                   }
                 : {}),
@@ -142,7 +179,7 @@ const structuredData = {
             name: modelo.nombre,
             description: modelo.descripcion_corta,
             url: hardwareUrl,
-            ...(imagenUrl ? { image: [imagenUrl] } : {}),
+            ...(imagenSeoUrl ? { image: [imagenSeoUrl] } : {}),
             ...(modelo.tipo_hardware
                 ? { category: modelo.tipo_hardware }
                 : {}),
@@ -290,6 +327,8 @@ const structuredData = {
                                 <div class="border-b border-slate-200 bg-slate-950">
                                     <img
                                         src={imagenUrl}
+                                        width={imagenWidth}
+                                        height={imagenHeight}
                                         alt={modelo.nombre}
                                         class="h-[280px] w-full object-contain md:h-[520px]"
                                     />
@@ -348,19 +387,17 @@ const structuredData = {
                                     </h2>
 
                                     <div class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                                        {galeria.map((imagen: any) => {
-                                            const url = getMediaUrl(imagen);
-
-                                            return url ? (
-                                                <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
-                                                    <img
-                                                        src={url}
-                                                        alt={modelo.nombre}
-                                                        class="h-64 w-full object-cover"
-                                                    />
-                                                </div>
-                                            ) : null;
-                                        })}
+                                        {galeriaOptimizada.map((imagen: any) => (
+                                            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm">
+                                                <img
+                                                    src={imagen.src}
+                                                    width={imagen.width}
+                                                    height={imagen.height}
+                                                    alt={modelo.nombre}
+                                                    class="h-64 w-full object-cover"
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
                                 </section>
                             )
