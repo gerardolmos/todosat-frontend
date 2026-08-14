@@ -8,6 +8,16 @@ import { getMediaUrl } from "../lib/media";
 
 const { marcas = [] } = Astro.props;
 
+const [
+	coberturaIconOptimized,
+	velocidadIconOptimized,
+	latenciaIconOptimized,
+] = await Promise.all([
+	getImage({ src: coberturaIcon, width: 168, format: "png" }),
+	getImage({ src: velocidadIcon, width: 168, format: "png" }),
+	getImage({ src: latenciaIcon, width: 168, format: "png" }),
+]);
+
 
 function getExternalUrl(url: string | null | undefined) {
 	if (!url) return null;
@@ -67,17 +77,17 @@ async function getOperatorData(marca: any) {
 			{
 				title: "Cobertura",
 				description: cobertura,
-				icon: coberturaIcon.src,
+				icon: coberturaIconOptimized.src,
 			},
 			{
 				title: "Velocidad",
 				description: velocidad,
-				icon: velocidadIcon.src,
+				icon: velocidadIconOptimized.src,
 			},
 			{
 				title: "Latencia",
 				description: latencia,
-				icon: latenciaIcon.src,
+				icon: latenciaIconOptimized.src,
 			},
 		],
 	};
