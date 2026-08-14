@@ -372,9 +372,9 @@ const structuredData = {
 		<section class="bg-slate-950">
 			<Container>
 				<HomeOperatorsSection marcas={operadoresHome} />
-				<SectionDivider />
+				{operadoresHome.length > 0 && <SectionDivider />}
 				<HomeFeaturedSection destacados={destacados} />
-				<SectionDivider />
+				{destacados.length > 0 && <SectionDivider />}
 				<HomeArticlesSection articulos={noticias} />
 				<SectionDivider />
 				<HomeModelsSection modelos={hardwares} />
