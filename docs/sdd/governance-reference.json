@@ -1,0 +1,10 @@
+{
+  "authority_repository": "todosat-backend",
+  "authority_path": ".specify/memory/constitution.md",
+  "constitution_version": "2.0.0",
+  "ratified_at": "2026-10-08",
+  "sha256": "496e689579ec2bd9340d9b311ea36ee69e084c47309547d2af02fe1184cb14d7",
+  "status": "controlled-copy",
+  "authority_commit": null,
+  "transition_status": "in-progress"
+}
