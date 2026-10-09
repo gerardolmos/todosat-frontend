@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@source not "../../.specify/**";
+@source not "../../.agents/skills/speckit-*/**";
+@source not "../../docs/sdd/**";
+@source not "../../AGENTS.md";
+@source not "../../specs/**";
 
 @font-face {
     font-family: "Inter";
