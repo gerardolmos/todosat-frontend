@@ -2,7 +2,7 @@
 
 Constitution local es copia controlada de todosat-backend. Verificar versión, SHA-256 y procedencia en governance-reference.json; no editar originalmente. La gobernanza común se custodia en backend; transición EN CURSO, aún sin cierre operativo.
 
-Consultar risks.md, production-gates.md, backlog.md y adr/ en docs/sdd de todosat-backend por revisión identificada. authority_commit permanece null: esta migración no tiene commit de origen nuevo. Hasta existir revisión publicada, identificar el snapshot local exacto mediante su hash y registro de migración; no tratar el HEAD anterior como si incluyera los documentos nuevos. Si no se puede identificar o acceder a la revisión aplicable, detener trabajo afectado.
+Consultar risks.md, production-gates.md, backlog.md y adr/ en docs/sdd de todosat-backend por revisión identificada. La revisión autoritativa publicada es `7aa335dd901ca87b5f1f28aa2eb0d5c040074473`, registrada en `governance-reference.json`; verificar su contenido y el hash de la Constitution. La transición permanece EN CURSO hasta la aceptación final de Gerard. Si no se puede identificar o acceder a la revisión aplicable, detener trabajo afectado.
 
 Documentos frontend-only permanecen en este repositorio; SPEC/PLAN/TASKS/QA por feature en specs/. No duplicar riesgos ni decisiones comunes. Para cross-repo, SPEC global única en coordinador y referencia local por repo/ruta/revisión. No asumir rutas hermanas.
 
