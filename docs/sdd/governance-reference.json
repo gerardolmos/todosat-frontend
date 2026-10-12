@@ -5,6 +5,6 @@
   "ratified_at": "2026-10-08",
   "sha256": "496e689579ec2bd9340d9b311ea36ee69e084c47309547d2af02fe1184cb14d7",
   "status": "controlled-copy",
-  "authority_commit": "7aa335dd901ca87b5f1f28aa2eb0d5c040074473",
-  "transition_status": "in-progress"
+  "authority_commit": "6a626c9728bedacd35748cf1102ffd1df3fd0b0d",
+  "transition_status": "complete"
 }
