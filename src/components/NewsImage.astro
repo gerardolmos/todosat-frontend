@@ -1,0 +1,7 @@
+---
+const {src,width,height,alt='',caption} = Astro.props;
+---
+<figure class="m-0 border-b border-slate-200 bg-white">
+    <img src={src} width={width} height={height} alt={alt} class="block h-auto max-h-[550px] w-full object-cover object-center" />
+    {typeof caption === 'string' && caption.trim() && <figcaption class="px-6 py-3 leading-6" style="font-size:14px;color:#475569;overflow-wrap:anywhere;white-space:pre-line">{caption}</figcaption>}
+</figure>

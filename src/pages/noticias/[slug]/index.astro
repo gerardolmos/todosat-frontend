@@ -1,4 +1,6 @@
 ---
+import NewsImage from "../../../components/NewsImage.astro";
+import { resolveNewsImages } from "../../../lib/news-media";
 import Layout from "../../../layouts/Layout.astro";
 import { getNoticias } from "../../../lib/content";
 import { renderBlocks, getReadingTime } from "../../../lib/renderBlocks";
@@ -23,7 +25,12 @@ export async function getStaticPaths() {
 
 const { articulo } = Astro.props as any;
 
-const contenidoHTML = renderBlocks(articulo.contenido);
+const images = await resolveNewsImages(articulo.contenido, { diagnose: message => console.warn(message) });
+for (const image of images.values()) {
+    if (typeof image.url === 'string' && /^\/(?!\/)/.test(image.url)) image.url = getMediaUrl(image);
+}
+if (articulo.imagen_principal && !Object.hasOwn(articulo.imagen_principal, 'caption')) console.warn('[editorial-caption] source=main caption-field=absent');
+const contenidoHTML = renderBlocks(articulo.contenido, { images });
 
 const imagenOrigenUrl = getMediaUrl(articulo.imagen_principal);
 const imagenOptimizada = imagenOrigenUrl
@@ -274,15 +281,7 @@ const structuredData = {
                     >
                         {
                             imagenUrl && (
-                                <div class="border-b border-slate-200 bg-slate-950">
-                                    <img
-                                        src={imagenUrl}
-                                        width={imagenWidth}
-                                        height={imagenHeight}
-                                        alt={articulo.titulo}
-                                        class="h-[280px] w-full object-contain md:h-[520px]"
-                                    />
-                                </div>
+                                <NewsImage src={imagenUrl} width={imagenWidth} height={imagenHeight} alt={articulo.imagen_principal?.alternativeText ?? articulo.titulo} caption={articulo.imagen_principal?.caption} />
                             )
                         }
 

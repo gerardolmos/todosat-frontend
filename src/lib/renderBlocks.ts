@@ -1,10 +1,19 @@
-export function renderBlocks(blocks: any[]) {
+export function renderBlocks(blocks: any[], options: { images?: Map<number, any> } = {}) {
     if (!blocks || !Array.isArray(blocks)) {
         return '';
     }
 
     return blocks
-        .map((block) => {
+        .map((block, index) => {
+            if (block.type === 'image' && options.images) {
+                const image = options.images.get(index);
+                const url = image?.url;
+                if (typeof url !== 'string' || !/^(https?:\/\/|\/(?!\/))/.test(url) || /[\u0000-\u0020\\]/.test(url)) return '';
+                const escape = (value: string) => value.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
+                const caption = typeof image.caption === 'string' ? image.caption : '';
+                const dimensions = ['width','height'].filter(k => Number.isFinite(image[k]) && image[k] > 0).map(k => ` ${k}="${image[k]}"`).join('');
+                return `<figure class="my-6"><img src="${escape(url)}" alt="${escape(image.alt || '')}"${dimensions} class="block max-w-full h-auto mx-auto" loading="lazy">${caption.trim() ? `<figcaption style="font-size:14px;color:#475569;overflow-wrap:anywhere;white-space:pre-line" class="mt-2 leading-6">${escape(caption)}</figcaption>` : ''}</figure>`;
+            }
             if (block.type === 'paragraph') {
                 return `<p class="mb-4 text-[1.05rem] font-normal leading-8">${renderChildren(block.children)}</p>`;
             }

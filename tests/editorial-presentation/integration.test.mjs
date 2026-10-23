@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';
+const lab=(await readFile('/private/tmp/todosat-editorial-latest.txt','utf8')).trim();
+const html=await readFile(lab+'/dist/noticias/noticia-ficticia/index.html','utf8');
+test('main caption and historical block caption rendered literally',()=>{assert.ok(html.includes('Caption principal &lt;literal&gt;'));assert.ok(html.includes('Caption histórico &lt;script&gt;literal&lt;/script&gt;'));assert.ok(!html.includes('fixture-token-not-secret'));assert.ok(!html.includes('h-[280px]'));assert.ok(html.indexOf('Antes')<html.indexOf('Caption histórico'));});
+test('caption contrast on white exceeds 4.5:1',()=>{const lum=hex=>{const a=hex.match(/../g).map(x=>parseInt(x,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return a[0]*.2126+a[1]*.7152+a[2]*.0722;};assert.ok(1.05/(lum('475569')+.05)>=4.5);});
+for(const slug of ['vertical','cuadrada','sin-imagen'])test('fixture builds '+slug,async()=>{const page=await readFile(lab+'/dist/noticias/'+slug+'/index.html','utf8');assert.ok(!page.includes('fixture-token-not-secret'));if(slug==='sin-imagen')assert.ok(!page.includes('<figcaption'));else assert.ok(page.includes('<figcaption'));});
+
+test('main image alone uses centered cover capped at 550px',()=>{const figure=html.match(/<figure[^>]*>[\s\S]*?<\/figure>/)?.[0];assert.ok(figure);assert.ok(figure.includes('max-h-[550px]'));assert.ok(figure.includes('object-cover'));assert.ok(figure.includes('object-center'));assert.ok(figure.includes('<figcaption'));const body=html.slice(html.indexOf('Antes'));assert.ok(!body.includes('max-h-[550px]'));});
