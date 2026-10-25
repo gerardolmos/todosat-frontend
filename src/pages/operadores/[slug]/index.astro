@@ -330,7 +330,7 @@ const structuredData = {
                             <div>
                                 {
                                     imagenPortadaUrl && (
-                                        <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 p-3 shadow-2xl">
+                                        <div class="relative aspect-[16/11] overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 shadow-2xl">
                                             <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(78,161,255,0.18),transparent_55%)]" />
 
                                             <img
@@ -338,7 +338,7 @@ const structuredData = {
                                                 width={imagenPortadaWidth}
                                                 height={imagenPortadaHeight}
                                                 alt={marca.nombre}
-                                                class="relative aspect-[16/11] w-full rounded-2xl object-contain"
+                                                class="absolute inset-0 h-full w-full object-cover object-center"
                                             />
 
                                             <div class="absolute bottom-6 left-6 z-10 flex flex-wrap gap-3">
