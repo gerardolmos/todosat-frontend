@@ -1,4 +1,5 @@
 ---
+import { selectFeaturedNews } from "../lib/news-home";
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
 import {
@@ -28,14 +29,7 @@ const manuales = todosManuales.slice(0, 7);
 const operadoresHome = await getOperadoresHome();
 const operadoresBusqueda = await getOperadores();
 
-const noticias = todosNoticias
-
-	.sort(
-		(a: any, b: any) =>
-			new Date(b.fecha_publicacion).getTime() -
-			new Date(a.fecha_publicacion).getTime(),
-	)
-	.slice(0, 7);
+const noticias = selectFeaturedNews(todosNoticias);
 
 function limpiarTexto(valor: any) {
 	return String(valor || "")

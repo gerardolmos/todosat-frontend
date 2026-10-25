@@ -104,6 +104,12 @@ const metricas = [
 
 const detallesTecnicos = [
     {
+        title: "Bandas de frecuencia",
+        value: typeof marca.bandas_frecuencia === "string" ? marca.bandas_frecuencia.trim() : "",
+        text: undefined,
+        icon: null,
+    },
+    {
         title: "Cobertura",
         value: marca.cobertura,
         text: marca.cobertura_descripcion,
@@ -395,11 +401,11 @@ const structuredData = {
                                     {detallesTecnicos.map((item) => (
                                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
                                             <div class="mb-4 flex items-center gap-3">
-                                                <img
+                                                {item.icon && <img
                                                     src={item.icon.src}
                                                     alt={item.title}
                                                     class="h-12 w-12 object-contain"
-                                                />
+                                                />}
 
                                                 <h3 class="text-xl font-bold text-slate-950">
                                                     {item.title}:

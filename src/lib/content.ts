@@ -49,7 +49,7 @@ export async function getOperadoresHome() {
 
 export async function getNoticias() {
     const data = await fetchAllAPI(
-        "/api/noticias?populate[imagen_principal]=true&populate[categoria_noticia]=true&populate[operadores][populate][imagen_portada]=true&populate[operadores][populate][logo]=true&populate[hardwares][populate][imagen_principal]=true&populate[manuales][populate][imagen_portada]=true"
+        "/api/noticias?status=published&populate[imagen_principal]=true&populate[categoria_noticia]=true&populate[operadores][populate][imagen_portada]=true&populate[operadores][populate][logo]=true&populate[hardwares][populate][imagen_principal]=true&populate[manuales][populate][imagen_portada]=true"
     );
 
     return data.data

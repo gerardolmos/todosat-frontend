@@ -24,3 +24,7 @@ if (!storeEnabled) {
         "[postbuild] Tienda desactivada: dist/tienda eliminado.",
     );
 }
+
+// Category transitions are enabled only when their new pages exist in this build.
+const { writeNewsCategoryRedirects } = await import('./news-category-redirects.mjs');
+await writeNewsCategoryRedirects(resolve('dist'));
