@@ -49,3 +49,15 @@ Revisión final: diff funcional idéntico al hash arriba; únicamente dos archiv
 Servidor identificado mediante comando completo: Python http.server 14390, bind 127.0.0.1, directorio exacto del laboratorio indicado arriba. Detenido exclusivamente mediante SIGTERM al PID 1690. No se afectan otros servidores.
 
 Publicación futura: autorización independiente para commit selectivo, push y despliegue con controles vigentes; preservar y separar los cambios pendientes de 008/009 e incluir el SVG original requerido. Este PASS acredita exclusivamente cierre local, no producción.
+
+
+## Publicación y aceptación productiva — 2026-10-27
+
+Feature 010 publicada mediante commit `5b21b576b6526c7849d99fef46f6f2671c37b571`, GitHub main confirmado y Netlify published_deploy `6ae09df1955bb0c9118c581c` ready con SHA idéntico. El propietario aprueba personalmente pictograma y dimensiones/posición/presentación del logo grande en la web publicada, sin incidencias en secciones o navegación. No se repite QA.
+
+El cierre conjunto y la distinción entre evidencia manual productiva, build ficticio y limitación HTTP 401 constan en [QA de publicación conjunta](../009-home-news-sections/qa.md#publicación-conjunta-009--010--2026-10-27). Integridad de Feature 008 confirmada; Git 0/0 e índice vacío antes de esta actualización documental. Estado local PASS y despliegue PASS; el STOP técnico inicial queda resuelto por el cierre postdeploy definitivo del 2026-10-27. Sin nuevos commits, pushes, despliegues o cambios de código.
+
+
+## Cierre postdeploy definitivo — PASS
+
+El propietario confirma robots noindex,nofollow y cero coincidencias de cookiebot, google-analytics, googletagmanager y adsbygoogle en el HTML inicial de la portada autenticada. Evidencia manual, distinta del QA aislado y de la consulta HTTP 401 de Codex. Alcance y límites precisos en [cierre conjunto](../009-home-news-sections/qa.md#cierre-postdeploy-definitivo-009--010--2026-10-27). No quedan bloqueos acordados; no se atribuye inspección dinámica ni comprobaciones manuales adicionales. Feature 008 íntegra, sin operaciones productivas nuevas.

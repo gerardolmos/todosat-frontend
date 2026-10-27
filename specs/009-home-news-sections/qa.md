@@ -46,3 +46,36 @@ Servidor temporal de revisión finalizado mediante la sesión exacta 30084 cread
 ## Resultado de CONVERGE local
 Skill local speckit-converge aplicada tras IMPLEMENT: 8 requisitos, 4 criterios de éxito, 9 escenarios de aceptación y 14 tareas revisados contra los tres archivos de producto y las evidencias QA. Diseño mínimo y restricciones constitucionales satisfechos en el alcance local. Cero hallazgos missing/partial/contradicts/unrequested; cero tareas añadidas. Sin hooks configurados ni operaciones externas requeridas. Tras registrar T012, CONVERGE no modifica tasks.md ni crea una fase vacía.
 Resultado: PASS / converged. No constituye publicación ni autorización para ella. Para publicar: autorización expresa del propietario, preparación de un commit exclusivo de 009 separado del diff de 008, y controles de publicación aplicables antes de push/deploy. No se crean commits, PR, pushes ni despliegues aquí. Producción y backend intactos.
+
+
+## Publicación conjunta 009 + 010 — 2026-10-27
+
+Push único autorizado completado. GitHub main confirmado mediante ls-remote en `5b21b576b6526c7849d99fef46f6f2671c37b571`; padre 009 `42518e9b5c184f32e6c5d8f41f5949fd325e0996`. Netlify, sitio exquisite-gelato-5c153c: published_deploy `6ae09df1955bb0c9118c581c`, state ready, commit_ref idéntico al autorizado, published_at 2026-10-27T12:50:37.539Z. Metadatos reconfirmados tras la respuesta del propietario. Correspondencia commit/deploy: PASS.
+
+**Evidencia manual sobre producción: PASS.** El propietario confirma desde su sesión autenticada: destacadas máximo cuatro sin tarjeta de archivo; noticias generales máximo siete con tarjeta única; recomendaciones mixtas conservadas; pictograma de bandas correcto; tamaño/posición/presentación del logo grande correctos; resto de secciones y navegación sin incidencias observadas. No se repite ni amplía el alcance de esta declaración.
+
+**Evidencia técnica del artefacto aislado: PASS.** Preflight previo desde git archive del SHA autorizado, sin archivos locales de 008: compilación y postbuild acreditados, 51 HTML con noindex,nofollow bajo PUBLIC_SITE_INDEXING=false; ambas secciones, recomendaciones, pictograma y clases del logo presentes; sin SDK Cookiebot, Analytics, AdSense ni controles exclusivos de 008. No se repite el build ni se equipara este artefacto ficticio con el HTML productivo.
+
+**Configuración de Netlify:** rama main, npm run build, dist y PUBLIC_SITE_INDEXING=false en Production confirmados manualmente por el propietario antes del push. La API consultada no expuso esos ajustes; no se atribuye confirmación API del valor efectivo.
+
+**Inspección HTTP de Codex: LIMITACIÓN conservada.** La petición recibió HTTP 401; Codex no inspeccionó directamente el HTML productivo. La evidencia manual posterior del propietario se registra en el cierre definitivo siguiente, sin convertirla en inspección automatizada.
+
+**Preservación:** 233 archivos excluidos comparados con sus huellas previas a commits: intactos, incluida Feature 008; índice vacío, main sincronizada 0/0. Solo se actualiza documentación de cierre de 009/010 sin commit adicional. No cambios de backend, datos o configuración ni nuevos pushes/deploys.
+
+**Estado anterior: STOP de cierre técnico**, resuelto por la evidencia manual posterior documentada a continuación. No hubo fallo funcional ni de despliegue.
+
+
+## Cierre postdeploy definitivo 009 + 010 — 2026-10-27
+
+**Resultado global: PASS dentro de los criterios acordados para este despliegue.**
+
+El propietario confirma inspección personal del código fuente HTML inicial de la portada publicada, desde sesión autenticada:
+- Robots `<meta name="robots" content="noindex, nofollow">`: PASS. El propietario comunica evidencia mediante captura; no se atribuye a Codex revisión de una captura adjunta en esta actualización.
+- Búsquedas `cookiebot`, `google-analytics`, `googletagmanager`, `adsbygoogle`: cero coincidencias comunicadas por el propietario. Evidencia limitada al HTML inicial de la portada, no auditoría de red, ejecución diferida o todas las rutas.
+- La validación funcional productiva de las seis comprobaciones permanece PASS según aprobación anterior; no repetida.
+
+Se combinan tres fuentes explícitamente separadas: (1) inspección manual del HTML inicial y aceptación funcional productiva; (2) QA del artefacto aislado del SHA autorizado, sin SDK ni controles de 008, y exclusión de sus archivos en los commits; (3) metadatos ya confirmados de GitHub main `5b21b576b6526c7849d99fef46f6f2671c37b571` y deploy Netlify publicado `6ae09df1955bb0c9118c581c` del mismo SHA. La ausencia de controles de 008 se sustenta en exclusión de código y artefacto aislado, no en una búsqueda manual adicional que el usuario no haya comunicado.
+
+No quedan bloqueos dentro del alcance acordado. Persisten como límites de evidencia, no como PASS extendido, el HTTP 401 de Codex y la ausencia de inspección de ejecución dinámica/terceros en toda la web. No se afirma haber realizado esas comprobaciones.
+
+Preservación nuevamente comprobada contra huellas: 233 archivos excluidos intactos, incluida Feature 008. Esta actuación modifica exclusivamente qa.md de 009 y 010. Sin código, datos, configuración, builds, QA repetido, commits, pushes, despliegues ni rollbacks.
