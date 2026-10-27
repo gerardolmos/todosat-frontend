@@ -1,5 +1,5 @@
 ---
-import { selectFeaturedNews } from "../lib/news-home";
+import { selectHomeNews } from "../lib/news-home";
 import Layout from "../layouts/Layout.astro";
 import Container from "../components/Container.astro";
 import {
@@ -29,7 +29,7 @@ const manuales = todosManuales.slice(0, 7);
 const operadoresHome = await getOperadoresHome();
 const operadoresBusqueda = await getOperadores();
 
-const noticias = selectFeaturedNews(todosNoticias);
+const { featured, recent } = selectHomeNews(todosNoticias);
 
 function limpiarTexto(valor: any) {
 	return String(valor || "")
@@ -369,7 +369,13 @@ const structuredData = {
 				{operadoresHome.length > 0 && <SectionDivider />}
 				<HomeFeaturedSection destacados={destacados} />
 				{destacados.length > 0 && <SectionDivider />}
-				<HomeArticlesSection articulos={noticias} />
+				{featured.length > 0 && (
+                    <>
+                        <HomeArticlesSection articulos={featured} title="Noticias destacadas" showArchiveCard={false} />
+                        <SectionDivider />
+                    </>
+                )}
+                <HomeArticlesSection articulos={recent} title="Noticias" showArchiveCard={true} />
 				<SectionDivider />
 				<HomeModelsSection modelos={hardwares} />
 				<SectionDivider />

@@ -1,0 +1,6 @@
+# Contrato de presentación Home
+Una lectura published/activo ya existente; API sin cambios. Selector nuevo selectHomeNews devuelve {featured, recent} conforme a data-model.md. Export histórico selectFeaturedNews no cambia ni se usa en Home nueva.
+HomeArticlesSection recibe articulos, title y showArchiveCard. Instancia featured: título Noticias destacadas, false, solo con resultados. Instancia recent: Noticias, true, incluso vacía. Conservar cuerpo literal y clases de CTA existente, href=/noticias; ninguna tarjeta nueva. ArticleCard sin cambios.
+Operadores → Recomendados por TodoSatcom → featured → recent → Hardware → Manuales; hero/búsqueda y demás elementos intactos. Preservar invocación/import/getDestacados, condición de visibilidad y separador de Recomendados en index; mantener funciones/componentes/colección.
+Aceptación: 0/1/4/>4 destacadas; generales 0..7; quinta destacada elegible entre generales; documentos repetidos y fechas iguales con entrada permutada; inactivos excluidos; tarjeta exactamente una vez después de recent; Recomendados intacto en su ubicación actual; igualdad de markup/clases CTA y de bloques ajenos con la base.
+Errores de API conservan política existente. Sin cambios en permisos/default false/datos. Este contrato nuevo sustituye solo selección Home del contrato 006, cuyo archivo permanece intacto.
